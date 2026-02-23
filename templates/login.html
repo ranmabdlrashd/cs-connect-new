@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - CS Connect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <div class="login-left">
+        <h1>Welcome to <br> 
+            CS CONNECT</h1>
+        <p>Department of Computer Science & Engineering<br>
+        Access for students,faculties and staff.</p>
+    </div>
+
+    <div class="login-right">
+        <h2>User Login</h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+
+            <div class="input-box">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+
+            <div class="input-box">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+            <p style="margin-top:15px;">
+    New user?
+    <a href="{{ url_for('register') }}">Create an account</a>
+</p>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+
+<!-- ADD THIS LINE -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <title>CS Connect | Home</title>
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}" />
 </head>
 <body>
-    <section class="stats-strip">
-        <div class="stat-item">
-            <span class="stat-number" data-target="1500">0</span>
-            <p>STUDENTS</p>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" data-target="60">0</span>
-            <p>FACULTY</p>
-        </div>
-    </section>
+   
 
     <div class="chatbot-float" onclick="toggleChat()">...</div>
     <div class="chat-window" id="chatWindow">...</div>
@@ -29,34 +26,21 @@
 
     <nav>
     <div class="logo">
-        <div style="
-            width: 40px;
-            height: 40px;
-            background: var(--primary-red);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            font-size: 10px;
-        ">
-            AISAT
-        </div>
+       <img src="static/media/aisat_logo.png" 
+       alt="AISAT Logo" 
+       style="width: 40px; height: 40px; object-fit: contain; margin-right: 10px;"> 
         AISAT CSE
     </div>
     <ul class="nav-links">
         <li><a href="indexn.html">Home</a></li>
-        <li><a href="about/about-aisat.html">About AISAT</a></li>
-        <li><a href="about/about-cse.html">About CSE</a></li>
-        <li><a href="academics/academics.html">Academics</a></li>
-        <li><a href="faculty/faculty.html">Faculty</a></li>
-        
+        <a href="{{ url_for('about_aisat') }}">About AISAT</a>
+        <a href="{{ url_for('about_cse') }}">About CSE</a>
+        <a href="{{ url_for('academics') }}">Academics</a>
+        <li><a href="{{ url_for('faculty') }}">Faculty</a></li>
         <li><a href="placements.html">Placements</a></li>
-        
         <li><a href="library/library.html">Library</a></li>
-        <li><a href="chatbot/chatbot.html">Chatbot</a></li>
     </ul>
-    <a href="#login" class="btn-login">Login</a>
+    <li><a href="{{ url_for('login') }}" class="btn-login">Login</a></li>
 </nav>
 
     <section class="hero" id="home">
@@ -152,18 +136,11 @@
       </div>
       <div class="faculty-image-container reveal">
         <div class="faculty-card">
-          <div
-            style="
-              height: 250px;
-              background: #ddd;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #333;
-            "
+          <img 
+            src="static/media/hod.jpg" 
+            alt="Dr. Jeswin Roy Decouth" 
+            style="width: 100%; height: 250px; object-fit: cover; border-radius: 4px;"
           >
-            [Image: Dr. Jeswin Roy Decouth]
-          </div>
           <h3 style="margin-top: 15px">Dr. Jeswin Roy Decouth</h3>
           <p style="color: var(--primary-red); font-weight: bold">
             HOD & Associate Professor
@@ -223,17 +200,6 @@
       </div>
     </section>
 
-    <section class="library-search reveal" id="library">
-      <h2>Department Library</h2>
-      <p style="color: var(--taupe-brown); margin-top: 10px">
-        Search for books, journals, and project reports.
-      </p>
-      <div class="search-bar">
-        <input type="text" placeholder="Search by Title, Author, or ISBN..." />
-        <button>Search Library</button>
-      </div>
-    </section>
-
     <footer>
       <div>
         <h4>AISAT CSE</h4>
@@ -261,9 +227,6 @@
       </div>
     </footer>
 
-    <div class="chatbot-float" onclick="toggleChat()">💬</div>
-
-    <div class="chat-window" id="chatWindow">
       <div class="chat-header">AISAT Assistant</div>
       <div class="chat-body">
         <p>Hello! How can I assist you with the CSE department today?</p>
@@ -329,15 +292,6 @@
       });
       statsObserver.observe(statsSection);
 
-      // 3. CHATBOT TOGGLE
-      function toggleChat() {
-        var chat = document.getElementById("chatWindow");
-        if (chat.style.display === "flex") {
-          chat.style.display = "none";
-        } else {
-          chat.style.display = "flex";
-        }
-      }
     </script>
     <!-- ========================================
      FLOATING CHATBOT WIDGET

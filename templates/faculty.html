@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS Connect | Page Name</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}" />
 </head>
@@ -25,13 +26,12 @@
     </div>
     <ul class="nav-links">
         <li><a href="../indexn.html">Home</a></li>
-        <li><a href="../about/about-aisat.html">About AISAT</a></li>
+        <a href="{{ url_for('about_aisat') }}">About AISAT</a>
         <li><a href="../about/about-cse.html">About CSE</a></li>
-        <li><a href="../academics/academics.html">Academics</a></li>
-        <li><a href="../faculty/faculty.html">Faculty</a></li>
+        <a href="{{ url_for('academics') }}">Academics</a>
+        <li><a href="{{ url_for('faculty') }}">Faculty</a></li>
         <li><a href="../placements.html">Placements</a></li>
         <li><a href="../library/library.html">Library</a></li>
-        <li><a href="../chatbot/chatbot.html">Chatbot</a></li>
     </ul>
     <a href="#login" class="btn-login">Login</a>
 </nav>
@@ -53,15 +53,7 @@
     <section class="hod-section">
       <div class="container">
         <div class="hod-card reveal">
-          <div class="hod-image">
-            <img
-              src="images/faculty/hod-placeholder.jpg"
-              alt="Dr. Jeswin Roy Decouth"
-              onerror="
-                this.src =
-                  'https://via.placeholder.com/250x300/A41F13/FFFFFF?text=HOD'
-              "
-            />
+          <img src="{{ url_for('static', filename='media/hod.jpg') }}" alt="HOD">
             <div class="hod-badge">Head of Department</div>
           </div>
           <div class="hod-info">
