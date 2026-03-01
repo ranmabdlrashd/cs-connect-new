@@ -1,17 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CS Connect | Academics</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/academics.css') }}">
-</head>
-<script>
-function toggleAccordion(header) {
-  const accordion = header.parentElement;
-  accordion.classList.toggle("active");
-}
-</script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/academics.css') }}"
+    />
+  </head>
   <body>
     <!-- News Ticker -->
     <div class="news-ticker">
@@ -25,21 +22,22 @@ function toggleAccordion(header) {
     <!-- Navigation -->
     <nav class="navbar">
       <div class="nav-container">
-      <div class="logo">AISAT CSE</div>
-
-       <ul class="nav-links">
-         <li><a href="{{ url_for('home') }}">Home</a></li>
+        <div class="logo">AISAT CSE</div>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('about_aisat') }}">About AISAT</a></li>
           <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
-          <li><a href="{{ url_for('academics') }}">Academics</a></li>
+          <li>
+            <a href="{{ url_for('academics') }}" class="active">Academics</a>
+          </li>
           <li><a href="{{ url_for('faculty') }}">Faculty</a></li>
           <li><a href="#">Placements</a></li>
           <li><a href="{{ url_for('library') }}">Library</a></li>
         </ul>
+        <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+      </div>
+    </nav>
 
-    <a href="{{ url_for('login') }}" class="btn-login">Login</a>
-  </div>
-</nav>
     <!-- Page Header -->
     <section class="page-header">
       <div class="header-overlay">
@@ -50,7 +48,7 @@ function toggleAccordion(header) {
       </div>
     </section>
 
-    <!-- Programs Offered Section -->
+    <!-- Programs Section -->
     <section class="programs-section">
       <div class="container">
         <div class="section-header">
@@ -60,9 +58,7 @@ function toggleAccordion(header) {
 
         <!-- B.Tech Card -->
         <div class="program-card reveal">
-          <div class="program-icon">
-            <span class="icon-grad">🎓</span>
-          </div>
+          <div class="program-icon"><span class="icon-grad">🎓</span></div>
           <div class="program-content">
             <h3>B.Tech in Computer Science & Engineering</h3>
             <div class="program-details">
@@ -121,9 +117,7 @@ function toggleAccordion(header) {
 
         <!-- M.Tech Card -->
         <div class="program-card reveal">
-          <div class="program-icon">
-            <span class="icon-grad">🎓</span>
-          </div>
+          <div class="program-icon"><span class="icon-grad">🎓</span></div>
           <div class="program-content">
             <h3>M.Tech in Computer Science & Engineering</h3>
             <div class="program-details">
@@ -182,7 +176,7 @@ function toggleAccordion(header) {
       </div>
     </section>
 
-    <!-- Semester-wise Syllabus Section -->
+    <!-- Syllabus Section -->
     <section class="syllabus-section" id="syllabus">
       <div class="container">
         <div class="section-header">
@@ -190,7 +184,6 @@ function toggleAccordion(header) {
           <div class="header-line"></div>
           <p class="section-desc">B.Tech CSE - KTU 2019 Scheme</p>
         </div>
-
         <div class="syllabus-container">
           <!-- Semester 1 -->
           <div class="semester-accordion reveal">
@@ -331,9 +324,6 @@ function toggleAccordion(header) {
             </div>
           </div>
 
-          <!-- Add more semesters (S4-S8) following the same pattern -->
-          <!-- I'll add a few more for demonstration -->
-
           <!-- Semester 4 -->
           <div class="semester-accordion reveal">
             <div class="accordion-header" onclick="toggleAccordion(this)">
@@ -374,7 +364,6 @@ function toggleAccordion(header) {
             </div>
           </div>
 
-          <!-- Placeholder for remaining semesters -->
           <div class="more-semesters-note reveal">
             <p>
               📚 Semesters 5-8 follow similar structure with advanced
@@ -388,7 +377,7 @@ function toggleAccordion(header) {
       </div>
     </section>
 
-    <!-- Academic Calendar Section -->
+    <!-- Calendar Section -->
     <section class="calendar-section">
       <div class="container">
         <div class="section-header">
@@ -411,9 +400,8 @@ function toggleAccordion(header) {
       <div>
         <h4>AISAT CSE</h4>
         <p style="font-size: 0.9rem; color: var(--neutral-gray)">
-          Albertian Institute of Science and Technology,<br />
-          Kalamassery, Kochi.<br />
-          Kerala, India.
+          Albertian Institute of Science and Technology,<br />Kalamassery,
+          Kochi.<br />Kerala, India.
         </p>
       </div>
       <div>
@@ -433,22 +421,7 @@ function toggleAccordion(header) {
         </ul>
       </div>
     </footer>
-    </script>
-    <script>
-window.addEventListener("scroll", reveal);
 
-function reveal() {
-  var reveals = document.querySelectorAll(".reveal");
-  for (var i = 0; i < reveals.length; i++) {
-    var windowHeight = window.innerHeight;
-    var elementTop = reveals[i].getBoundingClientRect().top;
-    var visible = 100;
-
-    if (elementTop < windowHeight - visible) {
-      reveals[i].classList.add("active");
-    }
-  }
-}
-</script>
+    <script src="{{ url_for('static', filename='js/academics.js') }}"></script>
   </body>
 </html>

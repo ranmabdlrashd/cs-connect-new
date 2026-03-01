@@ -1,343 +1,467 @@
-/* =========================
-   NAVIGATION
-========================= */
-
-.navbar {
-  background: #f4f2f0;
-  padding: 15px 0;
+/* CSS Variables */
+:root {
+  --primary-red: #a41f13;
+  --bg-off-white: #faf5f1;
+  --neutral-gray: #e0dbd8;
+  --dark-charcoal: #292f36;
+  --taupe-brown: #8f7a6e;
 }
 
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+body {
+  background-color: var(--bg-off-white);
+  color: var(--dark-charcoal);
+  overflow-x: hidden;
+}
+
+/* News Ticker */
+.news-ticker {
+  background: var(--dark-charcoal);
+  color: #fff;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 20s linear infinite;
+  padding-left: 100%;
+}
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Navigation */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
 .nav-container {
-  width: 85%;
-  margin: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .logo {
-  font-weight: bold;
-  color: #a41f13;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--primary-red);
 }
-
 .nav-links {
-  list-style: none;
   display: flex;
-  gap: 30px;
-  padding: 0;
-  margin: 0;
+  gap: 2rem;
+  list-style: none;
 }
-
-.nav-links li a {
+.nav-links a {
   text-decoration: none;
-  color: #333;
-  font-weight: 500;
+  color: var(--dark-charcoal);
+  font-weight: 600;
+  position: relative;
+  transition: 0.3s;
+  padding: 0.5rem 0;
+}
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary-red);
   transition: 0.3s;
 }
-
-.nav-links li a:hover {
-  color: #a41f13;
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
 }
-
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary-red);
+}
 .btn-login {
-  background: #2c2c2c;
+  padding: 0.6rem 1.8rem;
+  background: var(--dark-charcoal);
   color: white;
-  padding: 8px 18px;
-  border-radius: 20px;
+  border-radius: 50px;
   text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn-login:hover {
+  background: var(--primary-red);
+  transform: translateY(-2px);
 }
 
-/* =========================
-   HERO SECTION (HOME MATCH)
-========================= */
-
+/* Page Header */
 .page-header {
-  background: linear-gradient(to right, #a41f13, #2c2c2c);
-  color: white;
-  padding: 120px 20px;
+  height: 40vh;
+  background: linear-gradient(135deg, var(--primary-red), var(--dark-charcoal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  color: white;
 }
-
-/* =========================
-   GENERAL STYLES
-========================= */
-
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f8f6f4;
-    color: #333;
-}
-
-.container {
-    width: 85%;
-    margin: auto;
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.section-header h2 {
-    font-size: 32px;
-    margin-bottom: 10px;
-}
-
-.header-line {
-    width: 60px;
-    height: 4px;
-    background: #a41f13;
-    margin: 10px auto;
-    border-radius: 3px;
-}
-
-/* =========================
-   PAGE HEADER
-========================= */
-
-.page-header {
-    background: linear-gradient(to right, #a41f13, #2c2c2c);
-    color: white;
-    padding: 100px 20px;
-    text-align: center;
-}
-
 .page-title {
-    font-size: 42px;
-    margin: 10px 0;
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
-
 .page-subtitle {
-    font-size: 18px;
-    opacity: 0.9;
+  font-size: 1.2rem;
+  opacity: 0.9;
 }
 
-/* =========================
-   PROGRAM CARDS
-========================= */
+/* Container & Sections */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 5%;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.section-header h2 {
+  font-size: 2.5rem;
+  color: var(--dark-charcoal);
+  margin-bottom: 1rem;
+}
+.header-line {
+  width: 80px;
+  height: 4px;
+  background: var(--primary-red);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+.section-desc {
+  color: var(--taupe-brown);
+  margin-top: 0.5rem;
+}
 
+/* Program Cards */
 .program-card {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    margin-bottom: 40px;
-    transition: 0.3s ease;
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--neutral-gray);
+  display: flex;
+  gap: 2rem;
+  transition: 0.3s;
 }
-
 .program-card:hover {
-    transform: translateY(-5px);
+  transform: translateY(-5px);
+  border-color: var(--primary-red);
 }
-
 .program-icon {
-    font-size: 35px;
-    margin-bottom: 15px;
+  font-size: 4rem;
+  flex-shrink: 0;
 }
-
+.icon-grad {
+  font-size: 4rem;
+}
 .program-content h3 {
-    color: #a41f13;
-    margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: var(--dark-charcoal);
+  margin-bottom: 1.5rem;
 }
-
 .program-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
-
 .detail-item {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  align-items: start;
 }
-
-.detail-icon {
-    font-size: 20px;
+.detail-item .detail-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
 }
-
-.program-highlights {
-    margin-top: 20px;
+.detail-item strong {
+  color: var(--dark-charcoal);
 }
-
+.detail-item p {
+  color: var(--taupe-brown);
+  font-size: 0.95rem;
+}
+.program-highlights h4 {
+  color: var(--dark-charcoal);
+  margin-bottom: 1rem;
+}
 .program-highlights ul {
-    padding-left: 20px;
-    line-height: 1.8;
+  margin-left: 1.5rem;
+  line-height: 1.8;
+  color: var(--taupe-brown);
 }
-
 .btn-view-syllabus {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #a41f13;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: 0.3s;
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 2rem;
+  background: var(--primary-red);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: 0.3s;
 }
-
 .btn-view-syllabus:hover {
-    background: #7c150d;
+  background: var(--dark-charcoal);
 }
 
-/* =========================
-   SYLLABUS ACCORDION
-========================= */
-
+/* Syllabus Section */
+.syllabus-section {
+  background: white;
+}
+.syllabus-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
 .semester-accordion {
-    background: white;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    overflow: hidden;
+  background: var(--bg-off-white);
+  border-radius: 15px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 2px solid var(--neutral-gray);
+  transition: 0.3s;
 }
-
+.semester-accordion:hover {
+  border-color: var(--primary-red);
+}
 .accordion-header {
-    padding: 15px 20px;
-    background: #f3f1ef;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 1.5rem 2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  transition: 0.3s;
 }
-
+.accordion-header:hover {
+  background: var(--bg-off-white);
+}
+.semester-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 .semester-badge {
-    background: #a41f13;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin-right: 10px;
+  background: var(--primary-red);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-weight: 700;
 }
-
-.accordion-content {
-    display: none;
-    padding: 20px;
+.semester-info h3 {
+  font-size: 1.3rem;
+  color: var(--dark-charcoal);
 }
-
-.subjects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+.accordion-icon {
+  font-size: 1.2rem;
+  color: var(--primary-red);
+  transition: 0.3s;
 }
-
-.subject-card {
-    background: #fafafa;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #a41f13;
+.semester-accordion.active .accordion-icon {
+  transform: rotate(180deg);
 }
-
-.btn-download {
-    margin-top: 20px;
-    padding: 8px 16px;
-    background: #2c2c2c;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn-download:hover {
-    background: #000;
-}
-
-/* =========================
-   CALENDAR SECTION
-========================= */
-
-.calendar-section {
-    background: #f3f1ef;
-    padding: 60px 0;
-    text-align: center;
-}
-
-.calendar-card {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    display: inline-block;
-}
-
-.btn-download-calendar {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #a41f13;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-footer {
-    background: #2c2c2c;
-    color: white;
-    padding: 40px 20px;
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-
-footer h4 {
-    margin-bottom: 10px;
-}
-
-footer ul {
-    list-style: none;
-    padding: 0;
-}
-
-footer ul li {
-    margin-bottom: 5px;
-}
-
-footer ul li a {
-    color: #ddd;
-    text-decoration: none;
-}
-
-/* =========================
-   SMOOTH ACCORDITION ANIMATION
-========================= */
 .accordion-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s ease;
+  transition: max-height 0.3s;
 }
-
 .semester-accordion.active .accordion-content {
   max-height: 1000px;
 }
-
-/* =========================
-   Scroll Reveal Animation
-========================= */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: 0.6s ease;
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+}
+.subject-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid var(--primary-red);
+  transition: 0.3s;
+}
+.subject-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+.subject-code {
+  font-weight: 700;
+  color: var(--primary-red);
+  margin-bottom: 0.5rem;
+}
+.subject-name {
+  color: var(--dark-charcoal);
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+.subject-credits {
+  font-size: 0.85rem;
+  color: var(--taupe-brown);
+}
+.btn-download {
+  width: 90%;
+  margin: 1rem 2rem;
+  padding: 1rem;
+  background: var(--dark-charcoal);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn-download:hover {
+  background: var(--primary-red);
 }
 
+/* More Semesters Note */
+.more-semesters-note {
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg-off-white);
+  border-radius: 15px;
+  border: 2px dashed var(--neutral-gray);
+}
+.more-semesters-note p {
+  color: var(--taupe-brown);
+  margin-bottom: 1rem;
+}
+.btn-view-all {
+  padding: 0.8rem 2rem;
+  background: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn-view-all:hover {
+  background: var(--dark-charcoal);
+}
+
+/* Calendar Section */
+.calendar-section {
+  background: var(--bg-off-white);
+}
+.calendar-card {
+  background: white;
+  text-align: center;
+  padding: 3rem;
+  border-radius: 20px;
+  border: 2px solid var(--neutral-gray);
+  transition: 0.3s;
+}
+.calendar-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-red);
+}
+.calendar-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+.calendar-card h3 {
+  color: var(--dark-charcoal);
+  margin-bottom: 1rem;
+}
+.calendar-card p {
+  color: var(--taupe-brown);
+  margin-bottom: 1.5rem;
+}
+.btn-download-calendar {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: var(--primary-red);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn-download-calendar:hover {
+  background: var(--dark-charcoal);
+}
+
+/* Footer */
+footer {
+  background: var(--dark-charcoal);
+  color: var(--bg-off-white);
+  padding: 3rem 10%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+footer h4 {
+  color: var(--primary-red);
+  margin-bottom: 1rem;
+}
+footer ul {
+  list-style: none;
+}
+footer ul li {
+  margin-bottom: 0.5rem;
+}
+footer ul li a {
+  color: var(--neutral-gray);
+  text-decoration: none;
+  transition: 0.3s;
+}
+footer ul li a:hover {
+  color: white;
+}
+
+/* Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1s ease-out;
+}
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
-  .nav-links {
+  .nav-links,
+  .btn-login {
     display: none;
   }
-
+  .program-card {
+    flex-direction: column;
+  }
   .program-details {
     grid-template-columns: 1fr;
   }
-
-  .page-title {
-    font-size: 28px;
+  .subjects-grid {
+    grid-template-columns: 1fr;
   }
 }

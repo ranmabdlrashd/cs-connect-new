@@ -1,31 +1,23 @@
 // Accordion Toggle Function
 function toggleAccordion(header) {
-  const content = header.nextElementSibling;
-  const icon = header.querySelector(".accordion-icon");
-
-  // Close all other accordions
-  document.querySelectorAll(".accordion-content").forEach((item) => {
-    if (item !== content) {
-      item.classList.remove("active");
-      item.previousElementSibling.classList.remove("active");
-    }
-  });
-
-  // Toggle current accordion
-  content.classList.toggle("active");
-  header.classList.toggle("active");
+  const accordion = header.parentElement;
+  accordion.classList.toggle("active");
 }
 
-// Smooth scroll to syllabus section
-document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  anchor.addEventListener("click", function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute("href"));
-    if (target) {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+// Scroll Reveal Animation
+window.addEventListener("scroll", reveal);
+
+function reveal() {
+  var reveals = document.querySelectorAll(".reveal");
+  for (var i = 0; i < reveals.length; i++) {
+    var windowHeight = window.innerHeight;
+    var elementTop = reveals[i].getBoundingClientRect().top;
+    var visible = 100;
+    if (elementTop < windowHeight - visible) {
+      reveals[i].classList.add("active");
     }
-  });
-});
+  }
+}
+
+// Initial reveal on page load
+reveal();
