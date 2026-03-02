@@ -1,50 +1,48 @@
-// ===================================
-// CS CONNECT - SHARED UTILITIES
-// Used on all pages
-// ===================================
+// Search Functionality
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", (e) => {
+  const search = e.target.value.toLowerCase();
+  document.querySelectorAll(".faculty-card").forEach((card) => {
+    const name = card.querySelector("h3").textContent.toLowerCase();
+    card.style.display = name.includes(search) ? "block" : "none";
+  });
+});
 
-// 1. SCROLL REVEAL ANIMATION
+// Filter Functionality
+document.querySelectorAll(".filter-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document
+      .querySelectorAll(".filter-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.getAttribute("data-filter");
+    document.querySelectorAll(".faculty-card").forEach((card) => {
+      if (filter === "all") {
+        card.classList.remove("hidden");
+      } else {
+        card.getAttribute("data-designation") === filter
+          ? card.classList.remove("hidden")
+          : card.classList.add("hidden");
+      }
+    });
+  });
+});
+
+// Scroll Reveal
 function reveal() {
-  const reveals = document.querySelectorAll(".reveal");
-  reveals.forEach((el) => {
+  document.querySelectorAll(".reveal").forEach((el) => {
     const top = el.getBoundingClientRect().top;
-    if (top < window.innerHeight - 150) {
-      el.classList.add("active");
-    }
+    const windowHeight = window.innerHeight;
+    if (top < windowHeight - 100) el.classList.add("active");
   });
 }
-
 window.addEventListener("scroll", reveal);
-reveal(); // Trigger once on page load
+reveal();
 
-// 2. STATS COUNTER (home page)
-document.addEventListener("DOMContentLoaded", () => {
-  const statsSection = document.querySelector(".stats-strip");
-  if (!statsSection) return;
-
-  const animateCounters = () => {
-    document.querySelectorAll(".stat-number").forEach((counter) => {
-      const updateCount = () => {
-        const target = +counter.getAttribute("data-target");
-        const count = +counter.innerText;
-        const inc = target / 200;
-        if (count < target) {
-          counter.innerText = Math.ceil(count + inc);
-          setTimeout(updateCount, 20);
-        } else {
-          counter.innerText = target;
-        }
-      };
-      updateCount();
-    });
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      animateCounters();
-      observer.disconnect();
-    }
-  }, { threshold: 0.5 });
-
-  observer.observe(statsSection);
+// View Profile Button
+document.querySelectorAll(".view-profile-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    alert("Detailed profile page will open here!");
+  });
 });

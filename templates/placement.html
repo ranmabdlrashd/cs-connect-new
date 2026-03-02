@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Placements | CS Connect</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/placements.css') }}"
+    />
+  </head>
+  <body>
+    <div class="news-ticker">
+      <div class="ticker-content">
+        🎉 100% Placement Record 2024 | 💰 Highest Package: ₹45 LPA | 🏢 150+
+        Companies Visited
+      </div>
+    </div>
+
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">AISAT CSE</div>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('about_aisat') }}">About AISAT</a></li>
+          <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
+          <li><a href="{{ url_for('academics') }}">Academics</a></li>
+          <li><a href="{{ url_for('faculty') }}">Faculty</a></li>
+          <li>
+            <a href="{{ url_for('placements') }}" class="active">Placements</a>
+          </li>
+          <li><a href="{{ url_for('library') }}">Library</a></li>
+        </ul>
+        <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+      </div>
+    </nav>
+
+    <section class="page-header">
+      <div class="header-overlay">
+        <h1>Placement & Career Hub</h1>
+        <p>Empowering careers, Building futures</p>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card highlight reveal">
+            <div class="stat-icon">💰</div>
+            <div class="stat-number" data-target="45">0</div>
+            <div class="stat-label">Highest Package (LPA)</div>
+            <div class="stat-company">Google India</div>
+          </div>
+          <div class="stat-card reveal">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number" data-target="12.5">0</div>
+            <div class="stat-label">Average Package (LPA)</div>
+          </div>
+          <div class="stat-card reveal">
+            <div class="stat-icon">🎓</div>
+            <div class="stat-number" data-target="98">0</div>
+            <div class="stat-label">Students Placed (%)</div>
+          </div>
+          <div class="stat-card reveal">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-number" data-target="150">0</div>
+            <div class="stat-label">Top Recruiters</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="companies-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Our Recruiters</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="company-categories">
+          <button class="cat-btn active" data-cat="all">All Companies</button>
+          <button class="cat-btn" data-cat="it">IT Sector</button>
+          <button class="cat-btn" data-cat="core">Core Engineering</button>
+          <button class="cat-btn" data-cat="finance">Finance</button>
+        </div>
+        <div class="companies-marquee">
+          <div class="marquee-content">
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Google"
+                alt="Google"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Microsoft"
+                alt="Microsoft"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Amazon"
+                alt="Amazon"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=IBM"
+                alt="IBM"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=TCS"
+                alt="TCS"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Infosys"
+                alt="Infosys"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Wipro"
+                alt="Wipro"
+              />
+            </div>
+            <div class="company-logo" data-category="finance">
+              <img
+                src="https://via.placeholder.com/150x80?text=Goldman+Sachs"
+                alt="Goldman Sachs"
+              />
+            </div>
+            <div class="company-logo" data-category="finance">
+              <img
+                src="https://via.placeholder.com/150x80?text=JPMorgan"
+                alt="JPMorgan"
+              />
+            </div>
+            <div class="company-logo" data-category="core">
+              <img
+                src="https://via.placeholder.com/150x80?text=Bosch"
+                alt="Bosch"
+              />
+            </div>
+            <div class="company-logo" data-category="core">
+              <img
+                src="https://via.placeholder.com/150x80?text=L%26T"
+                alt="L&T"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Cognizant"
+                alt="Cognizant"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Google"
+                alt="Google"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Microsoft"
+                alt="Microsoft"
+              />
+            </div>
+            <div class="company-logo" data-category="it">
+              <img
+                src="https://via.placeholder.com/150x80?text=Amazon"
+                alt="Amazon"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="yearwise-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Year-wise Placement Data</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="year-tabs">
+          <button class="year-tab active" data-year="2024">2024</button>
+          <button class="year-tab" data-year="2023">2023</button>
+          <button class="year-tab" data-year="2022">2022</button>
+        </div>
+        <div class="year-content active" id="year-2024">
+          <div class="year-stats">
+            <div class="year-stat-item">
+              <h3>120</h3>
+              <p>Total Students</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>118</h3>
+              <p>Students Placed</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹45L</h3>
+              <p>Highest Package</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹12.5L</h3>
+              <p>Average Package</p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart2024"></canvas>
+          </div>
+        </div>
+        <div class="year-content" id="year-2023">
+          <div class="year-stats">
+            <div class="year-stat-item">
+              <h3>115</h3>
+              <p>Total Students</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>112</h3>
+              <p>Students Placed</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹38L</h3>
+              <p>Highest Package</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹11.2L</h3>
+              <p>Average Package</p>
+            </div>
+          </div>
+        </div>
+        <div class="year-content" id="year-2022">
+          <div class="year-stats">
+            <div class="year-stat-item">
+              <h3>110</h3>
+              <p>Total Students</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>105</h3>
+              <p>Students Placed</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹32L</h3>
+              <p>Highest Package</p>
+            </div>
+            <div class="year-stat-item">
+              <h3>₹10.5L</h3>
+              <p>Average Package</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alumni-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Alumni Success Stories</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="alumni-slider">
+          <button class="slider-btn prev" onclick="slideAlumni(-1)">❮</button>
+          <div class="alumni-wrapper">
+            <div class="alumni-track">
+              <div class="alumni-card">
+                <div class="alumni-photo">
+                  <img
+                    src="https://via.placeholder.com/200"
+                    alt="Rahul Menon"
+                  />
+                </div>
+                <h3>Rahul Menon</h3>
+                <span class="batch">Batch 2023</span>
+                <div class="company-badge">Google India</div>
+                <div class="package">Package: ₹45 LPA</div>
+                <div class="testimonial">
+                  "AISAT provided the perfect platform to develop my skills. The
+                  placement cell guided me throughout."
+                </div>
+              </div>
+              <div class="alumni-card">
+                <div class="alumni-photo">
+                  <img src="https://via.placeholder.com/200" alt="Priya Nair" />
+                </div>
+                <h3>Priya Nair</h3>
+                <span class="batch">Batch 2023</span>
+                <div class="company-badge">Microsoft</div>
+                <div class="package">Package: ₹38 LPA</div>
+                <div class="testimonial">
+                  "Excellent faculty support and rigorous training helped me
+                  crack my dream job at Microsoft."
+                </div>
+              </div>
+              <div class="alumni-card">
+                <div class="alumni-photo">
+                  <img src="https://via.placeholder.com/200" alt="Arun Kumar" />
+                </div>
+                <h3>Arun Kumar</h3>
+                <span class="batch">Batch 2022</span>
+                <div class="company-badge">Amazon</div>
+                <div class="package">Package: ₹32 LPA</div>
+                <div class="testimonial">
+                  "The coding culture and competitive environment at AISAT
+                  prepared me well for tech giants."
+                </div>
+              </div>
+              <div class="alumni-card">
+                <div class="alumni-photo">
+                  <img
+                    src="https://via.placeholder.com/200"
+                    alt="Sneha Thomas"
+                  />
+                </div>
+                <h3>Sneha Thomas</h3>
+                <span class="batch">Batch 2024</span>
+                <div class="company-badge">Goldman Sachs</div>
+                <div class="package">Package: ₹28 LPA</div>
+                <div class="testimonial">
+                  "Industry exposure through internships gave me an edge during
+                  placements."
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="slider-btn next" onclick="slideAlumni(1)">❯</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="internships-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Internship Opportunities</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="internship-grid">
+          <div class="internship-card reveal">
+            <h3>Software Development Intern</h3>
+            <div class="company">Amazon Web Services</div>
+            <div class="details">
+              <span><i class="fas fa-map-marker-alt"></i> Bangalore</span>
+              <span><i class="fas fa-calendar"></i> 6 Months</span>
+              <span><i class="fas fa-rupee-sign"></i> ₹50,000/month</span>
+            </div>
+            <div class="skills">
+              <span class="skill-tag">Java</span>
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">AWS</span>
+            </div>
+            <button class="apply-btn">Apply Now</button>
+          </div>
+          <div class="internship-card reveal">
+            <h3>Data Science Intern</h3>
+            <div class="company">Microsoft India</div>
+            <div class="details">
+              <span><i class="fas fa-map-marker-alt"></i> Hyderabad</span>
+              <span><i class="fas fa-calendar"></i> 3 Months</span>
+              <span><i class="fas fa-rupee-sign"></i> ₹45,000/month</span>
+            </div>
+            <div class="skills">
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">ML</span>
+              <span class="skill-tag">SQL</span>
+            </div>
+            <button class="apply-btn">Apply Now</button>
+          </div>
+          <div class="internship-card reveal">
+            <h3>Full Stack Developer</h3>
+            <div class="company">Google India</div>
+            <div class="details">
+              <span><i class="fas fa-map-marker-alt"></i> Bangalore</span>
+              <span><i class="fas fa-calendar"></i> 6 Months</span>
+              <span><i class="fas fa-rupee-sign"></i> ₹60,000/month</span>
+            </div>
+            <div class="skills">
+              <span class="skill-tag">React</span>
+              <span class="skill-tag">Node.js</span>
+              <span class="skill-tag">MongoDB</span>
+            </div>
+            <button class="apply-btn">Apply Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="resources-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Placement Preparation</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="resources-grid">
+          <div class="resource-card reveal">
+            <i class="fas fa-code"></i>
+            <h3>Coding Practice</h3>
+            <p>Master DSA with curated problems</p>
+            <a href="https://leetcode.com" target="_blank" class="resource-link"
+              >LeetCode →</a
+            >
+            <a
+              href="https://hackerrank.com"
+              target="_blank"
+              class="resource-link"
+              >HackerRank →</a
+            >
+          </div>
+          <div class="resource-card reveal">
+            <i class="fas fa-book-open"></i>
+            <h3>Interview Prep</h3>
+            <p>Crack technical interviews</p>
+            <a
+              href="https://geeksforgeeks.org"
+              target="_blank"
+              class="resource-link"
+              >GeeksforGeeks →</a
+            >
+            <a
+              href="https://interviewbit.com"
+              target="_blank"
+              class="resource-link"
+              >InterviewBit →</a
+            >
+          </div>
+          <div class="resource-card reveal">
+            <i class="fas fa-file-alt"></i>
+            <h3>Resume Templates</h3>
+            <p>Professional resume formats</p>
+            <button class="download-btn">Download Templates</button>
+          </div>
+          <div class="resource-card reveal">
+            <i class="fas fa-comments"></i>
+            <h3>Mock Interviews</h3>
+            <p>Practice with AI chatbot</p>
+            <button class="chatbot-btn">Start Mock Interview</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="team-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Placement Team</h2>
+          <div class="header-line"></div>
+        </div>
+        <div class="team-grid">
+          <div class="team-card reveal">
+            <div class="team-photo">
+              <img
+                src="https://via.placeholder.com/150"
+                alt="Dr. Rajesh Kumar"
+              />
+            </div>
+            <h3>Dr. Rajesh Kumar</h3>
+            <span class="team-role">Faculty Coordinator</span>
+            <p><i class="fas fa-envelope"></i> rajesh@aisat.ac.in</p>
+            <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+          </div>
+          <div class="team-card reveal">
+            <div class="team-photo">
+              <img src="https://via.placeholder.com/150" alt="Arjun Menon" />
+            </div>
+            <h3>Arjun Menon</h3>
+            <span class="team-role">Student Coordinator</span>
+            <p><i class="fas fa-envelope"></i> arjun@student.aisat.ac.in</p>
+          </div>
+          <div class="team-card reveal">
+            <div class="team-photo">
+              <img src="https://via.placeholder.com/150" alt="Priya Nair" />
+            </div>
+            <h3>Priya Nair</h3>
+            <span class="team-role">Student Coordinator</span>
+            <p><i class="fas fa-envelope"></i> priya@student.aisat.ac.in</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <h4>AISAT CSE</h4>
+        <p>Albertian Institute, Kalamassery, Kochi, Kerala.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#">Admissions</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Portal</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Twitter</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/placements.js') }}"></script>
+  </body>
+</html>
