@@ -1,0 +1,662 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - CS Connect{% endblock %}
+
+{% block content %}
+<style>
+  :root { --red: #c0392b; --dark: #1a1a2e; --card: #ffffff; }
+  .ap-header { background: linear-gradient(135deg,#c0392b,#922b21); color:#fff; padding:40px 30px 30px; border-radius:0 0 20px 20px; margin-bottom:30px; }
+  .ap-header h1 { margin:0; font-size:2rem; }
+  .ap-header p  { margin:6px 0 0; opacity:.85; }
+  .stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
+  .stat-card { background:#fff; border-radius:12px; padding:18px 24px; flex:1; min-width:130px; box-shadow:0 2px 12px rgba(0,0,0,.08); text-align:center; }
+  .stat-card h2 { margin:0; font-size:2rem; }
+  .stat-card p  { margin:4px 0 0; color:#666; font-size:.85rem; }
+  /* Tabs */
+  .tab-nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; }
+  .tab-btn {
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:16px 24px; border:2px solid #ddd; border-radius:12px;
+    background:#fff; cursor:pointer; font-weight:700; color:#555;
+    font-size:1rem; transition:all .2s; box-shadow:0 2px 8px rgba(0,0,0,.06);
+    min-width:110px;
+  }
+  .tab-btn .tab-icon { font-size:1.6rem; }
+  .tab-btn.active {
+    background:#c0392b; color:#fff; border-color:#c0392b;
+    box-shadow:0 4px 16px rgba(192,57,43,.35);
+  }
+  .tab-btn:hover:not(.active) { border-color:#c0392b; color:#c0392b; background:#fff8f8; transform:translateY(-2px); }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+  /* Table */
+  .admin-table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:20px; }
+  .admin-table thead { background:var(--red); color:#fff; }
+  .admin-table th, .admin-table td { padding:11px 13px; text-align:left; font-size:.9rem; }
+  .admin-table tbody tr:nth-child(even) { background:#fafafa; }
+  /* Add form */
+  .add-form { background:#fff; border-radius:12px; padding:22px; box-shadow:0 2px 12px rgba(0,0,0,.07); margin-bottom:24px; }
+  .add-form h3 { margin:0 0 16px; color:#c0392b; font-size:1.1rem; }
+  .form-row { display:flex; gap:12px; flex-wrap:wrap; }
+  .form-group { flex:1; min-width:180px; display:flex; flex-direction:column; gap:4px; }
+  .form-group label { font-size:.82rem; font-weight:600; color:#444; }
+  .form-group input, .form-group select, .form-group textarea {
+    border:1px solid #ddd; border-radius:7px; padding:8px 11px; font-size:.9rem; outline:none; transition:.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#c0392b; }
+  .btn-add  { background:#c0392b; color:#fff; border:none; border-radius:8px; padding:9px 20px; font-weight:600; cursor:pointer; margin-top:12px; }
+  .btn-del  { background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:.8rem; }
+  .btn-edit { background:#2980b9; color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:.8rem; }
+  /* Inline edit modal */
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; align-items:center; justify-content:center; }
+  .modal-bg.open { display:flex; }
+  .modal-box { background:#fff; border-radius:14px; padding:28px; width:min(560px,94vw); max-height:90vh; overflow-y:auto; }
+  .modal-box h3 { margin:0 0 18px; color:#c0392b; }
+  .modal-close { float:right; background:none; border:none; font-size:1.4rem; cursor:pointer; margin-top:-6px; }
+  .section-title { font-size:1.2rem; font-weight:700; color:#c0392b; margin:0 0 14px; border-left:4px solid #c0392b; padding-left:10px; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
+  .badge.available { background:#d5f5e3; color:#27ae60; }
+  .badge.issued    { background:#fadbd8; color:#c0392b; }
+  .badge.student   { background:#d5f5e3; color:#27ae60; }
+  .badge.faculty   { background:#d6eaf8; color:#2980b9; }
+  .badge.admin     { background:#fadbd8; color:#e74c3c; }
+
+  /* Flash classes */
+  .flash-success { background:#d5f5e3; color:#1e8449; font-weight:600; padding:12px 16px; border-radius:8px; margin-bottom:14px; }
+  .flash-error   { background:#fadbd8; color:#c0392b; font-weight:600; padding:12px 16px; border-radius:8px; margin-bottom:14px; }
+</style>
+
+<div style="max-width:1200px; margin:0 auto; padding:20px;">
+  <div class="ap-header">
+    <h1>🛠️ Admin Control Panel</h1>
+    <p>Welcome, <strong>{{ session.get('name') }}</strong> — Manage all site content from here.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><h2 style="color:#e74c3c">{{ all_users|length }}</h2><p>Total Users</p></div>
+    <div class="stat-card"><h2 style="color:#27ae60">{{ student_count }}</h2><p>Students</p></div>
+    <div class="stat-card"><h2 style="color:#2980b9">{{ faculty_count }}</h2><p>Faculty Accounts</p></div>
+    <div class="stat-card"><h2 style="color:#8e44ad">{{ admin_count }}</h2><p>Admins</p></div>
+    <div class="stat-card"><h2 style="color:#e67e22">{{ faculty_list|length }}</h2><p>Faculty Records</p></div>
+    <div class="stat-card"><h2 style="color:#16a085">{{ books_list|length }}</h2><p>Books</p></div>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for cat, msg in messages %}
+    <div class="flash-{{ 'success' if cat=='success' else 'error' }}">
+      {{ msg }}
+    </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <!-- Tab Nav -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('users')">
+      <span class="tab-icon">👥</span> Users
+    </button>
+    <button class="tab-btn" onclick="switchTab('faculty')">
+      <span class="tab-icon">🧑‍🏫</span> Faculty
+    </button>
+    <button class="tab-btn" onclick="switchTab('library')">
+      <span class="tab-icon">📚</span> Library
+    </button>
+    <button class="tab-btn" onclick="switchTab('academics')">
+      <span class="tab-icon">🎓</span> Academics
+    </button>
+    <button class="tab-btn" onclick="switchTab('placements')">
+      <span class="tab-icon">💼</span> Placements
+    </button>
+  </div>
+
+  <!-- ─── USERS TAB ─── -->
+  <div id="tab-users" class="tab-pane active">
+    <p class="section-title">All Registered Users</p>
+    <table class="admin-table">
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>User ID</th><th>Role</th></tr></thead>
+      <tbody>
+        {% for u in all_users %}
+        <tr>
+          <td>{{ u['id'] }}</td>
+          <td>{{ u['name'] }}</td>
+          <td>{{ u['email'] }}</td>
+          <td>{{ u['user_id'] }}</td>
+          <td><span class="badge {{ u['role'] }}">{{ u['role'] }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── FACULTY TAB ─── -->
+  <div id="tab-faculty" class="tab-pane">
+    <p class="section-title">Faculty Management</p>
+
+    <!-- Add Faculty Form -->
+    <div class="add-form">
+      <h3>➕ Add Faculty Member</h3>
+      <form method="POST" action="{{ url_for('admin_faculty_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Name *</label><input name="name" required placeholder="Dr. John Doe"></div>
+          <div class="form-group"><label>Designation *</label><input name="designation" required placeholder="Associate Professor"></div>
+          <div class="form-group">
+            <label>Designation Key *</label>
+            <select name="designation_key">
+              <option value="hod">HOD</option>
+              <option value="professor">Professor</option>
+              <option value="assistant" selected>Assistant</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Qualification</label><input name="qualification" placeholder="M.Tech CSE"></div>
+          <div class="form-group"><label>Date Joined</label><input name="joined" placeholder="01.06.2024"></div>
+          <div class="form-group"><label>Research Area</label><input name="research" placeholder="Machine Learning"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input name="email" type="email" placeholder="faculty@aisat.ac.in"></div>
+          <div class="form-group"><label>Photo URL</label><input name="photo" placeholder="https://..."></div>
+        </div>
+        <button type="submit" class="btn-add">Add Faculty</button>
+      </form>
+    </div>
+
+    <!-- Faculty Table -->
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Name</th><th>Designation</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for f in faculty_list %}
+        <tr>
+          <td>{{ f['id'] }}</td>
+          <td>{{ f['name'] }}</td>
+          <td>{{ f['designation'] }}</td>
+          <td>{{ f['email'] }}</td>
+          <td>{{ f['joined'] }}</td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn-edit" 
+                    data-id="{{ f['id'] }}" 
+                    data-name="{{ f['name'] }}" 
+                    data-designation="{{ f['designation'] }}" 
+                    data-dkey="{{ f['designation_key'] }}" 
+                    data-qual="{{ f['qualification'] }}" 
+                    data-joined="{{ f['joined'] }}" 
+                    data-research="{{ f['research'] }}" 
+                    data-email="{{ f['email'] }}" 
+                    data-photo="{{ f['photo'] }}" 
+                    onclick="handleFacultyEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_faculty_delete', fid=f['id']) }}" onsubmit="return confirm('Delete this faculty member?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── LIBRARY TAB ─── -->
+  <div id="tab-library" class="tab-pane">
+    <p class="section-title">Library Books Management</p>
+
+    <div class="add-form">
+      <h3>➕ Add Book</h3>
+      <form method="POST" action="{{ url_for('admin_books_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Data Structures"></div>
+          <div class="form-group"><label>Author *</label><input name="author" required placeholder="Author Name"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              <option value="textbook">Textbook</option>
+              <option value="reference">Reference</option>
+              <option value="journal">Journal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="available">Available</option>
+              <option value="issued">Issued</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Shelf</label><input name="shelf" placeholder="A-01"></div>
+        </div>
+        <button type="submit" class="btn-add">Add Book</button>
+      </form>
+    </div>
+
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Category</th><th>Shelf</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for b in books_list %}
+        <tr>
+          <td>{{ b['id'] }}</td>
+          <td>{{ b['title'] }}</td>
+          <td>{{ b['author'] }}</td>
+          <td>{{ b['category'] }}</td>
+          <td>{{ b['shelf'] }}</td>
+          <td><span class="badge {{ b['status'] }}">{{ b['status'] }}</span></td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn-edit" 
+                    data-id="{{ b['id'] }}" 
+                    data-title="{{ b['title'] }}" 
+                    data-author="{{ b['author'] }}" 
+                    data-category="{{ b['category'] }}" 
+                    data-status="{{ b['status'] }}" 
+                    data-shelf="{{ b['shelf'] }}" 
+                    onclick="handleBookEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_books_delete', bid=b['id']) }}" onsubmit="return confirm('Delete this book?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── ACADEMICS TAB ─── -->
+  <div id="tab-academics" class="tab-pane">
+    <p class="section-title">Academics — Programs</p>
+
+    <div class="add-form">
+      <h3>➕ Add Program</h3>
+      <form method="POST" action="{{ url_for('admin_programs_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Program Name *</label><input name="name" required placeholder="B.Tech in CSE"></div>
+          <div class="form-group"><label>Duration</label><input name="duration" placeholder="4 Years (8 Semesters)"></div>
+          <div class="form-group"><label>Intake</label><input name="intake" placeholder="120 Students per year"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Eligibility</label><input name="eligibility" placeholder="10+2 with PCM"></div>
+          <div class="form-group"><label>Extra Label</label><input name="extra_label" placeholder="Affiliation"></div>
+          <div class="form-group"><label>Extra Value</label><input name="extra_value" placeholder="KTU"></div>
+        </div>
+        <div class="form-group" style="min-width:100%">
+          <label>Highlights (one per line)</label>
+          <textarea name="highlights" rows="4" placeholder="Industry-aligned curriculum&#10;Hands-on training in AI, ML&#10;Strong industry partnerships"></textarea>
+        </div>
+        <button type="submit" class="btn-add">Add Program</button>
+      </form>
+    </div>
+
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Program Name</th><th>Duration</th><th>Intake</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for p in programs %}
+        <tr>
+          <td>{{ p['id'] }}</td>
+          <td>{{ p['name'] }}</td>
+          <td>{{ p['duration'] }}</td>
+          <td>{{ p['intake'] }}</td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn-edit" 
+                    data-id="{{ p['id'] }}" 
+                    data-name="{{ p['name'] }}" 
+                    data-duration="{{ p['duration'] }}" 
+                    data-intake="{{ p['intake'] }}" 
+                    data-eligibility="{{ p['eligibility'] }}" 
+                    data-extra-label="{{ p.get('extra_label','') }}" 
+                    data-extra-value="{{ p.get('extra_value','') }}" 
+                    data-highlights="{{ p.get('highlights_text','') }}" 
+                    onclick="handleProgramEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_programs_delete', pid=p['id']) }}" onsubmit="return confirm('Delete this program?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ─── PLACEMENTS TAB ─── -->
+  <div id="tab-placements" class="tab-pane">
+    
+    <!-- Placement Summary -->
+    <p class="section-title">📊 Placement Summary Stats</p>
+    <table class="admin-table">
+      <thead><tr><th>Icon</th><th>Value</th><th>Label</th><th>Company</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for s in summary_list %}
+        <tr>
+          <td>{{ s['icon'] }}</td>
+          <td>{{ s['value'] }}</td>
+          <td>{{ s['label'] }}</td>
+          <td>{{ s['company'] or '—' }}</td>
+          <td>
+            <button class="btn-edit" 
+                    data-id="{{ s['id'] }}" 
+                    data-icon="{{ s['icon'] }}" 
+                    data-value="{{ s['value'] }}" 
+                    data-label="{{ s['label'] }}" 
+                    data-company="{{ s['company'] or '' }}" 
+                    onclick="handleSummaryEdit(this)">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Companies -->
+    <p class="section-title">🏢 Placement Companies</p>
+    <div class="add-form">
+      <h3>➕ Add Company</h3>
+      <form method="POST" action="{{ url_for('admin_companies_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Company Name *</label><input name="name" required placeholder="Google"></div>
+          <div class="form-group"><label>Logo URL</label><input name="url" placeholder="https://..."></div>
+          <div class="form-group">
+            <label>Sector</label>
+            <select name="sector">
+              <option value="IT">IT</option>
+              <option value="Core">Core</option>
+              <option value="Finance">Finance</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-add">Add Company</button>
+      </form>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Name</th><th>Sector</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for c in companies_list %}
+        <tr>
+          <td>{{ c['id'] }}</td><td>{{ c['name'] }}</td><td>{{ c['sector'] }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_companies_delete', cid=c['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Alumni -->
+    <p class="section-title">🎓 Alumni Success</p>
+    <div class="add-form">
+      <h3>➕ Add Alumni</h3>
+      <form method="POST" action="{{ url_for('admin_alumni_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Name *</label><input name="name" required placeholder="Arjun S"></div>
+          <div class="form-group"><label>Batch</label><input name="batch" placeholder="2020-2024"></div>
+          <div class="form-group"><label>Company</label><input name="company" placeholder="Google"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Package</label><input name="package" placeholder="₹8 LPA"></div>
+          <div class="form-group"><label>Photo URL</label><input name="photo" placeholder="https://..."></div>
+          <div class="form-group"><label>Testimonial</label><input name="testimonial" placeholder="Short testimonial..."></div>
+        </div>
+        <button type="submit" class="btn-add">Add Alumni</button>
+      </form>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Name</th><th>Batch</th><th>Company</th><th>Package</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for a in alumni_list %}
+        <tr>
+          <td>{{ a['id'] }}</td><td>{{ a['name'] }}</td><td>{{ a['batch'] }}</td>
+          <td>{{ a['company'] }}</td><td>{{ a['package'] }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_alumni_delete', aid=a['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Internships -->
+    <p class="section-title">🧑‍💻 Internships</p>
+    <div class="add-form">
+      <h3>➕ Add Internship</h3>
+      <form method="POST" action="{{ url_for('admin_internships_add') }}">
+        <div class="form-row">
+          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Software Dev Intern"></div>
+          <div class="form-group"><label>Company *</label><input name="company" required placeholder="XYZ Corp"></div>
+          <div class="form-group"><label>Domain</label><input name="domain" placeholder="IT"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Location</label><input name="location" placeholder="Kochi / Remote"></div>
+          <div class="form-group"><label>Apply Link</label><input name="link" value="#" placeholder="https://..."></div>
+          <div class="form-group"><label>Description</label><input name="description" placeholder="Short description..."></div>
+        </div>
+        <button type="submit" class="btn-add">Add Internship</button>
+      </form>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>Title</th><th>Company</th><th>Domain</th><th>Location</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for i in interns_list %}
+        <tr>
+          <td>{{ i['id'] }}</td><td>{{ i['title'] }}</td><td>{{ i['company'] }}</td>
+          <td>{{ i['domain'] }}</td><td>{{ i['location'] }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_internships_delete', iid=i['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+              <button type="submit" class="btn-del">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── EDIT MODALS ─── -->
+
+<!-- Faculty Edit Modal -->
+<div class="modal-bg" id="modal-faculty">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-faculty')">✕</button>
+    <h3>✏️ Edit Faculty</h3>
+    <form method="POST" id="faculty-edit-form" action="">
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input id="fe-name" name="name" required></div>
+        <div class="form-group"><label>Designation</label><input id="fe-designation" name="designation"></div>
+        <div class="form-group">
+          <label>Designation Key</label>
+          <select id="fe-designation-key" name="designation_key">
+            <option value="hod">HOD</option>
+            <option value="professor">Professor</option>
+            <option value="assistant">Assistant</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Qualification</label><input id="fe-qualification" name="qualification"></div>
+        <div class="form-group"><label>Joined</label><input id="fe-joined" name="joined"></div>
+        <div class="form-group"><label>Research</label><input id="fe-research" name="research"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input id="fe-email" name="email" type="email"></div>
+        <div class="form-group"><label>Photo URL</label><input id="fe-photo" name="photo"></div>
+      </div>
+      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Book Edit Modal -->
+<div class="modal-bg" id="modal-book">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-book')">✕</button>
+    <h3>✏️ Edit Book</h3>
+    <form method="POST" id="book-edit-form" action="">
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input id="be-title" name="title" required></div>
+        <div class="form-group"><label>Author</label><input id="be-author" name="author"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="be-category" name="category">
+            <option value="textbook">Textbook</option>
+            <option value="reference">Reference</option>
+            <option value="journal">Journal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="be-status" name="status">
+            <option value="available">Available</option>
+            <option value="issued">Issued</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Shelf</label><input id="be-shelf" name="shelf"></div>
+      </div>
+      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Program Edit Modal -->
+<div class="modal-bg" id="modal-program">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-program')">✕</button>
+    <h3>✏️ Edit Program</h3>
+    <form method="POST" id="program-edit-form" action="">
+      <div class="form-row">
+        <div class="form-group"><label>Program Name</label><input id="pe-name" name="name" required></div>
+        <div class="form-group"><label>Duration</label><input id="pe-duration" name="duration"></div>
+        <div class="form-group"><label>Intake</label><input id="pe-intake" name="intake"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Eligibility</label><input id="pe-eligibility" name="eligibility"></div>
+        <div class="form-group"><label>Extra Label</label><input id="pe-extra-label" name="extra_label"></div>
+        <div class="form-group"><label>Extra Value</label><input id="pe-extra-value" name="extra_value"></div>
+      </div>
+      <div class="form-group" style="min-width:100%">
+        <label>Highlights (one per line)</label>
+        <textarea id="pe-highlights" name="highlights" rows="5"></textarea>
+      </div>
+      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Placement Summary Edit Modal -->
+<div class="modal-bg" id="modal-summary">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-summary')">✕</button>
+    <h3>✏️ Edit Placement Summary</h3>
+    <form method="POST" id="summary-edit-form" action="">
+      <div class="form-row">
+        <div class="form-group"><label>Icon (emoji)</label><input id="se-icon" name="icon"></div>
+        <div class="form-group"><label>Value</label><input id="se-value" name="value"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Label</label><input id="se-label" name="label"></div>
+        <div class="form-group"><label>Company (optional)</label><input id="se-company" name="company"></div>
+      </div>
+      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Tab switching — read hash on load
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.target.classList.add('active');
+    location.hash = tab;
+  }
+
+  // Auto open tab from URL hash
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = location.hash.replace('#', '');
+    const tabs = ['users', 'faculty', 'library', 'academics', 'placements'];
+    if (hash && tabs.includes(hash)) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + hash).classList.add('active');
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        if (b.getAttribute('onclick').includes("'" + hash + "'")) b.classList.add('active');
+      });
+    }
+  });
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // Wrapper handlers to extract data from attributes
+  function handleFacultyEdit(btn) {
+    const d = btn.dataset;
+    openFacultyEdit(d.id, d.name, d.designation, d.dkey, d.qual, d.joined, d.research, d.email, d.photo);
+  }
+  function handleBookEdit(btn) {
+    const d = btn.dataset;
+    openBookEdit(d.id, d.title, d.author, d.category, d.status, d.shelf);
+  }
+  function handleProgramEdit(btn) {
+    const d = btn.dataset;
+    openProgramEdit(d.id, d.name, d.duration, d.intake, d.eligibility, d.extraLabel, d.extraValue, d.highlights);
+  }
+  function handleSummaryEdit(btn) {
+    const d = btn.dataset;
+    openSummaryEdit(d.id, d.icon, d.value, d.label, d.company);
+  }
+
+  // Faculty edit
+  function openFacultyEdit(id, name, designation, dkey, qual, joined, research, email, photo) {
+    document.getElementById('faculty-edit-form').action = `/admin/faculty/edit/${id}`;
+    document.getElementById('fe-name').value = name;
+    document.getElementById('fe-designation').value = designation;
+    document.getElementById('fe-designation-key').value = dkey;
+    document.getElementById('fe-qualification').value = qual;
+    document.getElementById('fe-joined').value = joined;
+    document.getElementById('fe-research').value = research;
+    document.getElementById('fe-email').value = email;
+    document.getElementById('fe-photo').value = photo;
+    document.getElementById('modal-faculty').classList.add('open');
+  }
+
+  // Book edit
+  function openBookEdit(id, title, author, category, status, shelf) {
+    document.getElementById('book-edit-form').action = `/admin/books/edit/${id}`;
+    document.getElementById('be-title').value = title;
+    document.getElementById('be-author').value = author;
+    document.getElementById('be-category').value = category;
+    document.getElementById('be-status').value = status;
+    document.getElementById('be-shelf').value = shelf;
+    document.getElementById('modal-book').classList.add('open');
+  }
+
+  // Program edit
+  function openProgramEdit(id, name, duration, intake, eligibility, extraLabel, extraValue, highlights) {
+    document.getElementById('program-edit-form').action = `/admin/programs/edit/${id}`;
+    document.getElementById('pe-name').value = name;
+    document.getElementById('pe-duration').value = duration;
+    document.getElementById('pe-intake').value = intake;
+    document.getElementById('pe-eligibility').value = eligibility;
+    document.getElementById('pe-extra-label').value = extraLabel;
+    document.getElementById('pe-extra-value').value = extraValue;
+    document.getElementById('pe-highlights').value = highlights;
+    document.getElementById('modal-program').classList.add('open');
+  }
+
+  // Summary edit
+  function openSummaryEdit(id, icon, value, label, company) {
+    document.getElementById('summary-edit-form').action = `/admin/placement-summary/edit/${id}`;
+    document.getElementById('se-icon').value = icon;
+    document.getElementById('se-value').value = value;
+    document.getElementById('se-label').value = label;
+    document.getElementById('se-company').value = company;
+    document.getElementById('modal-summary').classList.add('open');
+  }
+
+  // Close on bg click
+  document.querySelectorAll('.modal-bg').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+</script>
+{% endblock %}
