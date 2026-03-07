@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-import sqlite3
+import psycopg2
+import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Import mock data (replace with DB queries later)
@@ -15,7 +16,39 @@ from data import (
 app = Flask(__name__)
 app.secret_key = "csconnectsecret"
 
-DATABASE = "csconnect.db"
+
+# PostgreSQL Connection details
+DB_HOST = "localhost"
+DB_NAME = "login"
+DB_USER = "postgres"
+DB_PASS = "1234"
+
+class DBConnection:
+    def __init__(self):
+        self.conn = psycopg2.connect(
+            host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASS
+        )
+    
+    def cursor(self):
+        return self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+    def execute(self, query, params=None):
+        cur = self.cursor()
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
+        return cur
+        
+    def commit(self):
+        self.conn.commit()
+        
+    def close(self):
+        self.conn.close()
+
+def get_db_connection():
+    return DBConnection()
+
 
 # ─────────────────────────────────────────────────
 # CONTEXT PROCESSOR — injects globals into every template
@@ -32,11 +65,11 @@ def inject_globals():
 # DATABASE SETUP
 # ─────────────────────────────────────────────────
 def init_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             user_id TEXT NOT NULL UNIQUE,
@@ -63,10 +96,7 @@ def home():
     )
 
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+
 
 @app.route('/faculty')
 def faculty():
@@ -206,11 +236,11 @@ def api_faculty():
     params = []
     
     if search:
-        query += " AND LOWER(name) LIKE ?"
+        query += " AND LOWER(name) LIKE %s"
         params.append(f"%{search}%")
         
     if designation and designation != 'all':
-        query += " AND designation_key = ?"
+        query += " AND designation_key = %s"
         params.append(designation)
         
     results = [dict(row) for row in conn.execute(query, params).fetchall()]
@@ -231,15 +261,15 @@ def api_books():
     params = []
     
     if search:
-        query += " AND (LOWER(title) LIKE ? OR LOWER(author) LIKE ?)"
+        query += " AND (LOWER(title) LIKE %s OR LOWER(author) LIKE %s)"
         params.extend([f"%{search}%", f"%{search}%"])
         
     if category and category != 'all':
-        query += " AND category = ?"
+        query += " AND category = %s"
         params.append(category)
         
     if status and status != 'all':
-        query += " AND status = ?"
+        query += " AND status = %s"
         params.append(status)
         
     results = [dict(row) for row in conn.execute(query, params).fetchall()]
@@ -288,16 +318,16 @@ def register():
         user_id = request.form["user_id"]
         role = request.form.get("role", "student")
 
-        conn = sqlite3.connect(DATABASE)
+        conn = get_db_connection()
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO users (name, email, user_id, password, role) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO users (name, email, user_id, password, role) VALUES (%s, %s, %s, %s, %s)",
                 (name, email, user_id, password, role)
             )
             conn.commit()
             flash("Account Created Successfully!", "success")
-        except sqlite3.IntegrityError:
+        except psycopg2.IntegrityError:
             flash("Email or User ID already exists!", "danger")
         finally:
             conn.close()
@@ -313,9 +343,9 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DATABASE)
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
 
@@ -465,7 +495,7 @@ def admin_faculty_add():
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO faculty (name, designation, designation_key, qualification, joined, research, email, photo) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO faculty (name, designation, designation_key, qualification, joined, research, email, photo) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         (f['name'], f['designation'], f['designation_key'], f['qualification'], f['joined'], f['research'], f['email'], f['photo'])
     )
     conn.commit(); conn.close()
@@ -479,7 +509,7 @@ def admin_faculty_edit(fid):
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "UPDATE faculty SET name=?, designation=?, designation_key=?, qualification=?, joined=?, research=?, email=?, photo=? WHERE id=?",
+        "UPDATE faculty SET name=%s, designation=%s, designation_key=%s, qualification=%s, joined=%s, research=%s, email=%s, photo=%s WHERE id=%s",
         (f['name'], f['designation'], f['designation_key'], f['qualification'], f['joined'], f['research'], f['email'], f['photo'], fid)
     )
     conn.commit(); conn.close()
@@ -491,7 +521,7 @@ def admin_faculty_delete(fid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM faculty WHERE id=?", (fid,))
+    conn.execute("DELETE FROM faculty WHERE id=%s", (fid,))
     conn.commit(); conn.close()
     flash("Faculty member deleted!", "warning")
     return redirect(url_for("admin_panel") + "#faculty")
@@ -508,7 +538,7 @@ def admin_books_add():
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO books (title, author, category, status, shelf, cover_gradient, cover_icon) VALUES (?,?,?,?,?,?,?)",
+        "INSERT INTO books (title, author, category, status, shelf, cover_gradient, cover_icon) VALUES (%s,%s,%s,%s,%s,%s,%s)",
         (f['title'], f['author'], f['category'], f['status'], f['shelf'],
          f.get('cover_gradient', 'linear-gradient(135deg,#667eea,#764ba2)'),
          f.get('cover_icon', 'fas fa-book'))
@@ -524,7 +554,7 @@ def admin_books_edit(bid):
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "UPDATE books SET title=?, author=?, category=?, status=?, shelf=? WHERE id=?",
+        "UPDATE books SET title=%s, author=%s, category=%s, status=%s, shelf=%s WHERE id=%s",
         (f['title'], f['author'], f['category'], f['status'], f['shelf'], bid)
     )
     conn.commit(); conn.close()
@@ -536,7 +566,7 @@ def admin_books_delete(bid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM books WHERE id=?", (bid,))
+    conn.execute("DELETE FROM books WHERE id=%s", (bid,))
     conn.commit(); conn.close()
     flash("Book deleted!", "warning")
     return redirect(url_for("admin_panel") + "#library")
@@ -555,7 +585,7 @@ def admin_programs_add():
     highlights = [h.strip() for h in f.get('highlights', '').split('\n') if h.strip()]
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO programs (name, duration, intake, eligibility, extra_icon, extra_label, extra_value, highlights) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO programs (name, duration, intake, eligibility, extra_icon, extra_label, extra_value, highlights) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
         (f['name'], f['duration'], f['intake'], f['eligibility'],
          f.get('extra_icon', '🏫'), f.get('extra_label', ''), f.get('extra_value', ''),
          json.dumps(highlights))
@@ -573,7 +603,7 @@ def admin_programs_edit(pid):
     highlights = [h.strip() for h in f.get('highlights', '').split('\n') if h.strip()]
     conn = get_db_connection()
     conn.execute(
-        "UPDATE programs SET name=?, duration=?, intake=?, eligibility=?, extra_label=?, extra_value=?, highlights=? WHERE id=?",
+        "UPDATE programs SET name=%s, duration=%s, intake=%s, eligibility=%s, extra_label=%s, extra_value=%s, highlights=%s WHERE id=%s",
         (f['name'], f['duration'], f['intake'], f['eligibility'],
          f.get('extra_label', ''), f.get('extra_value', ''),
          json.dumps(highlights), pid)
@@ -587,7 +617,7 @@ def admin_programs_delete(pid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM programs WHERE id=?", (pid,))
+    conn.execute("DELETE FROM programs WHERE id=%s", (pid,))
     conn.commit(); conn.close()
     flash("Program deleted!", "warning")
     return redirect(url_for("admin_panel") + "#academics")
@@ -604,7 +634,7 @@ def admin_placement_summary_edit(sid):
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "UPDATE placement_summary SET icon=?, value=?, label=?, company=? WHERE id=?",
+        "UPDATE placement_summary SET icon=%s, value=%s, label=%s, company=%s WHERE id=%s",
         (f['icon'], f['value'], f['label'], f.get('company', ''), sid)
     )
     conn.commit(); conn.close()
@@ -622,7 +652,7 @@ def admin_companies_add():
         return redirect(url_for("login"))
     f = request.form
     conn = get_db_connection()
-    conn.execute("INSERT INTO placement_companies (name, url, sector) VALUES (?,?,?)",
+    conn.execute("INSERT INTO placement_companies (name, url, sector) VALUES (%s,%s,%s)",
                  (f['name'], f.get('url', ''), f.get('sector', 'IT')))
     conn.commit(); conn.close()
     flash("Company added!", "success")
@@ -633,7 +663,7 @@ def admin_companies_delete(cid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM placement_companies WHERE id=?", (cid,))
+    conn.execute("DELETE FROM placement_companies WHERE id=%s", (cid,))
     conn.commit(); conn.close()
     flash("Company deleted!", "warning")
     return redirect(url_for("admin_panel") + "#placements")
@@ -649,7 +679,7 @@ def admin_alumni_add():
         return redirect(url_for("login"))
     f = request.form
     conn = get_db_connection()
-    conn.execute("INSERT INTO alumni (name, batch, company, package, photo, testimonial) VALUES (?,?,?,?,?,?)",
+    conn.execute("INSERT INTO alumni (name, batch, company, package, photo, testimonial) VALUES (%s,%s,%s,%s,%s,%s)",
                  (f['name'], f['batch'], f['company'], f['package'], f.get('photo', ''), f.get('testimonial', '')))
     conn.commit(); conn.close()
     flash("Alumni added!", "success")
@@ -660,7 +690,7 @@ def admin_alumni_delete(aid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM alumni WHERE id=?", (aid,))
+    conn.execute("DELETE FROM alumni WHERE id=%s", (aid,))
     conn.commit(); conn.close()
     flash("Alumni deleted!", "warning")
     return redirect(url_for("admin_panel") + "#placements")
@@ -676,7 +706,7 @@ def admin_internships_add():
         return redirect(url_for("login"))
     f = request.form
     conn = get_db_connection()
-    conn.execute("INSERT INTO internships (title, company, domain, location, description, link) VALUES (?,?,?,?,?,?)",
+    conn.execute("INSERT INTO internships (title, company, domain, location, description, link) VALUES (%s,%s,%s,%s,%s,%s)",
                  (f['title'], f['company'], f.get('domain', 'IT'), f.get('location', ''), f.get('description', ''), f.get('link', '#')))
     conn.commit(); conn.close()
     flash("Internship added!", "success")
@@ -687,7 +717,7 @@ def admin_internships_delete(iid):
     if admin_required():
         return redirect(url_for("login"))
     conn = get_db_connection()
-    conn.execute("DELETE FROM internships WHERE id=?", (iid,))
+    conn.execute("DELETE FROM internships WHERE id=%s", (iid,))
     conn.commit(); conn.close()
     flash("Internship deleted!", "warning")
     return redirect(url_for("admin_panel") + "#placements")
