@@ -5,47 +5,28 @@
 {% block content %}
 <div style="max-width:900px; margin: 60px auto; padding: 20px;">
 
-    <h1 style="color: var(--primary-red); margin-bottom: 10px;">
+    <h1 style="color: var(--primary-red); margin-bottom: 10px; display: none;">
         🧑‍🎓 Student Dashboard
     </h1>
     <p>Welcome, <strong>{{ session.get('name') }}</strong>! You are logged in as <strong>Student</strong>.</p>
 
     <hr style="margin: 20px 0;">
 
-    <!-- Quick Links -->
-    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-        <a href="{{ url_for('academics') }}" style="background:#3498db; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; text-decoration:none;">
-            <h2>📖</h2>
-            <p>Syllabus</p>
-        </a>
-        <a href="{{ url_for('placements') }}" style="background:#2ecc71; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; text-decoration:none;">
-            <h2>💼</h2>
-            <p>Placements</p>
-        </a>
-        <a href="{{ url_for('library') }}" style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; text-decoration:none;">
-            <h2>📚</h2>
-            <p>Library</p>
-        </a>
-        <a href="{{ url_for('faculty') }}" style="background:#9b59b6; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; text-decoration:none;">
-            <h2>👩‍🏫</h2>
-            <p>Faculty</p>
-        </a>
-    </div>
-
     <h2>📢 Upcoming Events</h2>
     <ul style="list-style:none; padding:0;">
-        <li style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
+        <li
+            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
             🗓️ Seminar on AI trends – 12th March 2026
         </li>
-        <li style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
+        <li
+            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
             🗓️ Campus Placement Drive – 18th March 2026
         </li>
-        <li style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
+        <li
+            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
             🗓️ Internal Examinations – 25th March 2026
         </li>
     </ul>
 
-    <br>
-    <a href="{{ url_for('logout') }}" style="background:#e74c3c; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none;">Logout</a>
 </div>
 {% endblock %}

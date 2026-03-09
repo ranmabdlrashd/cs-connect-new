@@ -97,7 +97,15 @@
             </div>
             {% endfor %}
           </div>
+          {% if session.get('user_id') %}
           <button class="btn-download">📥 Download Semester {{ loop.index }} Syllabus (PDF)</button>
+          {% else %}
+          <div
+            style="margin-top: 14px; padding: 10px 16px; background: #fff8f0; border: 1px solid #ffd8a8; border-radius: 8px; font-size: 0.85rem; color: #8a5700; text-align: center;">
+            🔒 <a href="{{ url_for('login') }}" style="color: #c0392b; font-weight: 600;">Login</a> to download semester
+            notes & syllabus.
+          </div>
+          {% endif %}
         </div>
       </div>
       {% endfor %}
@@ -121,7 +129,15 @@
       <div class="calendar-icon">📅</div>
       <h3>Current Academic Year Calendar</h3>
       <p>View important dates, exam schedules, and semester timelines</p>
+      {% if session.get('user_id') %}
       <a href="#" class="btn-download-calendar">📥 Download Academic Calendar (PDF)</a>
+      {% else %}
+      <div
+        style="margin-top: 14px; padding: 10px 16px; background: #fff8f0; border: 1px solid #ffd8a8; border-radius: 8px; font-size: 0.85rem; color: #8a5700; text-align: center;">
+        🔒 <a href="{{ url_for('login') }}" style="color: #c0392b; font-weight: 600;">Login</a> to download the Academic
+        Calendar.
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>

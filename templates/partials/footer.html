@@ -8,10 +8,14 @@
         </p>
     </div>
     <div>
-        <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
-        <li><a href="{{ url_for('placements') }}">Placements</a></li>
-        <li><a href="{{ url_for('library') }}">Library</a></li>
-        <li><a href="{{ url_for('login') }}">Student Portal</a></li>
+        <h4>Quick Links</h4>
+        <ul>
+            <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
+            <li><a href="{{ url_for('placements') }}">Placements</a></li>
+            {% if session.get('user_id') %}
+            <li><a href="{{ url_for('library_bp.library') }}">Library</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('login') }}">Student Portal</a></li>
         </ul>
     </div>
     <div>

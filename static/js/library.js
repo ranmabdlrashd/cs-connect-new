@@ -1,101 +1,82 @@
-// =============================================================================
-// library.js — CS Connect Library Page
-// Handles search, filter, and premium interactions
-// =============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
 
-document.addEventListener("DOMContentLoaded", () => {
-    // ── Live Search ──────────────────────────────────────────────────────
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput) {
-        searchInput.addEventListener("input", searchBooks);
+    function fetchBooks(query = '') {
+        fetch(`/search_books?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => renderBooks(data))
+            .catch(err => console.error("Error fetching books:", err));
     }
 
-    // ── Scroll Reveal ────────────────────────────────────────────────────
-    const revealElements = document.querySelectorAll(".reveal");
-    const revealOnScroll = () => {
-        revealElements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            if (rect.top < window.innerHeight * 0.9) {
-                el.classList.add("active");
+    function renderBooks(books) {
+        const grid = document.getElementById('booksGrid');
+        const noResults = document.getElementById('noResults');
+
+        grid.innerHTML = '';
+        if (books.length === 0) {
+            noResults.style.display = 'block';
+            return;
+        }
+        noResults.style.display = 'none';
+
+        books.forEach(book => {
+            const isAvail = book.availability !== false;
+            const statusClass = isAvail ? 'status-available' : 'status-issued';
+            const statusText = isAvail ? 'Available' : 'Issued';
+
+            // For card layout
+            const card = document.createElement('div');
+            card.className = 'book-card reveal active';
+            card.style.cursor = 'pointer';
+            card.style.background = 'white';
+            card.style.borderRadius = '10px';
+            card.style.overflow = 'hidden';
+            card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.05)';
+            card.onclick = () => { window.location.href = `/book/${book.id}`; };
+
+            let holderInfoHtml = '';
+            if (!isAvail && book.current_holder) {
+                if (window.USER_ROLE === 'admin') {
+                    holderInfoHtml = `<p class="book-holder" style="color: #d9534f; font-size: 0.85em; font-weight: bold; margin-top: 5px;">Currently with: ${book.current_holder}</p>`;
+                }
             }
+
+            const subject = book.subject || 'General Collection';
+            const author = book.author || 'Unknown Author';
+            const title = book.title;
+            const icon = book.cover_icon || 'fas fa-book';
+            const bg = book.cover_gradient || 'linear-gradient(135deg, #667eea, #764ba2)';
+
+            card.innerHTML = `
+                <div class="book-cover" style="height: 140px; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white;">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="book-info" style="padding: 20px;">
+                    <h3 class="book-title" style="margin: 0 0 5px 0; font-size: 1.2rem; color: #333;">${title}</h3>
+                    <p class="book-author" style="margin: 0 0 15px 0; color: #777; font-size: 0.9rem;">by ${author}</p>
+                    
+                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.8rem; background: #eee; padding: 3px 8px; border-radius: 4px; color: #555;">${subject}</span>
+                        <span style="font-size: 0.8rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; ${isAvail ? 'color: #28a745; background: #d4edda;' : 'color: #dc3545; background: #f8d7da;'}">${statusText}</span>
+                    </div>
+                    ${holderInfoHtml}
+                </div>
+            `;
+            grid.appendChild(card);
         });
-    };
-    window.addEventListener("scroll", revealOnScroll);
-    revealOnScroll(); // Initial check
-});
-
-// ── Search Books ───────────────────────────────────────────────────────────
-function searchBooks() {
-    const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-    const books = document.querySelectorAll(".book-card");
-    let visibleCount = 0;
-
-    books.forEach(book => {
-        const title = (book.getAttribute("data-title") || "").toLowerCase();
-        const author = (book.getAttribute("data-author") || "").toLowerCase();
-        const show = title.includes(searchTerm) || author.includes(searchTerm);
-        book.style.display = show ? "block" : "none";
-        if (show) visibleCount++;
-    });
-
-    const noResults = document.getElementById("noResults");
-    if (noResults) noResults.style.display = visibleCount === 0 ? "block" : "none";
-}
-
-// ── Filter Books ───────────────────────────────────────────────────────────
-function filterBooks(filter) {
-    const books = document.querySelectorAll(".book-card");
-    const chips = document.querySelectorAll(".filter-chip");
-    let visibleCount = 0;
-
-    chips.forEach(chip => chip.classList.remove("active"));
-    if (event && event.target) event.target.classList.add("active");
-
-    books.forEach(book => {
-        const category = book.getAttribute("data-category");
-        const status = book.getAttribute("data-status");
-        const show = filter === "all" || category === filter || status === filter;
-        book.style.display = show ? "block" : "none";
-        if (show) visibleCount++;
-    });
-
-    const noResults = document.getElementById("noResults");
-    if (noResults) noResults.style.display = visibleCount === 0 ? "block" : "none";
-}
-
-// ── Library Notices ────────────────────────────────────────────────────────
-function flashNotice(message) {
-    const notice = document.createElement('div');
-    notice.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--dark-charcoal);
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        z-index: 9999;
-        font-weight: 600;
-        animation: slideIn 0.3s ease-out;
-    `;
-    notice.innerHTML = `<i class="fas fa-info-circle" style="color: var(--primary-red); margin-right: 10px;"></i> ${message}`;
-    document.body.appendChild(notice);
-
-    setTimeout(() => {
-        notice.style.opacity = '0';
-        notice.style.transform = 'translateY(-20px)';
-        notice.style.transition = '0.3s all ease';
-        setTimeout(() => notice.remove(), 300);
-    }, 3000);
-}
-
-// Add animation keyframes for notice
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
     }
-`;
-document.head.appendChild(style);
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => fetchBooks(searchInput.value));
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            fetchBooks(searchInput.value);
+        });
+    }
+
+    // Initial load fetch
+    fetchBooks();
+});

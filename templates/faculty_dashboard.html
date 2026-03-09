@@ -5,7 +5,7 @@
 {% block content %}
 <div style="max-width:900px; margin: 60px auto; padding: 20px;">
 
-    <h1 style="color: var(--primary-red); margin-bottom: 10px;">
+    <h1 style="color: var(--primary-red); margin-bottom: 10px; display: none;">
         🎓 Faculty Dashboard
     </h1>
     <p>Welcome, <strong>{{ session.get('name') }}</strong>! You are logged in as <strong>Faculty</strong>.</p>
@@ -14,15 +14,20 @@
 
     <!-- Quick Links (Tiles) -->
     <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-        <div onclick="togglePanel('courses-panel')" style="background:#3498db; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div onclick="togglePanel('courses-panel')"
+            style="background:#3498db; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <h2>📚</h2>
             <p>Manage Courses</p>
         </div>
-        <div onclick="togglePanel('announcements-panel')" style="background:#9b59b6; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div onclick="togglePanel('announcements-panel')"
+            style="background:#9b59b6; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <h2>💬</h2>
             <p>Announcements</p>
         </div>
-        <div style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <h2>📅</h2>
             <p>Timetable</p>
         </div>
@@ -30,14 +35,17 @@
 
     <!-- Hidden Action Panels -->
     <!-- Manage Courses Panel -->
-    <div id="courses-panel" style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #3498db;">
+    <div id="courses-panel"
+        style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #3498db;">
         <h2 style="color:#3498db; display:flex; align-items:center; gap:10px; margin-top:0;">📚 Manage Courses</h2>
         <p style="color:#666; font-size:14px;">Upload Study Materials, PYQs & Syllabus Update</p>
-        
-        <form action="#" method="POST" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+
+        <form action="{{ url_for('faculty_upload') }}" method="POST" enctype="multipart/form-data"
+            style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
             <div>
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Select Course *</label>
-                <select name="course" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;" required>
+                <select name="course" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;"
+                    required>
                     <option value="">-- Choose Course --</option>
                     <option value="cs101">Data Structures (CS101)</option>
                     <option value="cs102">Operating Systems (CS102)</option>
@@ -48,7 +56,8 @@
 
             <div>
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Material Type *</label>
-                <select name="material_type" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;" required>
+                <select name="material_type" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;"
+                    required>
                     <option value="">-- Choose Type --</option>
                     <option value="notes">Class Notes</option>
                     <option value="pyq">Previous Year Questions (PYQ)</option>
@@ -58,37 +67,46 @@
 
             <div>
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">File Upload *</label>
-                <input type="file" name="file" style="width:100%; padding:8px; border:1px dashed #ccc; border-radius:5px;" required>
+                <input type="file" name="file"
+                    style="width:100%; padding:8px; border:1px dashed #ccc; border-radius:5px;" required>
             </div>
 
-            <button type="submit" style="background:#3498db; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer;">
+            <button type="submit"
+                style="background:#3498db; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer;">
                 Upload Material
             </button>
         </form>
     </div>
 
     <!-- Announcements Panel -->
-    <div id="announcements-panel" style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #9b59b6;">
+    <div id="announcements-panel"
+        style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #9b59b6;">
         <h2 style="color:#9b59b6; display:flex; align-items:center; gap:10px; margin-top:0;">💬 Announcements</h2>
         <p style="color:#666; font-size:14px;">Add or Edit CSE Notices</p>
-        
+
         <form action="#" method="POST" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
             <div>
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Announcement Title *</label>
-                <input type="text" name="title" placeholder="e.g. Rescheduled Lab Exam" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box;" required>
+                <input type="text" name="title" placeholder="e.g. Rescheduled Lab Exam"
+                    style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box;"
+                    required>
             </div>
 
             <div>
                 <label style="font-weight:bold; display:block; margin-bottom:5px;">Details *</label>
-                <textarea name="description" rows="4" placeholder="Enter full details here..." style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box; resize: vertical;" required></textarea>
+                <textarea name="description" rows="4" placeholder="Enter full details here..."
+                    style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box; resize: vertical;"
+                    required></textarea>
             </div>
-            
+
             <div style="display:flex; gap:10px;">
-                <button type="submit" style="background:#9b59b6; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; flex:1;">
+                <button type="submit"
+                    style="background:#9b59b6; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; flex:1;">
                     Post Announcement
                 </button>
                 <!-- Simulated "Edit" option link -->
-                <a href="#" style="background:#f1c40f; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; text-decoration:none; text-align:center; flex:1;">
+                <a href="#"
+                    style="background:#f1c40f; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; text-decoration:none; text-align:center; flex:1;">
                     Manage Existing
                 </a>
             </div>
@@ -99,7 +117,8 @@
     <div style="background:#fff; border-radius:10px; padding:25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <h2 style="margin-top:0;">Recent Notices (Preview)</h2>
         <ul style="list-style:none; padding:0; margin:0;">
-            <li style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+            <li
+                style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <strong>Faculty meeting scheduled for 10th March at 10AM.</strong>
                     <div style="font-size:12px; color:#888;">Posted 2 days ago</div>
@@ -109,7 +128,8 @@
                     <a href="#" style="color:#e74c3c; text-decoration:none;">Delete</a>
                 </div>
             </li>
-            <li style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+            <li
+                style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <strong>Submit internal assessment marks by 15th March.</strong>
                     <div style="font-size:12px; color:#888;">Posted 5 days ago</div>
@@ -122,10 +142,6 @@
         </ul>
     </div>
 
-    <br><br>
-    <div style="text-align: right;">
-        <a href="{{ url_for('logout') }}" style="background:#e74c3c; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none;">Logout</a>
-    </div>
 </div>
 
 <script>

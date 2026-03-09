@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block title %}S2 CSE A – Timetable | CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tt-page {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px 60px;
+    }
+
+    .tt-header {
+        background: linear-gradient(135deg, #c0392b, #8b1e1e);
+        color: #fff;
+        border-radius: 14px;
+        padding: 30px 36px;
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tt-header h1 {
+        margin: 0;
+        font-size: 1.7rem;
+    }
+
+    .tt-header p {
+        margin: 4px 0 0;
+        opacity: .85;
+        font-size: 0.9rem;
+    }
+
+    .tt-badge {
+        background: rgba(255, 255, 255, .15);
+        border: 1px solid rgba(255, 255, 255, .3);
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    /* ── TABLE ── */
+    .tt-table-wrap {
+        overflow-x: auto;
+        border-radius: 14px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, .1);
+    }
+
+    table.tt {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 0.82rem;
+        min-width: 780px;
+    }
+
+    table.tt th {
+        background: #2c3e50;
+        color: #fff;
+        padding: 12px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.78rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    table.tt th.day-col {
+        background: #1a252f;
+    }
+
+    table.tt td {
+        padding: 0;
+        text-align: center;
+        border: 1px solid #ecf0f1;
+        vertical-align: middle;
+    }
+
+    table.tt td.day-label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        background: #f8f9fa;
+        color: #2c3e50;
+        padding: 10px 12px;
+        white-space: nowrap;
+    }
+
+    /* Slot cell */
+    .tt-slot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 8px 6px;
+        min-height: 60px;
+        height: 100%;
+        border-radius: 6px;
+        margin: 3px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+        cursor: default;
+        transition: transform .15s, box-shadow .15s;
+    }
+
+    .tt-slot:hover {
+        transform: scale(1.04);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        z-index: 2;
+        position: relative;
+    }
+
+    .tt-slot .subj {
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .tt-slot .fac {
+        font-size: 0.68rem;
+        opacity: .85;
+    }
+
+    .tt-slot .lab-badge {
+        font-size: 0.6rem;
+        background: rgba(255, 255, 255, .25);
+        border-radius: 4px;
+        padding: 1px 5px;
+        margin-top: 2px;
+    }
+
+    .tt-empty {
+        background: #f8f9fa;
+    }
+
+    /* ── LEGEND / SUBJECT TABLE ── */
+    .tt-legend-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 36px 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+
+    .legend-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .07);
+        border-left: 4px solid;
+    }
+
+    .legend-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.7rem;
+        color: #fff;
+        flex-shrink: 0;
+        text-align: center;
+        line-height: 1.1;
+    }
+
+    .legend-info .code {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #2c3e50;
+    }
+
+    .legend-info .name {
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 2px;
+    }
+
+    .legend-info .faculty {
+        font-size: 0.72rem;
+        color: #999;
+        margin-top: 1px;
+    }
+
+    @media (max-width: 600px) {
+        .tt-header {
+            padding: 20px;
+        }
+
+        .tt-header h1 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tt-page">
+
+    <!-- Header -->
+    <div class="tt-header">
+        <div>
+            <h1>📅 Class Timetable</h1>
+            <p>Semester 2 · CSE Section A · Room A213 · 2025–26</p>
+        </div>
+        <span class="tt-badge">S2 CSE A</span>
+    </div>
+
+    <!-- Timetable Table -->
+    <div class="tt-table-wrap">
+        <table class="tt">
+            <thead>
+                <tr>
+                    <th class="day-col">Day / Period</th>
+                    {% for pnum, ptime in periods %}
+                    <th>P{{ pnum }}<br><span style="font-weight:400;font-size:0.7rem;">{{ ptime }}</span></th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in days %}
+                <tr>
+                    <td class="day-label">{{ day | upper }}</td>
+                    {% set skip_until = [0] %}
+                    {% for pnum, ptime in periods %}
+                    {% if pnum <= skip_until[0] %} {# This period was consumed by a spanning lab — skip #} {% else %} {%
+                        set slot=slot_map.get((day, pnum)) %} {% if slot %} {% set code=slot.subject_code %} {% set
+                        color=colors.get(code, '#607d8b' ) %} {% set sp=slot.span %} {% if sp> 1 %}{% if
+                        skip_until.append(pnum + sp - 1) %}{% endif %}{% endif %}
+                        <td colspan="{{ sp }}" style="padding:0;">
+                            <div class="tt-slot" data-color="{{ color }}" title="{{ code }} — {{ slot.faculty_code }}">
+                                <span class="subj">{{ code }}</span>
+                                <span class="fac">({{ slot.faculty_code }})</span>
+                                {% if slot.is_lab %}<span class="lab-badge">LAB</span>{% endif %}
+                            </div>
+                        </td>
+                        {% else %}
+                        <td class="tt-empty"></td>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Subject Legend -->
+    <p class="tt-legend-title">📚 Subject Reference</p>
+    <div class="legend-grid">
+        {% for subj in subjects %}
+        {% set color = colors.get(subj.code, '#607d8b') %}
+        <div class="legend-card" data-border-color="{{ color }}">
+            <div class="legend-dot" data-color="{{ color }}">{{ subj.code[:3] if subj.code|length > 3 else subj.code }}
+            </div>
+            <div class="legend-info">
+                <div class="code">{{ subj.code }}</div>
+                <div class="name">{{ subj.full_name }}</div>
+                <div class="faculty">{{ subj.faculty_name }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    // Apply dynamic colors from data attributes (avoids CSS-lint false-positives in Jinja2 templates)
+    document.querySelectorAll('.tt-slot[data-color]').forEach(function (el) {
+        el.style.background = el.dataset.color;
+    });
+    document.querySelectorAll('.legend-dot[data-color]').forEach(function (el) {
+        el.style.background = el.dataset.color;
+    });
+    document.querySelectorAll('.legend-card[data-border-color]').forEach(function (el) {
+        el.style.borderLeftColor = el.dataset.borderColor;
+    });
+</script>
+{% endblock %}

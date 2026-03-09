@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Notifications{% endblock %}
+
+{% block content %}
+<section class="page-header" style="height: 250px;">
+    <div class="header-overlay" style="display: flex; align-items: center; justify-content: center;">
+        <div class="header-content reveal" style="text-align: center;">
+            <h1>Admin Notifications</h1>
+        </div>
+    </div>
+</section>
+
+<div class="container mt-5 mb-5" style="max-width: 900px; margin: 50px auto; padding: 0 20px;">
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0; margin-bottom: 25px; color: #333;"><i class="fas fa-bell"
+                style="color: #4facfe; margin-right: 10px;"></i> Recent Notifications</h3>
+
+        {% if notifications %}
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for notif in notifications %}
+            <li class="{% if not notif.read_status %}unread-notif{% endif %}"
+                style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 15px;">
+                <div
+                    style="background: #e9ecef; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6c757d;">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div>
+                    <div style="font-size: 1.05rem; color: #444; margin-bottom: 5px;">{{ notif.message }}</div>
+                    <div style="font-size: 0.85rem; color: #888;"><i class="far fa-clock"
+                            style="margin-right: 5px;"></i> {{ notif.created_at.strftime('%Y-%m-%d %H:%M') if
+                        notif.created_at else notif.created_at }}</div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div style="text-align: center; padding: 40px 0;">
+            <i class="far fa-bell" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+            <p style="color: #888; margin: 0;">You have no new notifications.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

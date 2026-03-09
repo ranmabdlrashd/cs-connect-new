@@ -46,15 +46,32 @@
     </div>
 
     <style>
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; color: #fff; font-weight: 500; font-size: 0.85rem; }
-        .badge-admin { background: #e74c3c; }
-        .badge-faculty { background: #3498db; }
-        .badge-student { background: #2ecc71; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .badge-admin {
+            background: #e74c3c;
+        }
+
+        .badge-faculty {
+            background: #3498db;
+        }
+
+        .badge-student {
+            background: #2ecc71;
+        }
     </style>
 
     <!-- Users Table -->
     <h2>All Registered Users</h2>
-    <table style="width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <table
+        style="width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <thead style="background:var(--primary-red); color:#fff;">
             <tr>
                 <th style="padding:12px;">ID</th>
@@ -83,10 +100,8 @@
 
     <br>
     <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:10px;">
-        <a href="{{ url_for('admin_panel') }}" style="background:#2980b9; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
-            ⚙️ Open Admin Control Panel
-        </a>
-        <a href="{{ url_for('logout') }}" style="background:#e74c3c; color:#fff; padding:12px 20px; border-radius:8px; text-decoration:none;">Logout</a>
+        <a href="{{ url_for('logout') }}"
+            style="background:#e74c3c; color:#fff; padding:12px 20px; border-radius:8px; text-decoration:none;">Logout</a>
     </div>
 </div>
 {% endblock %}

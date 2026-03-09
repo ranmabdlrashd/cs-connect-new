@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Library Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header" style="height: 250px;">
+    <div class="header-overlay" style="display: flex; align-items: center; justify-content: center;">
+        <div class="header-content reveal" style="text-align: center;">
+            <h1>Admin Library Dashboard</h1>
+        </div>
+    </div>
+</section>
+
+<div class="container mt-5 mb-5" style="max-width: 1200px; margin: 50px auto; padding: 0 20px;">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {% if category=='danger' %}alert-danger{% elif category=='success' %}alert-success{% elif category=='warning' %}alert-warning{% else %}alert-info{% endif %}"
+        style="padding:15px; margin-bottom:25px; border-radius:8px; font-weight: 500;">
+        <i class="fas {% if category=='danger' %}fa-exclamation-circle{% elif category=='success' %}fa-check-circle{% elif category=='warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"
+            style="margin-right: 8px;"></i> {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+        <!-- Pending Requests -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #333;"><i class="fas fa-bookmark"
+                        style="color: #17a2b8; margin-right: 10px;"></i> Pending Book Requests</h3>
+                <span
+                    style="background: #17a2b8; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold;">{{
+                    requests|length }}</span>
+            </div>
+
+            {% if requests %}
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for req in requests %}
+                <li
+                    style="padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 12px; background: #fbfbfb;">
+                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;"><a
+                            href="{{ url_for('library_bp.book_details', book_id=req.book_id) }}"
+                            style="color: #444; text-decoration: none;">{{ req.book_title }}</a></div>
+                    <div style="font-size: 0.85rem; color: #777; margin-bottom: 10px;">
+                        <span style="margin-right: 15px;"><i class="fas fa-barcode"></i> ID: {{ req.book_id }}</span>
+                        <span><i class="far fa-calendar-alt"></i> {{ req.request_date.strftime('%Y-%m-%d %H:%M') if
+                            req.request_date else req.request_date }}</span>
+                    </div>
+                    <div style="margin-bottom: 12px; font-size: 0.95rem;">
+                        Requested by: <strong style="color: #333;">{{ req.user_name }}</strong>
+                    </div>
+                    <form action="{{ url_for('admin_bp.send_request_message', request_id=req.id) }}" method="POST">
+                        <button type="submit"
+                            style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background 0.2s; width: 100%;"><i
+                                class="fas fa-bell" style="margin-right: 5px;"></i> Notify Current Holder</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-check-circle" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                <p style="color: #888; margin: 0;">No pending requests found.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Active Issues -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #333;"><i class="fas fa-hand-holding"
+                        style="color: #ffc107; margin-right: 10px;"></i> Active Book Issues</h3>
+                <span
+                    style="background: #ffc107; color: #333; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold;">{{
+                    issues|length }}</span>
+            </div>
+
+            {% if issues %}
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for issue in issues %}
+                <li
+                    style="padding: 15px; border: 1px solid #eee; border-left: 4px solid #ffc107; border-radius: 8px; margin-bottom: 12px; background: #fbfbfb;">
+                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;"><a
+                            href="{{ url_for('library_bp.book_details', book_id=issue.book_id) }}"
+                            style="color: #444; text-decoration: none;">{{ issue.book_title }}</a></div>
+                    <div style="font-size: 0.85rem; color: #777; margin-bottom: 10px;">
+                        <span><i class="far fa-calendar-alt"></i> Issued on: {{ issue.issue_date.strftime('%Y-%m-%d
+                            %H:%M') if issue.issue_date else issue.issue_date }}</span>
+                    </div>
+                    <div style="font-size: 0.95rem;">
+                        Issued to: <strong style="color: #333;">{{ issue.user_name }}</strong>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div style="text-align: center; padding: 40px 0;">
+                <i class="fas fa-boxes" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                <p style="color: #888; margin: 0;">No books are currently issued.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Circulation History -->
+    <div
+        style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 30px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #333;"><i class="fas fa-history"
+                    style="color: #667eea; margin-right: 10px;"></i> Circulation History</h3>
+
+            <div id="historyFilters" style="display: flex; gap: 10px;">
+                <button onclick="filterHistory('all')" class="filter-btn active"
+                    style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: #667eea; color: white; cursor: pointer; font-size: 0.85rem;">All</button>
+                <button onclick="filterHistory('issued')" class="filter-btn"
+                    style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem;">Issued</button>
+                <button onclick="filterHistory('requested')" class="filter-btn"
+                    style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem;">Requested</button>
+                <button onclick="filterHistory('returned')" class="filter-btn"
+                    style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem;">Returned</button>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;" id="historyTable">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #eee; text-align: left;">
+                    <th style="padding: 12px 15px; color: #555; font-weight: 600;">Date</th>
+                    <th style="padding: 12px 15px; color: #555; font-weight: 600;">Book Title</th>
+                    <th style="padding: 12px 15px; color: #555; font-weight: 600;">User</th>
+                    <th style="padding: 12px 15px; color: #555; font-weight: 600;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr class="history-row" data-status="{{ 'requested' if 'request' in t.type else t.type }}"
+                    style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px 15px; color: #666; font-size: 0.9rem;">
+                        {{ t.date.strftime('%Y-%m-%d %H:%M') if t.date else 'N/A' }}
+                    </td>
+                    <td style="padding: 12px 15px; font-weight: 500;">
+                        <a href="{{ url_for('library_bp.book_details', book_id=t.book_id) }}"
+                            style="color: #2980b9; text-decoration: none;">{{ t.book_title }}</a>
+                    </td>
+                    <td style="padding: 12px 15px; color: #444;">{{ t.user_name }}</td>
+                    <td style="padding: 12px 15px;">
+                        <span class="badge {{ t.badge_class }}"
+                            style="padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+                            {{ t.type }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function filterHistory(status) {
+        // Update active button styling
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            btn.style.background = 'white';
+            btn.style.color = '#555';
+        });
+        const clickedBtn = Array.from(buttons).find(b => b.textContent.toLowerCase() === status);
+        if (clickedBtn) {
+            clickedBtn.style.background = '#667eea';
+            clickedBtn.style.color = 'white';
+        }
+
+        // Filter table rows
+        const rows = document.querySelectorAll('.history-row');
+        rows.forEach(row => {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    // Include default bootstrap-like badge styles if not already present
+    const style = document.createElement('style');
+    style.innerHTML = `
+  .badge.success { background-color: #d4edda; color: #155724; }
+  .badge.warning { background-color: #fff3cd; color: #856404; }
+  .badge.info { background-color: #d1ecf1; color: #0c5460; }
+  .badge.secondary { background-color: #e2e3e5; color: #383d41; }
+`;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

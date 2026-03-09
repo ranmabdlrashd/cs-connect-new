@@ -3,92 +3,362 @@
 
 {% block content %}
 <style>
-  :root { --red: #c0392b; --dark: #1a1a2e; --card: #ffffff; }
-  .ap-header { background: linear-gradient(135deg,#c0392b,#922b21); color:#fff; padding:40px 30px 30px; border-radius:0 0 20px 20px; margin-bottom:30px; }
-  .ap-header h1 { margin:0; font-size:2rem; }
-  .ap-header p  { margin:6px 0 0; opacity:.85; }
-  .stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
-  .stat-card { background:#fff; border-radius:12px; padding:18px 24px; flex:1; min-width:130px; box-shadow:0 2px 12px rgba(0,0,0,.08); text-align:center; }
-  .stat-card h2 { margin:0; font-size:2rem; }
-  .stat-card p  { margin:4px 0 0; color:#666; font-size:.85rem; }
+  :root {
+    --red: #c0392b;
+    --dark: #1a1a2e;
+    --card: #ffffff;
+  }
+
+  .ap-header {
+    background: linear-gradient(135deg, #c0392b, #922b21);
+    color: #fff;
+    padding: 40px 30px 30px;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 30px;
+  }
+
+  .ap-header h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .ap-header p {
+    margin: 6px 0 0;
+    opacity: .85;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 24px;
+    flex: 1;
+    min-width: 130px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+    text-align: center;
+  }
+
+  .stat-card h2 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .stat-card p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: .85rem;
+  }
+
   /* Tabs */
-  .tab-nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px; }
+  .tab-nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
   .tab-btn {
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    padding:16px 24px; border:2px solid #ddd; border-radius:12px;
-    background:#fff; cursor:pointer; font-weight:700; color:#555;
-    font-size:1rem; transition:all .2s; box-shadow:0 2px 8px rgba(0,0,0,.06);
-    min-width:110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 24px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    color: #555;
+    font-size: 1rem;
+    transition: all .2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    min-width: 110px;
   }
-  .tab-btn .tab-icon { font-size:1.6rem; }
+
+  .tab-btn .tab-icon {
+    font-size: 1.6rem;
+  }
+
   .tab-btn.active {
-    background:#c0392b; color:#fff; border-color:#c0392b;
-    box-shadow:0 4px 16px rgba(192,57,43,.35);
+    background: #c0392b;
+    color: #fff;
+    border-color: #c0392b;
+    box-shadow: 0 4px 16px rgba(192, 57, 43, .35);
   }
-  .tab-btn:hover:not(.active) { border-color:#c0392b; color:#c0392b; background:#fff8f8; transform:translateY(-2px); }
-  .tab-pane { display:none; }
-  .tab-pane.active { display:block; }
+
+  .tab-btn:hover:not(.active) {
+    border-color: #c0392b;
+    color: #c0392b;
+    background: #fff8f8;
+    transform: translateY(-2px);
+  }
+
+  .tab-pane {
+    display: none;
+  }
+
+  .tab-pane.active {
+    display: block;
+  }
+
   /* Table */
-  .admin-table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.07); margin-bottom:20px; }
-  .admin-table thead { background:var(--red); color:#fff; }
-  .admin-table th, .admin-table td { padding:11px 13px; text-align:left; font-size:.9rem; }
-  .admin-table tbody tr:nth-child(even) { background:#fafafa; }
-  /* Add form */
-  .add-form { background:#fff; border-radius:12px; padding:22px; box-shadow:0 2px 12px rgba(0,0,0,.07); margin-bottom:24px; }
-  .add-form h3 { margin:0 0 16px; color:#c0392b; font-size:1.1rem; }
-  .form-row { display:flex; gap:12px; flex-wrap:wrap; }
-  .form-group { flex:1; min-width:180px; display:flex; flex-direction:column; gap:4px; }
-  .form-group label { font-size:.82rem; font-weight:600; color:#444; }
-  .form-group input, .form-group select, .form-group textarea {
-    border:1px solid #ddd; border-radius:7px; padding:8px 11px; font-size:.9rem; outline:none; transition:.2s;
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .07);
+    margin-bottom: 20px;
   }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#c0392b; }
-  .btn-add  { background:#c0392b; color:#fff; border:none; border-radius:8px; padding:9px 20px; font-weight:600; cursor:pointer; margin-top:12px; }
-  .btn-del  { background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:.8rem; }
-  .btn-edit { background:#2980b9; color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:.8rem; }
+
+  .admin-table thead {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 11px 13px;
+    text-align: left;
+    font-size: .9rem;
+  }
+
+  .admin-table tbody tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  /* Add form */
+  .add-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    margin-bottom: 24px;
+  }
+
+  .add-form h3 {
+    margin: 0 0 16px;
+    color: #c0392b;
+    font-size: 1.1rem;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .form-group {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .form-group label {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #444;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-size: .9rem;
+    outline: none;
+    transition: .2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #c0392b;
+  }
+
+  .btn-add {
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+
+  .btn-del {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: .8rem;
+  }
+
+  .btn-edit {
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: .8rem;
+  }
+
   /* Inline edit modal */
-  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; align-items:center; justify-content:center; }
-  .modal-bg.open { display:flex; }
-  .modal-box { background:#fff; border-radius:14px; padding:28px; width:min(560px,94vw); max-height:90vh; overflow-y:auto; }
-  .modal-box h3 { margin:0 0 18px; color:#c0392b; }
-  .modal-close { float:right; background:none; border:none; font-size:1.4rem; cursor:pointer; margin-top:-6px; }
-  .section-title { font-size:1.2rem; font-weight:700; color:#c0392b; margin:0 0 14px; border-left:4px solid #c0392b; padding-left:10px; }
-  .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
-  .badge.available { background:#d5f5e3; color:#27ae60; }
-  .badge.issued    { background:#fadbd8; color:#c0392b; }
-  .badge.student   { background:#d5f5e3; color:#27ae60; }
-  .badge.faculty   { background:#d6eaf8; color:#2980b9; }
-  .badge.admin     { background:#fadbd8; color:#e74c3c; }
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-bg.open {
+    display: flex;
+  }
+
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px;
+    width: min(560px, 94vw);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-box h3 {
+    margin: 0 0 18px;
+    color: #c0392b;
+  }
+
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-top: -6px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #c0392b;
+    margin: 0 0 14px;
+    border-left: 4px solid #c0392b;
+    padding-left: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  .badge.available {
+    background: #d5f5e3;
+    color: #27ae60;
+  }
+
+  .badge.issued {
+    background: #fadbd8;
+    color: #c0392b;
+  }
+
+  .badge.student {
+    background: #d5f5e3;
+    color: #27ae60;
+  }
+
+  .badge.faculty {
+    background: #d6eaf8;
+    color: #2980b9;
+  }
+
+  .badge.admin {
+    background: #fadbd8;
+    color: #e74c3c;
+  }
 
   /* Flash classes */
-  .flash-success { background:#d5f5e3; color:#1e8449; font-weight:600; padding:12px 16px; border-radius:8px; margin-bottom:14px; }
-  .flash-error   { background:#fadbd8; color:#c0392b; font-weight:600; padding:12px 16px; border-radius:8px; margin-bottom:14px; }
+  .flash-success {
+    background: #d5f5e3;
+    color: #1e8449;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+
+  .flash-error {
+    background: #fadbd8;
+    color: #c0392b;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
 </style>
 
 <div style="max-width:1200px; margin:0 auto; padding:20px;">
   <div class="ap-header">
-    <h1>🛠️ Admin Control Panel</h1>
+    <h1 style="display: none;">🛠️ Admin Control Panel</h1>
     <p>Welcome, <strong>{{ session.get('name') }}</strong> — Manage all site content from here.</p>
   </div>
 
   <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card"><h2 style="color:#e74c3c">{{ all_users|length }}</h2><p>Total Users</p></div>
-    <div class="stat-card"><h2 style="color:#27ae60">{{ student_count }}</h2><p>Students</p></div>
-    <div class="stat-card"><h2 style="color:#2980b9">{{ faculty_count }}</h2><p>Faculty Accounts</p></div>
-    <div class="stat-card"><h2 style="color:#8e44ad">{{ admin_count }}</h2><p>Admins</p></div>
-    <div class="stat-card"><h2 style="color:#e67e22">{{ faculty_list|length }}</h2><p>Faculty Records</p></div>
-    <div class="stat-card"><h2 style="color:#16a085">{{ books_list|length }}</h2><p>Books</p></div>
+    <div class="stat-card">
+      <h2 style="color:#e74c3c">{{ all_users|length }}</h2>
+      <p>Total Users</p>
+    </div>
+    <div class="stat-card">
+      <h2 style="color:#27ae60">{{ student_count }}</h2>
+      <p>Students</p>
+    </div>
+    <div class="stat-card">
+      <h2 style="color:#2980b9">{{ faculty_count }}</h2>
+      <p>Faculty Accounts</p>
+    </div>
+    <div class="stat-card">
+      <h2 style="color:#8e44ad">{{ admin_count }}</h2>
+      <p>Admins</p>
+    </div>
+    <div class="stat-card">
+      <h2 style="color:#e67e22">{{ faculty_list|length }}</h2>
+      <p>Faculty Records</p>
+    </div>
+    <div class="stat-card">
+      <h2 style="color:#16a085">{{ books_list|length }}</h2>
+      <p>Books</p>
+    </div>
   </div>
 
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    {% for cat, msg in messages %}
-    <div class="flash-{{ 'success' if cat=='success' else 'error' }}">
-      {{ msg }}
-    </div>
-    {% endfor %}
+  {% for cat, msg in messages %}
+  <div class="flash-{{ 'success' if cat=='success' else 'error' }}">
+    {{ msg }}
+  </div>
+  {% endfor %}
   {% endif %}
   {% endwith %}
 
@@ -113,9 +383,79 @@
 
   <!-- ─── USERS TAB ─── -->
   <div id="tab-users" class="tab-pane active">
+
+    <!-- Unified Quick Stats from Admin Dashboard -->
+    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
+      <div style="background:#f4f4f4; border-radius:10px; padding:20px; flex:1; min-width:150px; text-align:center;">
+        <h2 style="margin:0;">{{ all_users|length }}</h2>
+        <p style="margin:5px 0 0;">Total Users</p>
+      </div>
+      <div style="background:#d5f5e3; border-radius:10px; padding:20px; flex:1; min-width:150px; text-align:center;">
+        <h2 style="margin:0; color:#2ecc71;">{{ student_count }}</h2>
+        <p style="margin:5px 0 0;">Students</p>
+      </div>
+      <div style="background:#d6eaf8; border-radius:10px; padding:20px; flex:1; min-width:150px; text-align:center;">
+        <h2 style="margin:0; color:#3498db;">{{ faculty_count }}</h2>
+        <p style="margin:5px 0 0;">Faculty</p>
+      </div>
+      <div style="background:#fadbd8; border-radius:10px; padding:20px; flex:1; min-width:150px; text-align:center;">
+        <h2 style="margin:0; color:#e74c3c;">{{ admin_count }}</h2>
+        <p style="margin:5px 0 0;">Admins</p>
+      </div>
+    </div>
+
+    <!-- Add User Form -->
+    <div class="add-form">
+      <h3>➕ Add New User</h3>
+      <form method="POST" action="{{ url_for('admin_users_add') }}">
+        <div class="form-row" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label>Name *</label>
+            <input name="name" required placeholder="John Doe"
+              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="email" required placeholder="mail@example.com"
+              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom: 15px;">
+          <div class="form-group">
+            <label>User ID / Roll No *</label>
+            <input name="user_id" required placeholder="CS24001"
+              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" name="password" required placeholder="Secure Password"
+              style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          <div class="form-group">
+            <label>Role *</label>
+            <select name="role" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              <option value="student" selected>Student</option>
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-add">Add User</button>
+      </form>
+    </div>
+
     <p class="section-title">All Registered Users</p>
     <table class="admin-table">
-      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>User ID</th><th>Role</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>User ID</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for u in all_users %}
         <tr>
@@ -124,6 +464,16 @@
           <td>{{ u['email'] }}</td>
           <td>{{ u['user_id'] }}</td>
           <td><span class="badge {{ u['role'] }}">{{ u['role'] }}</span></td>
+          <td style="display:flex; gap:6px; align-items: center; justify-content: center;">
+            <button class="btn-edit" data-id="{{ u['id'] }}" data-name="{{ u['name'] }}" data-email="{{ u['email'] }}"
+              data-role="{{ u['role'] }}" onclick="handleUserEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_users_delete', uid=u['id']) }}"
+              onsubmit="return confirm('WARNING: Are you sure you want to permanently delete this user?');"
+              style="margin:0;">
+              <button type="submit" class="btn-delete"
+                style="background:#e74c3c; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight: 500;">Delete</button>
+            </form>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -140,7 +490,8 @@
       <form method="POST" action="{{ url_for('admin_faculty_add') }}">
         <div class="form-row">
           <div class="form-group"><label>Name *</label><input name="name" required placeholder="Dr. John Doe"></div>
-          <div class="form-group"><label>Designation *</label><input name="designation" required placeholder="Associate Professor"></div>
+          <div class="form-group"><label>Designation *</label><input name="designation" required
+              placeholder="Associate Professor"></div>
           <div class="form-group">
             <label>Designation Key *</label>
             <select name="designation_key">
@@ -151,12 +502,15 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Qualification</label><input name="qualification" placeholder="M.Tech CSE"></div>
+          <div class="form-group"><label>Qualification</label><input name="qualification" placeholder="M.Tech CSE">
+          </div>
           <div class="form-group"><label>Date Joined</label><input name="joined" placeholder="01.06.2024"></div>
-          <div class="form-group"><label>Research Area</label><input name="research" placeholder="Machine Learning"></div>
+          <div class="form-group"><label>Research Area</label><input name="research" placeholder="Machine Learning">
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Email</label><input name="email" type="email" placeholder="faculty@aisat.ac.in"></div>
+          <div class="form-group"><label>Email</label><input name="email" type="email"
+              placeholder="faculty@aisat.ac.in"></div>
           <div class="form-group"><label>Photo URL</label><input name="photo" placeholder="https://..."></div>
         </div>
         <button type="submit" class="btn-add">Add Faculty</button>
@@ -165,7 +519,16 @@
 
     <!-- Faculty Table -->
     <table class="admin-table">
-      <thead><tr><th>#</th><th>Name</th><th>Designation</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Designation</th>
+          <th>Email</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for f in faculty_list %}
         <tr>
@@ -175,18 +538,13 @@
           <td>{{ f['email'] }}</td>
           <td>{{ f['joined'] }}</td>
           <td style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn-edit" 
-                    data-id="{{ f['id'] }}" 
-                    data-name="{{ f['name'] }}" 
-                    data-designation="{{ f['designation'] }}" 
-                    data-dkey="{{ f['designation_key'] }}" 
-                    data-qual="{{ f['qualification'] }}" 
-                    data-joined="{{ f['joined'] }}" 
-                    data-research="{{ f['research'] }}" 
-                    data-email="{{ f['email'] }}" 
-                    data-photo="{{ f['photo'] }}" 
-                    onclick="handleFacultyEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_faculty_delete', fid=f['id']) }}" onsubmit="return confirm('Delete this faculty member?');" style="display:inline;">
+            <button class="btn-edit" data-id="{{ f['id'] }}" data-name="{{ f['name'] }}"
+              data-designation="{{ f['designation'] }}" data-dkey="{{ f['designation_key'] }}"
+              data-qual="{{ f['qualification'] }}" data-joined="{{ f['joined'] }}" data-research="{{ f['research'] }}"
+              data-email="{{ f['email'] }}" data-photo="{{ f['photo'] }}"
+              onclick="handleFacultyEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_faculty_delete', fid=f['id']) }}"
+              onsubmit="return confirm('Delete this faculty member?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -204,7 +562,8 @@
       <h3>➕ Add Book</h3>
       <form method="POST" action="{{ url_for('admin_books_add') }}">
         <div class="form-row">
-          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Data Structures"></div>
+          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Data Structures">
+          </div>
           <div class="form-group"><label>Author *</label><input name="author" required placeholder="Author Name"></div>
         </div>
         <div class="form-row">
@@ -223,33 +582,49 @@
               <option value="issued">Issued</option>
             </select>
           </div>
-          <div class="form-group"><label>Shelf</label><input name="shelf" placeholder="A-01"></div>
         </div>
         <button type="submit" class="btn-add">Add Book</button>
       </form>
     </div>
 
-    <table class="admin-table">
-      <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Category</th><th>Shelf</th><th>Status</th><th>Actions</th></tr></thead>
+    <div style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
+      <input type="text" id="adminBookSearch" onkeyup="filterAdminBooks()"
+        placeholder="🔍 Search books by title or author..."
+        style="padding: 10px 15px; width: 100%; max-width: 400px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; outline: none;">
+    </div>
+
+    <table class="admin-table" id="adminBooksTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for b in books_list %}
         <tr>
           <td>{{ b['id'] }}</td>
-          <td>{{ b['title'] }}</td>
+          <td><a href="{{ url_for('library_bp.book_details', book_id=b['id']) }}"
+              style="color: #2980b9; text-decoration: none; font-weight: 500;">{{ b['title'] }}</a></td>
           <td>{{ b['author'] }}</td>
           <td>{{ b['category'] }}</td>
-          <td>{{ b['shelf'] }}</td>
-          <td><span class="badge {{ b['status'] }}">{{ b['status'] }}</span></td>
+          <td>
+            {% if b['availability'] != false %}
+            <span class="badge available">Available</span>
+            {% else %}
+            <span class="badge issued">Issued</span>
+            {% endif %}
+          </td>
           <td style="display:flex; gap:6px;">
-            <button class="btn-edit" 
-                    data-id="{{ b['id'] }}" 
-                    data-title="{{ b['title'] }}" 
-                    data-author="{{ b['author'] }}" 
-                    data-category="{{ b['category'] }}" 
-                    data-status="{{ b['status'] }}" 
-                    data-shelf="{{ b['shelf'] }}" 
-                    onclick="handleBookEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_books_delete', bid=b['id']) }}" onsubmit="return confirm('Delete this book?');" style="display:inline;">
+            <button class="btn-edit" data-id="{{ b['id'] }}" data-title="{{ b['title'] }}"
+              data-author="{{ b['author'] }}" data-category="{{ b['category'] }}" data-status="{{ b['status'] }}"
+              onclick="handleBookEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_books_delete', bid=b['id']) }}"
+              onsubmit="return confirm('Delete this book?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -257,6 +632,59 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <!-- Circulation History -->
+    <div
+      style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); margin-top: 40px; border: 1px solid #eee;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h3 style="margin: 0; color: #333; font-size: 1.2rem;"><i class="fas fa-history"
+            style="color: #667eea; margin-right: 10px;"></i> Circulation History</h3>
+
+        <div id="historyFilters" style="display: flex; gap: 10px;">
+          <button onclick="filterHistory('all')" class="filter-btn active"
+            style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: #667eea; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 500;">All</button>
+          <button onclick="filterHistory('issued')" class="filter-btn"
+            style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Issued</button>
+          <button onclick="filterHistory('requested')" class="filter-btn"
+            style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Requested</button>
+          <button onclick="filterHistory('returned')" class="filter-btn"
+            style="padding: 6px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Returned</button>
+        </div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin-top: 15px;" id="historyTable">
+        <thead>
+          <tr style="background: #f8f9fa; border-bottom: 2px solid #eee; text-align: left;">
+            <th style="padding: 12px 15px; color: #555; font-weight: 600; font-size: 0.9rem;">Date</th>
+            <th style="padding: 12px 15px; color: #555; font-weight: 600; font-size: 0.9rem;">Book Title</th>
+            <th style="padding: 12px 15px; color: #555; font-weight: 600; font-size: 0.9rem;">User</th>
+            <th style="padding: 12px 15px; color: #555; font-weight: 600; font-size: 0.9rem;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in transactions %}
+          <tr class="history-row" data-status="{{ 'requested' if 'request' in t.type else t.type }}"
+            style="border-bottom: 1px solid #eee;">
+            <td style="padding: 12px 15px; color: #666; font-size: 0.85rem;">
+              {{ t.date.strftime('%Y-%m-%d %H:%M') if t.date else 'N/A' }}
+            </td>
+            <td style="padding: 12px 15px; font-weight: 500;">
+              <a href="{{ url_for('library_bp.book_details', book_id=t.book_id) }}"
+                style="color: #2980b9; text-decoration: none; font-size: 0.9rem;">{{ t.book_title }}</a>
+            </td>
+            <td style="padding: 12px 15px; color: #444; font-size: 0.9rem;">{{ t.user_name }}</td>
+            <td style="padding: 12px 15px;">
+              <span class="badge {{ t.badge_class }}"
+                style="padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                {{ t.type }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
   <!-- ─── ACADEMICS TAB ─── -->
@@ -267,8 +695,10 @@
       <h3>➕ Add Program</h3>
       <form method="POST" action="{{ url_for('admin_programs_add') }}">
         <div class="form-row">
-          <div class="form-group"><label>Program Name *</label><input name="name" required placeholder="B.Tech in CSE"></div>
-          <div class="form-group"><label>Duration</label><input name="duration" placeholder="4 Years (8 Semesters)"></div>
+          <div class="form-group"><label>Program Name *</label><input name="name" required placeholder="B.Tech in CSE">
+          </div>
+          <div class="form-group"><label>Duration</label><input name="duration" placeholder="4 Years (8 Semesters)">
+          </div>
           <div class="form-group"><label>Intake</label><input name="intake" placeholder="120 Students per year"></div>
         </div>
         <div class="form-row">
@@ -278,14 +708,23 @@
         </div>
         <div class="form-group" style="min-width:100%">
           <label>Highlights (one per line)</label>
-          <textarea name="highlights" rows="4" placeholder="Industry-aligned curriculum&#10;Hands-on training in AI, ML&#10;Strong industry partnerships"></textarea>
+          <textarea name="highlights" rows="4"
+            placeholder="Industry-aligned curriculum&#10;Hands-on training in AI, ML&#10;Strong industry partnerships"></textarea>
         </div>
         <button type="submit" class="btn-add">Add Program</button>
       </form>
     </div>
 
     <table class="admin-table">
-      <thead><tr><th>#</th><th>Program Name</th><th>Duration</th><th>Intake</th><th>Actions</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Program Name</th>
+          <th>Duration</th>
+          <th>Intake</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for p in programs %}
         <tr>
@@ -294,17 +733,13 @@
           <td>{{ p['duration'] }}</td>
           <td>{{ p['intake'] }}</td>
           <td style="display:flex; gap:6px;">
-            <button class="btn-edit" 
-                    data-id="{{ p['id'] }}" 
-                    data-name="{{ p['name'] }}" 
-                    data-duration="{{ p['duration'] }}" 
-                    data-intake="{{ p['intake'] }}" 
-                    data-eligibility="{{ p['eligibility'] }}" 
-                    data-extra-label="{{ p.get('extra_label','') }}" 
-                    data-extra-value="{{ p.get('extra_value','') }}" 
-                    data-highlights="{{ p.get('highlights_text','') }}" 
-                    onclick="handleProgramEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_programs_delete', pid=p['id']) }}" onsubmit="return confirm('Delete this program?');" style="display:inline;">
+            <button class="btn-edit" data-id="{{ p['id'] }}" data-name="{{ p['name'] }}"
+              data-duration="{{ p['duration'] }}" data-intake="{{ p['intake'] }}"
+              data-eligibility="{{ p['eligibility'] }}" data-extra-label="{{ p.get('extra_label','') }}"
+              data-extra-value="{{ p.get('extra_value','') }}" data-highlights="{{ p.get('highlights_text','') }}"
+              onclick="handleProgramEdit(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin_programs_delete', pid=p['id']) }}"
+              onsubmit="return confirm('Delete this program?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -316,11 +751,19 @@
 
   <!-- ─── PLACEMENTS TAB ─── -->
   <div id="tab-placements" class="tab-pane">
-    
+
     <!-- Placement Summary -->
     <p class="section-title">📊 Placement Summary Stats</p>
     <table class="admin-table">
-      <thead><tr><th>Icon</th><th>Value</th><th>Label</th><th>Company</th><th>Action</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Icon</th>
+          <th>Value</th>
+          <th>Label</th>
+          <th>Company</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         {% for s in summary_list %}
         <tr>
@@ -329,13 +772,9 @@
           <td>{{ s['label'] }}</td>
           <td>{{ s['company'] or '—' }}</td>
           <td>
-            <button class="btn-edit" 
-                    data-id="{{ s['id'] }}" 
-                    data-icon="{{ s['icon'] }}" 
-                    data-value="{{ s['value'] }}" 
-                    data-label="{{ s['label'] }}" 
-                    data-company="{{ s['company'] or '' }}" 
-                    onclick="handleSummaryEdit(this)">Edit</button>
+            <button class="btn-edit" data-id="{{ s['id'] }}" data-icon="{{ s['icon'] }}" data-value="{{ s['value'] }}"
+              data-label="{{ s['label'] }}" data-company="{{ s['company'] or '' }}"
+              onclick="handleSummaryEdit(this)">Edit</button>
           </td>
         </tr>
         {% endfor %}
@@ -364,13 +803,23 @@
       </form>
     </div>
     <table class="admin-table">
-      <thead><tr><th>#</th><th>Name</th><th>Sector</th><th>Action</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Sector</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         {% for c in companies_list %}
         <tr>
-          <td>{{ c['id'] }}</td><td>{{ c['name'] }}</td><td>{{ c['sector'] }}</td>
+          <td>{{ c['id'] }}</td>
+          <td>{{ c['name'] }}</td>
+          <td>{{ c['sector'] }}</td>
           <td>
-            <form method="POST" action="{{ url_for('admin_companies_delete', cid=c['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+            <form method="POST" action="{{ url_for('admin_companies_delete', cid=c['id']) }}"
+              onsubmit="return confirm('Delete?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -392,20 +841,34 @@
         <div class="form-row">
           <div class="form-group"><label>Package</label><input name="package" placeholder="₹8 LPA"></div>
           <div class="form-group"><label>Photo URL</label><input name="photo" placeholder="https://..."></div>
-          <div class="form-group"><label>Testimonial</label><input name="testimonial" placeholder="Short testimonial..."></div>
+          <div class="form-group"><label>Testimonial</label><input name="testimonial"
+              placeholder="Short testimonial..."></div>
         </div>
         <button type="submit" class="btn-add">Add Alumni</button>
       </form>
     </div>
     <table class="admin-table">
-      <thead><tr><th>#</th><th>Name</th><th>Batch</th><th>Company</th><th>Package</th><th>Action</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Batch</th>
+          <th>Company</th>
+          <th>Package</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         {% for a in alumni_list %}
         <tr>
-          <td>{{ a['id'] }}</td><td>{{ a['name'] }}</td><td>{{ a['batch'] }}</td>
-          <td>{{ a['company'] }}</td><td>{{ a['package'] }}</td>
+          <td>{{ a['id'] }}</td>
+          <td>{{ a['name'] }}</td>
+          <td>{{ a['batch'] }}</td>
+          <td>{{ a['company'] }}</td>
+          <td>{{ a['package'] }}</td>
           <td>
-            <form method="POST" action="{{ url_for('admin_alumni_delete', aid=a['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+            <form method="POST" action="{{ url_for('admin_alumni_delete', aid=a['id']) }}"
+              onsubmit="return confirm('Delete?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -420,27 +883,42 @@
       <h3>➕ Add Internship</h3>
       <form method="POST" action="{{ url_for('admin_internships_add') }}">
         <div class="form-row">
-          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Software Dev Intern"></div>
+          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Software Dev Intern">
+          </div>
           <div class="form-group"><label>Company *</label><input name="company" required placeholder="XYZ Corp"></div>
           <div class="form-group"><label>Domain</label><input name="domain" placeholder="IT"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label>Location</label><input name="location" placeholder="Kochi / Remote"></div>
           <div class="form-group"><label>Apply Link</label><input name="link" value="#" placeholder="https://..."></div>
-          <div class="form-group"><label>Description</label><input name="description" placeholder="Short description..."></div>
+          <div class="form-group"><label>Description</label><input name="description"
+              placeholder="Short description..."></div>
         </div>
         <button type="submit" class="btn-add">Add Internship</button>
       </form>
     </div>
     <table class="admin-table">
-      <thead><tr><th>#</th><th>Title</th><th>Company</th><th>Domain</th><th>Location</th><th>Action</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Company</th>
+          <th>Domain</th>
+          <th>Location</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         {% for i in interns_list %}
         <tr>
-          <td>{{ i['id'] }}</td><td>{{ i['title'] }}</td><td>{{ i['company'] }}</td>
-          <td>{{ i['domain'] }}</td><td>{{ i['location'] }}</td>
+          <td>{{ i['id'] }}</td>
+          <td>{{ i['title'] }}</td>
+          <td>{{ i['company'] }}</td>
+          <td>{{ i['domain'] }}</td>
+          <td>{{ i['location'] }}</td>
           <td>
-            <form method="POST" action="{{ url_for('admin_internships_delete', iid=i['id']) }}" onsubmit="return confirm('Delete?');" style="display:inline;">
+            <form method="POST" action="{{ url_for('admin_internships_delete', iid=i['id']) }}"
+              onsubmit="return confirm('Delete?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
           </td>
@@ -449,9 +927,35 @@
       </tbody>
     </table>
   </div>
+
 </div>
 
 <!-- ─── EDIT MODALS ─── -->
+
+<!-- User Edit Modal -->
+<div class="modal-bg" id="modal-user">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+    <h3>✏️ Edit User</h3>
+    <form method="POST" id="user-edit-form" action="">
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input id="ue-name" name="name" required></div>
+        <div class="form-group"><label>Email</label><input id="ue-email" name="email" required type="email"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Role</label>
+          <select id="ue-role" name="role">
+            <option value="student">student</option>
+            <option value="faculty">faculty</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+    </form>
+  </div>
+</div>
 
 <!-- Faculty Edit Modal -->
 <div class="modal-bg" id="modal-faculty">
@@ -511,11 +1015,11 @@
             <option value="issued">Issued</option>
           </select>
         </div>
-        <div class="form-group"><label>Shelf</label><input id="be-shelf" name="shelf"></div>
       </div>
-      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
-    </form>
   </div>
+  <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
+  </form>
+</div>
 </div>
 
 <!-- Program Edit Modal -->
@@ -575,7 +1079,7 @@
   // Auto open tab from URL hash
   window.addEventListener('DOMContentLoaded', () => {
     const hash = location.hash.replace('#', '');
-    const tabs = ['users', 'faculty', 'library', 'academics', 'placements'];
+    const tabs = ['users', 'faculty', 'library', 'academics', 'placements', 'notifications'];
     if (hash && tabs.includes(hash)) {
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -589,13 +1093,17 @@
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
   // Wrapper handlers to extract data from attributes
+  function handleUserEdit(btn) {
+    const d = btn.dataset;
+    openUserEdit(d.id, d.name, d.email, d.role);
+  }
   function handleFacultyEdit(btn) {
     const d = btn.dataset;
     openFacultyEdit(d.id, d.name, d.designation, d.dkey, d.qual, d.joined, d.research, d.email, d.photo);
   }
   function handleBookEdit(btn) {
     const d = btn.dataset;
-    openBookEdit(d.id, d.title, d.author, d.category, d.status, d.shelf);
+    openBookEdit(d.id, d.title, d.author, d.category, d.status);
   }
   function handleProgramEdit(btn) {
     const d = btn.dataset;
@@ -604,6 +1112,15 @@
   function handleSummaryEdit(btn) {
     const d = btn.dataset;
     openSummaryEdit(d.id, d.icon, d.value, d.label, d.company);
+  }
+
+  // User edit
+  function openUserEdit(id, name, email, role) {
+    document.getElementById('user-edit-form').action = `/admin/users/edit/${id}`;
+    document.getElementById('ue-name').value = name;
+    document.getElementById('ue-email').value = email;
+    document.getElementById('ue-role').value = role;
+    document.getElementById('modal-user').classList.add('open');
   }
 
   // Faculty edit
@@ -621,13 +1138,12 @@
   }
 
   // Book edit
-  function openBookEdit(id, title, author, category, status, shelf) {
+  function openBookEdit(id, title, author, category, status) {
     document.getElementById('book-edit-form').action = `/admin/books/edit/${id}`;
     document.getElementById('be-title').value = title;
     document.getElementById('be-author').value = author;
     document.getElementById('be-category').value = category;
     document.getElementById('be-status').value = status;
-    document.getElementById('be-shelf').value = shelf;
     document.getElementById('modal-book').classList.add('open');
   }
 
@@ -658,5 +1174,53 @@
   document.querySelectorAll('.modal-bg').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
   });
+
+  // Circulation History Filter
+  function filterHistory(status) {
+    // Update active button styling
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => {
+      btn.style.background = 'white';
+      btn.style.color = '#555';
+    });
+    const clickedBtn = Array.from(buttons).find(b => b.textContent.toLowerCase() === status);
+    if (clickedBtn) {
+      clickedBtn.style.background = '#667eea';
+      clickedBtn.style.color = 'white';
+    }
+
+    // Filter table rows
+    const rows = document.querySelectorAll('.history-row');
+    rows.forEach(row => {
+      if (status === 'all' || row.dataset.status === status) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Search Filter for Books in Admin Panel
+  function filterAdminBooks() {
+    let input = document.getElementById('adminBookSearch');
+    let filter = input.value.toLowerCase();
+    let table = document.getElementById('adminBooksTable');
+    let tr = table.getElementsByTagName('tr');
+
+    // Loop through all table rows, starting from index 1 (skip header)
+    for (let i = 1; i < tr.length; i++) {
+      let titleTd = tr[i].getElementsByTagName('td')[1]; // Title column
+      let authorTd = tr[i].getElementsByTagName('td')[2]; // Author column
+      if (titleTd || authorTd) {
+        let titleVal = titleTd.textContent || titleTd.innerText;
+        let authorVal = authorTd.textContent || authorTd.innerText;
+        if (titleVal.toLowerCase().indexOf(filter) > -1 || authorVal.toLowerCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
 </script>
 {% endblock %}

@@ -1,0 +1,5 @@
+[tool.pylint.messages_control]
+disable=C0114,C0115,C0116,C0301,C0303,C0304,C0325,W0718,W0611,E0401,C0413,W0311
+
+[tool.pylint.format]
+max-line-length=150

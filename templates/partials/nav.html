@@ -1,3 +1,14 @@
+<style>
+    .notif-unread {
+        background: #f4faff !important;
+        border-left: 4px solid #c0392b !important;
+    }
+
+    .notif-read {
+        background: #ffffff !important;
+        border-left: 4px solid transparent !important;
+    }
+</style>
 <nav>
     <div class="logo">
         <img src="{{ url_for('static', filename='media/aisat_logo.png') }}" alt="AISAT Logo"
@@ -9,8 +20,11 @@
         <li><a href="{{ url_for('home') }}" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
         <li><a href="{{ url_for('academics') }}" class="{{ 'active' if active_page == 'academics' }}">Academics</a></li>
         <li><a href="{{ url_for('faculty') }}" class="{{ 'active' if active_page == 'faculty' }}">Faculty</a></li>
-        <li><a href="{{ url_for('library') }}" class="{{ 'active' if active_page == 'library' }}">Library</a></li>
+        <li><a href="{{ url_for('library_bp.library') }}" class="{{ 'active' if active_page == 'library' }}">Library</a>
+        </li>
         <li><a href="{{ url_for('placements') }}" class="{{ 'active' if active_page == 'placements' }}">Placements</a>
+        </li>
+        <li><a href="{{ url_for('timetable') }}" class="{{ 'active' if active_page == 'timetable' }}">Timetable</a>
         </li>
         {% else %}
         <li><a href="{{ url_for('home') }}" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
@@ -21,7 +35,12 @@
         <li><a href="{{ url_for('faculty') }}" class="{{ 'active' if active_page == 'faculty' }}">Faculty</a></li>
         <li><a href="{{ url_for('placements') }}" class="{{ 'active' if active_page == 'placements' }}">Placements</a>
         </li>
-        <li><a href="{{ url_for('library') }}" class="{{ 'active' if active_page == 'library' }}">Library</a></li>
+        {% if session.get('user_id') %}
+        <li><a href="{{ url_for('library_bp.library') }}" class="{{ 'active' if active_page == 'library' }}">Library</a>
+        </li>
+        <li><a href="{{ url_for('timetable') }}" class="{{ 'active' if active_page == 'timetable' }}">Timetable</a>
+        </li>
+        {% endif %}
         {% endif %}
     </ul>
     <div class="nav-actions">
@@ -37,6 +56,57 @@
             style="text-decoration: none; color: inherit; margin-right: 10px;">👤 {{ session.get('name') }}</a>
         {% endif %}
 
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrapper" id="notifBellWrapper"
+            style="position:relative; display:inline-block; margin-right: 10px;">
+            <button id="notifBellBtn" onclick="toggleNotifDropdown()" aria-label="Notifications"
+                style="background:none; border:none; cursor:pointer; font-size:1.25rem; position:relative; padding:4px 6px; color: inherit;">
+                🔔
+                {% if notif_count and notif_count > 0 %}
+                <span id="notifBadge"
+                    style="position:absolute; top:-4px; right:-4px; background:#e74c3c; color:#fff; border-radius:50%; font-size:0.65rem; font-weight:700; padding:2px 5px; line-height:1; min-width:16px; text-align:center;">{{
+                    notif_count }}</span>
+                {% else %}
+                <span id="notifBadge"
+                    style="display:none; position:absolute; top:-4px; right:-4px; background:#e74c3c; color:#fff; border-radius:50%; font-size:0.65rem; font-weight:700; padding:2px 5px; line-height:1; min-width:16px; text-align:center;">0</span>
+                {% endif %}
+            </button>
+            <div id="notifDropdown"
+                style="display:none; position:absolute; right:0; top:calc(100% + 8px); width:420px; background:#fff; border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,0.18); z-index:9999; overflow:hidden; border:1px solid #eee;">
+                <div
+                    style="padding:14px 18px; background:#c0392b; color:#fff; font-weight:700; font-size:0.95rem; display:flex; justify-content:space-between; align-items:center;">
+                    <span>🔔 Notifications</span>
+                    <span style="font-size:0.78rem; opacity:0.85; font-weight:400;">{{ notif_count }} unread</span>
+                </div>
+                <ul style="list-style:none; padding:0; margin:0;">
+                    {% if nav_notifs %}
+                    {% for n in nav_notifs[:5] %}
+                    <li class="{{ 'notif-unread' if not n.read_status else 'notif-read' }}"
+                        style="padding:13px 18px; border-bottom:1px solid #f0f0f0;">
+                        <p style="margin:0 0 5px 0; font-size:0.875rem; color:#2c2c2c; line-height:1.45;">{{ n.message
+                            }}</p>
+                        <p style="margin:0; font-size:0.73rem; color:#aaa;">
+                            <i class="far fa-clock" style="margin-right:3px;"></i>
+                            {{ n.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                        </p>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li style="padding:28px 18px; text-align:center; color:#999; font-size:0.875rem;">
+                        <i class="far fa-bell-slash"
+                            style="font-size:1.6rem; display:block; margin-bottom:8px; color:#ddd;"></i>
+                        No notifications yet.
+                    </li>
+                    {% endif %}
+                </ul>
+                <div style="padding:12px 18px; background:#fafafa; border-top:1px solid #eee; text-align:center;">
+                    <a href="/notifications/all" onclick="document.getElementById('notifDropdown').style.display='none'"
+                        style="color:#c0392b; font-weight:600; font-size:0.85rem; text-decoration:none; letter-spacing:0.3px;">View
+                        All Notifications →</a>
+                </div>
+            </div>
+        </div>
+
         <a href="{{ url_for('logout') }}" class="btn-login">Logout</a>
         {% else %}
         <a href="{{ url_for('login') }}" class="btn-login">Login</a>
@@ -46,3 +116,26 @@
         </button>
     </div>
 </nav>
+<script>
+    function toggleNotifDropdown() {
+        var dd = document.getElementById('notifDropdown');
+        var isOpen = dd.style.display !== 'none';
+        dd.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) {
+            // Mark as read via API
+            fetch('/notifications/mark-read', { method: 'POST' })
+                .then(function () {
+                    var badge = document.getElementById('notifBadge');
+                    if (badge) badge.style.display = 'none';
+                });
+        }
+    }
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+        var wrapper = document.getElementById('notifBellWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            var dd = document.getElementById('notifDropdown');
+            if (dd) dd.style.display = 'none';
+        }
+    });
+</script>

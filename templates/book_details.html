@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - CS Connect{% endblock %}
+
+{% block content %}
+<section class="page-header" style="height: 200px; padding-bottom: 30px;">
+    <div class="header-overlay" style="display: flex; align-items: center; justify-content: center;">
+        <div class="header-content reveal" style="text-align: center;">
+            <h1>Book Details</h1>
+        </div>
+    </div>
+</section>
+
+<div class="container"
+    style="max-width: 900px; margin: -50px auto 50px auto; padding: 0 20px; position: relative; z-index: 10;">
+    <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">
+            <i class="fas {% if category=='danger' %}fa-exclamation-circle{% elif category=='success' %}fa-check-circle{% elif category=='warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"
+                style="margin-right: 8px;"></i> {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+            <!-- Cover -->
+            <div id="book-cover-bg"
+                style="width: 220px; height: 320px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 6rem; box-shadow: 0 8px 20px rgba(0,0,0,0.15); flex-shrink: 0;">
+                <i class="{{ book.cover_icon or 'fas fa-book' }}"></i>
+            </div>
+            <script>
+                document.getElementById('book-cover-bg').style.background = "{{ book.cover_gradient or 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}";
+            </script>
+
+            <!-- Details -->
+            <div style="flex: 1; min-width: 300px;">
+                <h2 style="margin-top: 0; margin-bottom: 5px; color: #333; font-size: 2.2rem;">{{ book.title }}</h2>
+                <h4 style="color: #666; font-weight: 500; margin-bottom: 25px; font-size: 1.2rem;">by {{ book.author or
+                    'Unknown Author' }}</h4>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <p
+                            style="color: #888; font-size: 0.85rem; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px;">
+                            Department</p>
+                        <p style="font-weight: 600; color: #444;">{{ book.subject or 'General' }}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <p
+                        style="color: #888; font-size: 0.85rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">
+                        Description</p>
+                    <p style="color: #555; line-height: 1.6;">{{ book.description or 'No particular description is
+                        available for this resource.' }}</p>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #eee; margin-bottom: 20px;">
+
+                <div class="{% if book.availability != false %}status-available{% else %}status-issued{% endif %}"
+                    style="margin-bottom: 35px; background: #f8f9fa; padding: 15px 20px; border-radius: 8px;">
+                    <h4 style="margin-top: 0; margin-bottom: 8px; color: #555; font-size: 0.95rem;">Availability Status
+                    </h4>
+                    {% if book.availability != false %}
+                    <span
+                        style="display:inline-block; padding: 6px 16px; background: rgba(40, 167, 69, 0.1); color: #28a745; border-radius: 20px; font-weight: 700; font-size: 1.1rem;"><i
+                            class="fas fa-check-circle" style="margin-right: 5px;"></i> Available</span>
+                    {% else %}
+                    <span
+                        style="display:inline-block; padding: 6px 16px; background: rgba(220, 53, 69, 0.1); color: #dc3545; border-radius: 20px; font-weight: 700; font-size: 1.1rem;"><i
+                            class="fas fa-times-circle" style="margin-right: 5px;"></i> Issued</span>
+                    {% if session.get('role') == 'admin' %}
+                    <p style="margin-top: 12px; margin-bottom: 0; color: #555; font-size: 0.95rem;"><i
+                            class="fas fa-user-circle" style="color: #888; margin-right: 5px;"></i> Currently held by:
+                        <strong style="color: #333;">{{ holder or 'Unknown Student' }}</strong>
+                    </p>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; flex-direction: column;">
+                    {% if session.get('role') != 'admin' %}
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; width: 100%;">
+                        <!-- ISSUE -->
+                        <form action="{{ url_for('library_bp.issue_book', book_id=book.id) }}" method="POST"
+                            style="flex: 1; min-width: 120px;">
+                            <button type="submit"
+                                style="width: 100%; padding: 14px 20px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(40,167,69,0.2);"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(40,167,69,0.3)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(40,167,69,0.2)';"><i
+                                    class="fas fa-hand-holding" style="margin-right: 8px;"></i> ISSUE</button>
+                        </form>
+
+                        <!-- RETURN -->
+                        <form action="{{ url_for('library_bp.return_book', book_id=book.id) }}" method="POST"
+                            style="flex: 1; min-width: 120px;">
+                            <button type="submit"
+                                style="width: 100%; padding: 14px 20px; background: #ffc107; color: #333; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(255,193,7,0.2);"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(255,193,7,0.3)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(255,193,7,0.2)';"><i
+                                    class="fas fa-undo" style="margin-right: 8px;"></i> RETURN</button>
+                        </form>
+
+                        <!-- REQUEST -->
+                        <form action="{{ url_for('library_bp.request_book', book_id=book.id) }}" method="POST"
+                            style="flex: 1; min-width: 120px;">
+                            <button type="submit"
+                                style="width: 100%; padding: 14px 20px; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(23,162,184,0.2);"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(23,162,184,0.3)';"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(23,162,184,0.2)';"><i
+                                    class="fas fa-bookmark" style="margin-right: 8px;"></i> REQUEST</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <!-- Admin controls go here -->
+                    {% if pending_requests %}
+                    <div
+                        style="width: 100%; padding: 20px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="color: #856404; margin-top: 0; margin-bottom: 15px; font-size: 1.05rem;"><i
+                                class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> Pending Requests</h4>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            {% for req in pending_requests %}
+                            <li
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                <div>
+                                    <strong style="color: #333;">{{ req.user_name }}</strong> requested this book.
+                                </div>
+                                {% if holder %}
+                                <form action="{{ url_for('admin_bp.send_request_message', request_id=req.id) }}"
+                                    method="POST">
+                                    <button type="submit"
+                                        style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background 0.2s;"><i
+                                            class="fas fa-bell" style="margin-right: 5px;"></i> Notify Current
+                                        Holder</button>
+                                </form>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div style="width: 100%; border: 1px solid #ced4da; border-radius: 8px; margin-bottom: 15px;">
+                        <div
+                            style="background: #e9ecef; padding: 15px 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom: 1px solid #ced4da;">
+                            <h4 style="color: #495057; margin: 0; font-size: 1.05rem;"><i class="fas fa-history"
+                                    style="margin-right: 8px;"></i> Book Circulation History</h4>
+                        </div>
+                        <div style="padding: 0;">
+                            {% if history %}
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                    <thead
+                                        style="background: #f8f9fa; position: sticky; top: 0; box-shadow: 0 1px 0 #dee2e6;">
+                                        <tr>
+                                            <th
+                                                style="padding: 10px 15px; text-align: left; color: #495057; font-weight: 600;">
+                                                Status</th>
+                                            <th
+                                                style="padding: 10px 15px; text-align: left; color: #495057; font-weight: 600;">
+                                                User</th>
+                                            <th
+                                                style="padding: 10px 15px; text-align: left; color: #495057; font-weight: 600;">
+                                                Issue Date</th>
+                                            <th
+                                                style="padding: 10px 15px; text-align: left; color: #495057; font-weight: 600;">
+                                                Return Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record in history %}
+                                        <tr style="border-bottom: 1px solid #dee2e6;">
+                                            <td style="padding: 10px 15px;">
+                                                {% if record.status == 'issued' %}
+                                                <span
+                                                    style="color: #dc3545; font-weight: 600; font-size: 0.85rem; padding: 3px 8px; background: rgba(220,53,69,0.1); border-radius: 12px;">Active</span>
+                                                {% else %}
+                                                <span
+                                                    style="color: #28a745; font-weight: 600; font-size: 0.85rem; padding: 3px 8px; background: rgba(40,167,69,0.1); border-radius: 12px;">Returned</span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="padding: 10px 15px;">
+                                                <div style="font-weight: 500; color: #333;">{{ record.user_name }}</div>
+                                                <div style="font-size: 0.8rem; color: #6c757d;">{{ record.admission_num
+                                                    }}</div>
+                                            </td>
+                                            <td style="padding: 10px 15px; color: #555;">{{
+                                                record.issue_date.strftime('%Y-%m-%d %H:%M') if record.issue_date else
+                                                '-' }}</td>
+                                            <td style="padding: 10px 15px; color: #555;">{{
+                                                record.return_date.strftime('%Y-%m-%d %H:%M') if record.return_date else
+                                                '-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div style="padding: 30px; text-align: center;">
+                                <p style="color: #6c757d; margin: 0; font-size: 0.95rem;">This book has perfectly
+                                    pristine circulation. No past issues or returns have been recorded.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="height: 50px;"></div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Department Library | CS CONNECT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}" />
+<style>
+    .book-card {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .book-holder {
+        font-size: 0.85em;
+        color: #d03030;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .search-box-main {
+        display: flex;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-box-main input {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 30px 0 0 30px;
+        outline: none;
+    }
+
+    .search-box-main button {
+        padding: 12px 30px;
+        border: none;
+        background: #4facfe;
+        color: white;
+        border-radius: 0 30px 30px 0;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+
+    .search-box-main button:hover {
+        background: #00f2fe;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+    <div class="header-overlay" style="width: 100%; text-align: center;">
+        <div class="header-content reveal">
+            <h1>Department Library</h1>
+            <p>Your Gateway to Knowledge and Technical Resources</p>
+        </div>
+    </div>
+</section>
+
+<div class="library-container" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+
+    <div class="search-filter-section reveal"
+        style="margin-bottom: 40px; background: rgba(255,255,255,0.7); padding: 30px; border-radius: 15px; box-shadow: 0 8px 32px rgba(31,38,135,0.1); backdrop-filter: blur(4px);">
+        <div class="search-box-main">
+            <input type="text" id="searchInput" placeholder="Search by title, author, subject, or keyword..." />
+            <button class="search-btn" id="searchBtn">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </div>
+
+    <div class="books-grid" id="booksGrid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+        <!-- Populated via AJAX -->
+    </div>
+
+    <div class="no-results" id="noResults" style="display: none; text-align: center; padding: 50px;">
+        <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+        <h3>No Books Found</h3>
+        <p style="color: #666;">Try adjusting your search criteria</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/library.js') }}"></script>
+{% endblock %}

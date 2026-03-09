@@ -7,6 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "csconnectsecret"
 
+from routes.library_routes import library_bp
+from routes.admin_routes import admin_bp
+
+app.register_blueprint(library_bp)
+app.register_blueprint(admin_bp)
+
 import os
 from dotenv import load_dotenv
 
@@ -92,10 +98,39 @@ def get_placement_batches():
 # ─────────────────────────────────────────────────
 @app.context_processor
 def inject_globals():
+    from models.notification import Notification
+    try:
+        notif_count = Notification.get_unread_count() if session.get('user_id') else 0
+        nav_notifs = Notification.get_user_notifications() if session.get('user_id') else []
+    except Exception:
+        notif_count = 0
+        nav_notifs = []
     return {
         "ticker_text": get_news_ticker(),
         "active_page": "",   # overridden per route
+        "notif_count": notif_count,
+        "nav_notifs": nav_notifs,
     }
+
+
+@app.route('/notifications/mark-read', methods=['POST'])
+def notifications_mark_read():
+    if session.get('user_id'):
+        from models.notification import Notification
+        Notification.mark_all_read()
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/notifications/all')
+def notifications_all():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    from models.notification import Notification
+    all_notifs = Notification.get_user_notifications()
+    # Mark all as read once they open the full page
+    Notification.mark_all_read()
+    return render_template('notifications_all.html', all_notifs=all_notifs, active_page='')
 
 
 # ─────────────────────────────────────────────────
@@ -140,9 +175,42 @@ def init_db():
             author TEXT,
             category TEXT,
             status TEXT,
-            shelf TEXT,
             cover_gradient TEXT,
             cover_icon TEXT
+        )
+    ''')
+    
+    # Library Module Additions
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS subject TEXT')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS description TEXT')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS availability BOOLEAN DEFAULT TRUE')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS issues (
+            id SERIAL PRIMARY KEY,
+            book_id INTEGER,
+            user_id INTEGER,
+            issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            return_date TIMESTAMP,
+            status TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS requests (
+            id SERIAL PRIMARY KEY,
+            book_id INTEGER,
+            requested_by INTEGER,
+            request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS notifications (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER,
+            message TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            read_status BOOLEAN DEFAULT FALSE
         )
     ''')
     
@@ -254,8 +322,109 @@ def init_db():
         )
     ''')
 
+    # 14. timetable_subjects
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS timetable_subjects (
+            id SERIAL PRIMARY KEY,
+            batch TEXT DEFAULT 'S2 CSE A',
+            code TEXT NOT NULL,
+            full_name TEXT,
+            faculty_code TEXT,
+            faculty_name TEXT
+        )
+    ''')
+
+    # 15. timetable
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS timetable (
+            id SERIAL PRIMARY KEY,
+            batch TEXT DEFAULT 'S2 CSE A',
+            day TEXT NOT NULL,
+            period INTEGER NOT NULL,
+            subject_code TEXT,
+            faculty_code TEXT,
+            is_lab BOOLEAN DEFAULT FALSE,
+            span INTEGER DEFAULT 1
+        )
+    ''')
+
+    # Seed S2 CSE A data (only if empty)
+    cursor.execute("SELECT COUNT(*) FROM timetable")
+    existing = cursor.fetchone()[0]
+    if existing == 0:
+        # --- Subjects ---
+        subjects = [
+            ('S2 CSE A', 'MAT-2',    'GAMAT201 Mathematics for Information Science - 2',           'DGP',     'Prof. Dhanya George P'),
+            ('S2 CSE A', 'PHY',      'GAPHT121 Physics for Information Science',                    'SRC',     'Prof. Sreeja C'),
+            ('S2 CSE A', 'FOC',      'GXEST203 Foundations of Computing',                           'TEJ',     'Prof. Teenu Jose'),
+            ('S2 CSE A', 'CP',       'GXEST204 Programming in C',                                   'THV/SPJ', 'Prof. Thilakavathi A / Prof. Sinijoy P J'),
+            ('S2 CSE A', 'DMS',      'PCCST205 Discrete Mathematics',                               'AAF',     'Prof. Anson Antony Fertal'),
+            ('S2 CSE A', 'IPR',      'UCEST206 Engineering Entrepreneurship & IPR',                 'ANG',     'Prof. Angel Mathai'),
+            ('S2 CSE A', 'HW',       'UCHWT127 Health and Wellness',                               'DMR',     'Prof. Dilu Mary Rose'),
+            ('S2 CSE A', 'IT W/S',   'GXESL208 IT Workshop',                                       'TEJ',     'Prof. Teenu Jose'),
+            ('S2 CSE A', 'LT',       'Language Training',                                           'DMR',     'Prof. Dilu Mary Rose'),
+            ('S2 CSE A', 'ACTIVITY', 'Activity Hour',                                               'SRC',     'Prof. Sreeja C'),
+            ('S2 CSE A', 'CP/PHY LAB','CP / Physics Lab (Combined)',                               'THV/SRC', 'Prof. Thilakavathi A / Prof. Sreeja C'),
+            ('S2 CSE A', 'IT W/S/PHY LAB','IT Workshop / Physics Lab (Combined)',                  'TEJ/SRC', 'Prof. Teenu Jose / Prof. Sreeja C'),
+            ('S2 CSE A', 'CP/IT W/S', 'Programming in C / IT Workshop (Combined)',                 'THV/TEJ', 'Prof. Thilakavathi A / Prof. Teenu Jose'),
+            ('S2 CSE A', 'DMS(T)',   'Discrete Mathematics Tutorial',                               'AAF',     'Prof. Anson Antony Fertal'),
+            ('S2 CSE A', 'HW(P)',    'Health and Wellness (Practical)',                             'DMR',     'Prof. Dilu Mary Rose'),
+        ]
+        cursor.executemany(
+            'INSERT INTO timetable_subjects (batch, code, full_name, faculty_code, faculty_name) VALUES (%s,%s,%s,%s,%s)',
+            subjects
+        )
+
+        # --- Timetable entries (day, period, subject_code, faculty_code, is_lab, span) ---
+        entries = [
+            # MONDAY
+            ('S2 CSE A','Monday',1,'DMS','AAF',False,1),
+            ('S2 CSE A','Monday',2,'FOC','TEJ',False,1),
+            ('S2 CSE A','Monday',3,'MAT-2','DGP',False,1),
+            ('S2 CSE A','Monday',4,'PHY','SRC',False,1),
+            ('S2 CSE A','Monday',5,'DMS(T)','AAF',False,1),
+            ('S2 CSE A','Monday',6,'HW','DMR',False,1),
+            # TUESDAY
+            ('S2 CSE A','Tuesday',1,'IPR','ANG',False,1),
+            ('S2 CSE A','Tuesday',2,'FOC','TEJ',False,1),
+            ('S2 CSE A','Tuesday',3,'CP/PHY LAB','THV/SRC',True,2),
+            ('S2 CSE A','Tuesday',5,'HW(P)','DMR',True,1),
+            ('S2 CSE A','Tuesday',6,'MAT-2','DGP',False,1),
+            # WEDNESDAY
+            ('S2 CSE A','Wednesday',1,'MAT-2','DGP',False,1),
+            ('S2 CSE A','Wednesday',2,'CP','THV',False,1),
+            ('S2 CSE A','Wednesday',3,'IPR','ANG',False,1),
+            ('S2 CSE A','Wednesday',4,'DMS','AAF',False,1),
+            ('S2 CSE A','Wednesday',5,'PHY','SRC',False,1),
+            ('S2 CSE A','Wednesday',6,'CP','THV',False,1),
+            # THURSDAY
+            ('S2 CSE A','Thursday',1,'DMS','AAF',False,1),
+            ('S2 CSE A','Thursday',2,'FOC','TEJ',False,1),
+            ('S2 CSE A','Thursday',3,'IT W/S/PHY LAB','TEJ/SRC',True,2),
+            ('S2 CSE A','Thursday',5,'CP','THV',False,1),
+            ('S2 CSE A','Thursday',6,'IPR','ANG',False,1),
+            # FRIDAY
+            ('S2 CSE A','Friday',1,'PHY','SRC',False,1),
+            ('S2 CSE A','Friday',2,'LT','DMR',False,1),
+            ('S2 CSE A','Friday',3,'CP','THV',False,1),
+            ('S2 CSE A','Friday',4,'MAT-2','DGP',False,1),
+            ('S2 CSE A','Friday',5,'CP/IT W/S','THV/TEJ',True,2),
+            # SATURDAY
+            ('S2 CSE A','Saturday',1,'CP','THV',False,1),
+            ('S2 CSE A','Saturday',2,'DMS','AAF',False,1),
+            ('S2 CSE A','Saturday',3,'HW','DMR',False,1),
+            ('S2 CSE A','Saturday',4,'ACTIVITY','SRC',False,1),
+            ('S2 CSE A','Saturday',5,'PHY','SRC',False,1),
+            ('S2 CSE A','Saturday',6,'FOC','TEJ',False,1),
+        ]
+        cursor.executemany(
+            'INSERT INTO timetable (batch, day, period, subject_code, faculty_code, is_lab, span) VALUES (%s,%s,%s,%s,%s,%s,%s)',
+            entries
+        )
+
     conn.commit()
     conn.close()
+
 
 
 # ─────────────────────────────────────────────────
@@ -270,6 +439,77 @@ def home():
         stats=get_home_stats(),
         feature_cards=get_site_data('home_feature_cards'),
         events=get_site_data('home_events'),
+    )
+
+
+@app.route('/timetable')
+def timetable():
+    if not session.get('user_id'):
+        flash("Please log in to view the timetable.", "warning")
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+
+    # Load all slots ordered by day/period
+    DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    PERIODS = [
+        (1, '8:00 – 8:45'),
+        (2, '9:10 – 9:55'),
+        (3, '10:00 – 10:45'),
+        (4, '10:50 – 11:35'),
+        (5, '11:55 – 12:40'),
+        (6, '12:45 – 1:30'),
+    ]
+
+    rows = conn.execute(
+        "SELECT day, period, subject_code, faculty_code, is_lab, span FROM timetable WHERE batch='S2 CSE A' ORDER BY period"
+    ).fetchall()
+
+    subjects_raw = conn.execute(
+        "SELECT code, full_name, faculty_code, faculty_name FROM timetable_subjects WHERE batch='S2 CSE A'"
+    ).fetchall()
+    conn.close()
+
+    # Build a lookup: (day, period) -> slot dict
+    slot_map = {}
+    for r in rows:
+        slot_map[(r['day'], r['period'])] = {
+            'subject_code': r['subject_code'],
+            'faculty_code': r['faculty_code'],
+            'is_lab': r['is_lab'],
+            'span': r['span'],
+        }
+
+    # Subject lookup for legend
+    subjects = [dict(s) for s in subjects_raw]
+
+    # Color mapping per subject code
+    COLORS = {
+        'MAT-2':            '#3498db',
+        'PHY':              '#9b59b6',
+        'FOC':              '#e67e22',
+        'CP':               '#27ae60',
+        'DMS':              '#e74c3c',
+        'IPR':              '#1abc9c',
+        'HW':               '#f39c12',
+        'IT W/S':           '#2980b9',
+        'LT':               '#8e44ad',
+        'ACTIVITY':         '#2ecc71',
+        'CP/PHY LAB':       '#16a085',
+        'IT W/S/PHY LAB':   '#d35400',
+        'CP/IT W/S':        '#c0392b',
+        'DMS(T)':           '#c0392b',
+        'HW(P)':            '#a29bfe',
+    }
+
+    return render_template(
+        'timetable.html',
+        days=DAYS,
+        periods=PERIODS,
+        slot_map=slot_map,
+        subjects=subjects,
+        colors=COLORS,
+        active_page='timetable',
     )
 
 
@@ -342,17 +582,7 @@ def academics():
     )
 
 
-@app.route('/library')
-def library():
-    conn = get_db_connection()
-    books = [dict(row) for row in conn.execute('SELECT * FROM books').fetchall()]
-    conn.close()
 
-    return render_template(
-        'library/library.html',
-        active_page='library',
-        books=books,
-    )
 
 
 @app.route('/placements')
@@ -559,20 +789,7 @@ def admin_dashboard():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
 
-    conn = get_db_connection()
-    all_users = conn.execute("SELECT * FROM users").fetchall()
-    conn.close()
-
-    student_count = sum(1 for u in all_users if u['role'] == 'student')
-    faculty_count = sum(1 for u in all_users if u['role'] == 'faculty')
-    admin_count   = sum(1 for u in all_users if u['role'] == 'admin')
-
-    return render_template("admin_dashboard.html",
-                           active_page='admin_dashboard',
-                           all_users=all_users,
-                           student_count=student_count,
-                           faculty_count=faculty_count,
-                           admin_count=admin_count)
+    return redirect(url_for('admin_panel'))
 
 
 @app.route('/faculty-dashboard')
@@ -584,6 +801,49 @@ def faculty_dashboard():
 
     return render_template("faculty_dashboard.html",
                            active_page='faculty_dashboard')
+
+
+@app.route('/faculty/upload', methods=['POST'])
+def faculty_upload():
+    """Handle faculty file upload for notes, PYQs, and syllabus."""
+    if session.get('role') != 'faculty':
+        flash("Access denied! Faculty only.", "danger")
+        return redirect(url_for('login'))
+
+    course = request.form.get('course', '').strip()
+    material_type = request.form.get('material_type', '').strip()
+    uploaded_file = request.files.get('file')
+
+    # Basic validation
+    if not course or not material_type:
+        flash("Please select a course and material type.", "danger")
+        return redirect(url_for('faculty_dashboard'))
+
+    if not uploaded_file or uploaded_file.filename == '':
+        flash("No file selected. Please choose a file to upload.", "danger")
+        return redirect(url_for('faculty_dashboard'))
+
+    import os
+    from werkzeug.utils import secure_filename
+
+    ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'zip'}
+    filename = secure_filename(uploaded_file.filename)
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+
+    if ext not in ALLOWED_EXTENSIONS:
+        flash(f"File type '.{ext}' not allowed. Accepted: {', '.join(ALLOWED_EXTENSIONS)}", "danger")
+        return redirect(url_for('faculty_dashboard'))
+
+    upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'notes')
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Build a descriptive filename: course_type_originalname
+    save_filename = f"{course}_{material_type}_{filename}"
+    save_path = os.path.join(upload_dir, save_filename)
+    uploaded_file.save(save_path)
+
+    flash(f"✅ '{filename}' uploaded successfully for {course} as {material_type}.", "success")
+    return redirect(url_for('faculty_dashboard'))
 
 
 @app.route('/student-dashboard')
@@ -641,6 +901,37 @@ def admin_panel():
     faculty_count = sum(1 for u in all_users if u['role'] == 'faculty')
     admin_count   = sum(1 for u in all_users if u['role'] == 'admin')
 
+    # Get Unified Circulation History & Admin Notifications
+    from models.issue import Issue
+    from models.request import Request
+    from models.notification import Notification
+    
+    all_issues = Issue.get_all_issues()
+    all_reqs = Request.get_all_requests()
+    admin_notifs = Notification.get_admin_notifications()
+
+    transactions = []
+    for issue in all_issues:
+        transactions.append({
+            'type': issue['status'],
+            'book_title': issue['book_title'],
+            'book_id': issue['book_id'],
+            'user_name': issue['user_name'],
+            'date': issue['return_date'] if issue['status'] == 'returned' and issue['return_date'] else issue['issue_date'],
+            'badge_class': 'success' if issue['status'] == 'returned' else 'warning'
+        })
+    for req in all_reqs:
+        transactions.append({
+            'type': 'requested' if req['status'] == 'pending' else 'processed request',
+            'book_title': req['book_title'],
+            'book_id': req['book_id'],
+            'user_name': req['user_name'],
+            'date': req['request_date'],
+            'badge_class': 'info' if req['status'] == 'pending' else 'secondary'
+        })
+    
+    transactions.sort(key=lambda x: str(x['date'] or ''), reverse=True)
+
     return render_template(
         "admin_panel.html",
         active_page='admin_dashboard',
@@ -655,8 +946,70 @@ def admin_panel():
         interns_list=interns_list,
         companies_list=companies_list,
         summary_list=summary_list,
+        transactions=transactions,
+        admin_notifs=admin_notifs,
     )
 
+@app.route('/admin/users/edit/<int:uid>', methods=["POST"])
+def admin_users_edit(uid):
+    if admin_required():
+        return redirect(url_for("login"))
+    f = request.form
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE users SET name=%s, email=%s, role=%s WHERE id=%s",
+        (f['name'], f['email'], f['role'], uid)
+    )
+    conn.commit()
+    conn.close()
+    flash("User updated!", "success")
+    return redirect(url_for("admin_panel") + "#users")
+
+@app.route('/admin/users/add', methods=["POST"])
+def admin_users_add():
+    if admin_required():
+        return redirect(url_for("login"))
+    
+    f = request.form
+    # Basic validation
+    if not f.get('name') or not f.get('email') or not f.get('user_id') or not f.get('password') or not f.get('role'):
+        flash("All fields are required to create a user.", "danger")
+        return redirect(url_for("admin_panel") + "#users")
+
+    hashed_pw = generate_password_hash(f['password'])
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "INSERT INTO users (name, email, user_id, password, role) VALUES (%s, %s, %s, %s, %s)",
+            (f['name'], f['email'], f['user_id'], hashed_pw, f['role'])
+        )
+        conn.commit()
+        flash("User added successfully!", "success")
+    except psycopg2.errors.UniqueViolation:
+        conn.rollback()
+        flash("Error: Email or User ID already exists. Please choose another.", "danger")
+    finally:
+        conn.close()
+        
+    return redirect(url_for("admin_panel") + "#users")
+
+
+@app.route('/admin/users/delete/<int:uid>', methods=["POST"])
+def admin_users_delete(uid):
+    if admin_required():
+        return redirect(url_for("login"))
+    
+    # Prevent admin from deleting themselves
+    if uid == session.get("user_id"):
+        flash("You cannot delete your own account.", "danger")
+        return redirect(url_for("admin_panel") + "#users")
+        
+    conn = get_db_connection()
+    conn.execute("DELETE FROM users WHERE id=%s", (uid,))
+    conn.commit()
+    conn.close()
+    flash("User deleted!", "success")
+    return redirect(url_for("admin_panel") + "#users")
 
 # ─────────────────────────────────────────────────
 # ADMIN — FACULTY CRUD
@@ -712,8 +1065,8 @@ def admin_books_add():
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO books (title, author, category, status, shelf, cover_gradient, cover_icon) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-        (f['title'], f['author'], f['category'], f['status'], f['shelf'],
+        "INSERT INTO books (title, author, category, status, cover_gradient, cover_icon) VALUES (%s,%s,%s,%s,%s,%s)",
+        (f['title'], f['author'], f['category'], f['status'],
          f.get('cover_gradient', 'linear-gradient(135deg,#667eea,#764ba2)'),
          f.get('cover_icon', 'fas fa-book'))
     )
@@ -728,8 +1081,8 @@ def admin_books_edit(bid):
     f = request.form
     conn = get_db_connection()
     conn.execute(
-        "UPDATE books SET title=%s, author=%s, category=%s, status=%s, shelf=%s WHERE id=%s",
-        (f['title'], f['author'], f['category'], f['status'], f['shelf'], bid)
+        "UPDATE books SET title=%s, author=%s, category=%s, status=%s WHERE id=%s",
+        (f['title'], f['author'], f['category'], f['status'], bid)
     )
     conn.commit(); conn.close()
     flash("Book updated!", "success")

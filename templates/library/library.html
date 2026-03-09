@@ -66,9 +66,12 @@
     {% for book in books %}
     <div class="book-card reveal" data-category="{{ book.category }}" data-status="{{ book.status }}"
       data-title="{{ book.title }}" data-author="{{ book.author }}">
-      <div class="book-cover" style="background: {{ book.cover_gradient }}">
+      <div class="book-cover" id="book-cover-bg-{{ loop.index }}">
         <i class="{{ book.cover_icon }}"></i>
       </div>
+      <script>
+        document.getElementById('book-cover-bg-{{ loop.index }}').style.background = "{{ book.cover_gradient }}";
+      </script>
       <div class="book-info">
         <h3 class="book-title">{{ book.title }}</h3>
         <p class="book-author">by {{ book.author }}</p>
@@ -120,5 +123,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  window.USER_ROLE = "{{ session.get('role', 'student') }}";
+</script>
 <script src="{{ url_for('static', filename='js/library.js') }}"></script>
 {% endblock %}

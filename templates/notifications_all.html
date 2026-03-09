@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}All Notifications - CS Connect{% endblock %}
+
+{% block content %}
+<div style="max-width: 720px; margin: 50px auto; padding: 20px;">
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 28px;">
+        <span style="font-size: 1.8rem;">🔔</span>
+        <div>
+            <h1 style="margin: 0; font-size: 1.6rem; color: #c0392b;">Notifications</h1>
+            <p style="margin: 4px 0 0; color: #888; font-size: 0.9rem;">
+                {% if all_notifs %}
+                {{ all_notifs | selectattr('read_status', 'equalto', False) | list | length }} unread &bull; {{
+                all_notifs | length }} total
+                {% else %}
+                No notifications yet.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div
+        style="background: white; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #eee;">
+        {% if all_notifs %}
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for n in all_notifs %}
+            <li style="padding: 16px 22px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 14px; align-items: flex-start;
+                           background: {{ '#f4faff' if not n.read_status else '#fff' }};
+                           border-left: 4px solid {{ '#c0392b' if not n.read_status else 'transparent' }};">
+                <div style="font-size: 1.3rem; margin-top: 2px;">
+                    {{ '🔔' if not n.read_status else '📩' }}
+                </div>
+                <div style="flex: 1;">
+                    <p style="margin: 0 0 6px 0; font-size: 0.92rem; color: #222; line-height: 1.5;
+                                  font-weight: {{ '600' if not n.read_status else 'normal' }};">
+                        {{ n.message }}
+                    </p>
+                    <p style="margin: 0; font-size: 0.78rem; color: #aaa;">
+                        <i class="far fa-clock" style="margin-right: 4px;"></i>
+                        {{ n.created_at.strftime('%d %B %Y at %I:%M %p') }}
+                    </p>
+                </div>
+                {% if not n.read_status %}
+                <span
+                    style="background: #c0392b; color: white; border-radius: 20px; padding: 2px 9px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; margin-top: 3px;">New</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div style="padding: 60px 20px; text-align: center; color: #999;">
+            <i class="far fa-bell-slash" style="font-size: 3rem; color: #ddd; display: block; margin-bottom: 14px;"></i>
+            <h3 style="margin: 0 0 8px; color: #666; font-size: 1.1rem;">You're all caught up!</h3>
+            <p style="margin: 0; font-size: 0.9rem;">No notifications to show at this time.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="javascript:history.back()" style="color: #c0392b; font-size: 0.9rem; text-decoration: none;">
+            ← Go Back
+        </a>
+    </div>
+
+</div>
+{% endblock %}
