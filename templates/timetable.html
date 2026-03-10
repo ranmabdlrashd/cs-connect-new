@@ -218,11 +218,32 @@
     <div class="tt-header">
         <div>
             <h1>📅 Class Timetable</h1>
-            <p>Semester 2 · CSE Section A · Room A213 · 2025–26</p>
+            <p>Select your batch to view the current schedule</p>
         </div>
-        <span class="tt-badge">S2 CSE A</span>
+
+        <!-- Batch Selector -->
+        <span class="tt-badge" style="padding: 0; border: none; background: transparent;">
+            <form action="{{ url_for('timetable') }}" method="GET"
+                style="display: flex; gap: 8px; align-items: center;">
+                <select name="batch" onchange="this.form.submit()"
+                    style="padding: 8px 12px; border-radius: 8px; border: none; background: #fff; color: #c0392b; font-weight: bold; font-size: 0.95rem; cursor: pointer; outline: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    {% for b in all_batches %}
+                    <option value="{{ b }}" {% if b==selected_batch %}selected{% endif %}>{{ b }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </span>
     </div>
 
+    {% if is_image and image_filename %}
+    <!-- Image Mode -->
+    <div
+        style="background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); text-align: center;">
+        <img src="{{ url_for('static', filename='uploads/timetable/' + image_filename) }}"
+            alt="Timetable for {{ selected_batch }}"
+            style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #eee;">
+    </div>
+    {% else %}
     <!-- Timetable Table -->
     <div class="tt-table-wrap">
         <table class="tt">
@@ -279,6 +300,7 @@
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 
 </div>
 
