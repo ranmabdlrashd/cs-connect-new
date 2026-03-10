@@ -348,6 +348,15 @@ def init_db():
         )
     ''')
 
+    # 16. timetable_meta
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS timetable_meta (
+            batch TEXT PRIMARY KEY,
+            is_image BOOLEAN DEFAULT FALSE,
+            image_filename TEXT
+        )
+    ''')
+
     # Seed S2 CSE A data (only if empty)
     cursor.execute("SELECT COUNT(*) FROM timetable")
     existing = cursor.fetchone()[0]
@@ -421,6 +430,12 @@ def init_db():
             'INSERT INTO timetable (batch, day, period, subject_code, faculty_code, is_lab, span) VALUES (%s,%s,%s,%s,%s,%s,%s)',
             entries
         )
+        
+        # --- Timetable Meta ---
+        cursor.execute(
+            'INSERT INTO timetable_meta (batch, is_image, image_filename) VALUES (%s, %s, %s)',
+            ('S2 CSE A', False, None)
+        )
 
     conn.commit()
     conn.close()
@@ -449,8 +464,21 @@ def timetable():
         return redirect(url_for('login'))
 
     conn = get_db_connection()
+    
+    # Fetch all batches for dropdown
+    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta").fetchall()
+    all_batches = [b['batch'] for b in batches_raw] if batches_raw else ['S2 CSE A']
+    
+    # Determine the selected batch
+    selected_batch = request.args.get('batch')
+    if not selected_batch or selected_batch not in all_batches:
+        selected_batch = all_batches[0] if all_batches else 'S2 CSE A'
+    
+    # Fetch metadata for the selected batch
+    meta = conn.execute("SELECT * FROM timetable_meta WHERE batch=%s", (selected_batch,)).fetchone()
+    is_image = meta['is_image'] if meta else False
+    image_filename = meta['image_filename'] if meta else None
 
-    # Load all slots ordered by day/period
     DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     PERIODS = [
         (1, '8:00 – 8:45'),
@@ -461,27 +489,33 @@ def timetable():
         (6, '12:45 – 1:30'),
     ]
 
-    rows = conn.execute(
-        "SELECT day, period, subject_code, faculty_code, is_lab, span FROM timetable WHERE batch='S2 CSE A' ORDER BY period"
-    ).fetchall()
-
-    subjects_raw = conn.execute(
-        "SELECT code, full_name, faculty_code, faculty_name FROM timetable_subjects WHERE batch='S2 CSE A'"
-    ).fetchall()
-    conn.close()
-
-    # Build a lookup: (day, period) -> slot dict
     slot_map = {}
-    for r in rows:
-        slot_map[(r['day'], r['period'])] = {
-            'subject_code': r['subject_code'],
-            'faculty_code': r['faculty_code'],
-            'is_lab': r['is_lab'],
-            'span': r['span'],
-        }
+    subjects = []
+    
+    if not is_image:
+        # Load slots for the selected batch
+        rows = conn.execute(
+            "SELECT day, period, subject_code, faculty_code, is_lab, span FROM timetable WHERE batch=%s ORDER BY period",
+            (selected_batch,)
+        ).fetchall()
 
-    # Subject lookup for legend
-    subjects = [dict(s) for s in subjects_raw]
+        subjects_raw = conn.execute(
+            "SELECT code, full_name, faculty_code, faculty_name FROM timetable_subjects WHERE batch=%s",
+            (selected_batch,)
+        ).fetchall()
+
+        # Build lookup
+        for r in rows:
+            slot_map[(r['day'], r['period'])] = {
+                'subject_code': r['subject_code'],
+                'faculty_code': r['faculty_code'],
+                'is_lab': r['is_lab'],
+                'span': r['span'],
+            }
+
+        subjects = [dict(s) for s in subjects_raw]
+
+    conn.close()
 
     # Color mapping per subject code
     COLORS = {
@@ -504,6 +538,10 @@ def timetable():
 
     return render_template(
         'timetable.html',
+        all_batches=all_batches,
+        selected_batch=selected_batch,
+        is_image=is_image,
+        image_filename=image_filename,
         days=DAYS,
         periods=PERIODS,
         slot_map=slot_map,
@@ -864,41 +902,201 @@ def admin_required():
     return session.get("role") == "admin"
 
 
-@app.route('/admin/timetable/upload', methods=['POST'])
-def admin_timetable_upload():
+@app.route('/admin/timetable/create', methods=['POST'])
+def admin_timetable_create():
     if not admin_required():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for('login'))
-
+        
     batch = request.form.get('batch', '').strip()
-    uploaded_file = request.files.get('file')
-
     if not batch:
         flash("Batch name is required.", "danger")
-        return redirect(url_for('admin_panel'))
+        return redirect(url_for('admin_panel') + '#academics')
+        
+    conn = get_db_connection()
+    try:
+        # Check if exists
+        exists = conn.execute("SELECT 1 FROM timetable_meta WHERE batch=%s", (batch,)).fetchone()
+        if exists:
+            flash(f"Batch '{batch}' already exists.", "danger")
+            return redirect(url_for('admin_panel') + '#academics')
+            
+        conn.execute("INSERT INTO timetable_meta (batch) VALUES (%s)", (batch,))
+        conn.commit()
+        flash(f"Batch '{batch}' created successfully. You can now edit its schedule.", "success")
+    finally:
+        conn.close()
+        
+    return redirect(url_for('admin_timetable_edit', batch=batch))
 
-    if not uploaded_file or uploaded_file.filename == '':
-        flash("No file selected. Please choose a file.", "danger")
-        return redirect(url_for('admin_panel'))
+@app.route('/admin/timetable/delete/<batch>', methods=['POST'])
+def admin_timetable_delete(batch):
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    try:
+        # Get meta to delete image file if exists
+        meta = conn.execute("SELECT image_filename FROM timetable_meta WHERE batch=%s", (batch,)).fetchone()
+        if meta and meta['image_filename']:
+            filepath = os.path.join(app.root_path, 'static', 'uploads', 'timetable', meta['image_filename'])
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                
+        # Delete all related records
+        conn.execute("DELETE FROM timetable_meta WHERE batch=%s", (batch,))
+        conn.execute("DELETE FROM timetable_subjects WHERE batch=%s", (batch,))
+        conn.execute("DELETE FROM timetable WHERE batch=%s", (batch,))
+        conn.commit()
+        flash(f"Timetable for '{batch}' has been completely deleted.", "success")
+    finally:
+        conn.close()
+        
+    return redirect(url_for('admin_panel') + '#academics')
 
-    if not uploaded_file.filename.lower().endswith('.csv'):
-        flash("Only .csv files are supported for timetable upload.", "danger")
-        return redirect(url_for('admin_panel'))
-
-    # os and secure_filename already imported at top
+@app.route('/admin/timetable/edit/<batch>')
+def admin_timetable_edit(batch):
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
     
+    meta = conn.execute("SELECT * FROM timetable_meta WHERE batch=%s", (batch,)).fetchone()
+    if not meta:
+        conn.close()
+        flash(f"Batch '{batch}' not found.", "danger")
+        return redirect(url_for('admin_panel') + '#academics')
+        
+    # Get subjects
+    subjects_raw = conn.execute("SELECT * FROM timetable_subjects WHERE batch=%s ORDER BY code", (batch,)).fetchall()
+    subjects = [dict(s) for s in subjects_raw]
+    
+    # Get periods
+    DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    PERIODS = [1, 2, 3, 4, 5, 6]
+    
+    # Get slots and build a grid map
+    slots_raw = conn.execute("SELECT * FROM timetable WHERE batch=%s", (batch,)).fetchall()
+    conn.close()
+    
+    # Build dictionary (day, period) -> slot data
+    grid = {}
+    for slot in slots_raw:
+        grid[(slot['day'], slot['period'])] = dict(slot)
+
+    return render_template(
+        'admin_timetable_edit.html',
+        active_page='admin_dashboard',
+        batch=batch,
+        meta=dict(meta),
+        subjects=subjects,
+        days=DAYS,
+        periods=PERIODS,
+        grid=grid
+    )
+
+@app.route('/admin/timetable/toggle_image/<batch>', methods=['POST'])
+def admin_timetable_toggle_image(batch):
+    if not admin_required(): return jsonify({"success": False, "error": "Unauthorized"}), 403
+    
+    is_image = request.json.get('is_image', False)
+    conn = get_db_connection()
+    try:
+        conn.execute("UPDATE timetable_meta SET is_image=%s WHERE batch=%s", (is_image, batch))
+        conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True})
+
+@app.route('/admin/timetable/upload_image/<batch>', methods=['POST'])
+def admin_timetable_upload_image(batch):
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for('login'))
+        
+    uploaded_file = request.files.get('file')
+    if not uploaded_file or uploaded_file.filename == '':
+        flash("No file selected.", "danger")
+        return redirect(url_for('admin_timetable_edit', batch=batch))
+        
     upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'timetable')
     os.makedirs(upload_dir, exist_ok=True)
     
-    filename = secure_filename(f"{batch.replace(' ', '_')}_{uploaded_file.filename}")
+    filename = secure_filename(f"{batch.replace(' ', '_')}_image_{uploaded_file.filename}")
     save_path = os.path.join(upload_dir, filename)
     uploaded_file.save(save_path)
     
-    # Future parsing logic and saving to `timetable` table can go here
-    
-    flash(f"✅ Timetable for '{batch}' uploaded successfully.", "success")
-    return redirect(url_for('admin_panel'))
+    conn = get_db_connection()
+    try:
+        # Delete old image if it exists
+        old = conn.execute("SELECT image_filename FROM timetable_meta WHERE batch=%s", (batch,)).fetchone()
+        if old and old['image_filename']:
+            old_path = os.path.join(upload_dir, old['image_filename'])
+            if os.path.exists(old_path) and old['image_filename'] != filename:
+                os.remove(old_path)
+                
+        conn.execute("UPDATE timetable_meta SET image_filename=%s, is_image=TRUE WHERE batch=%s", (filename, batch))
+        conn.commit()
+        flash("Image uploaded successfully.", "success")
+    finally:
+        conn.close()
+        
+    return redirect(url_for('admin_timetable_edit', batch=batch))
 
+@app.route('/admin/timetable/subject/add', methods=['POST'])
+def admin_timetable_subj_add():
+    if not admin_required(): return jsonify({"success": False}), 403
+    data = request.json
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "INSERT INTO timetable_subjects (batch, code, full_name, faculty_code, faculty_name) VALUES (%s, %s, %s, %s, %s)",
+            (data['batch'], data['code'], data['full_name'], data['faculty_code'], data['faculty_name'])
+        )
+        conn.commit()
+        return jsonify({"success": True})
+    finally:
+        conn.close()
+
+@app.route('/admin/timetable/subject/delete', methods=['POST'])
+def admin_timetable_subj_delete():
+    if not admin_required(): return jsonify({"success": False}), 403
+    data = request.json
+    conn = get_db_connection()
+    try:
+        conn.execute("DELETE FROM timetable_subjects WHERE id=%s", (data['id'],))
+        conn.commit()
+        return jsonify({"success": True})
+    finally:
+        conn.close()
+
+@app.route('/admin/timetable/slot', methods=['POST'])
+def admin_timetable_slot_update():
+    if not admin_required(): return jsonify({"success": False}), 403
+    data = request.json
+    batch, day, period = data['batch'], data['day'], data['period']
+    subject_code = data.get('subject_code')
+    faculty_code = data.get('faculty_code')
+    is_lab = data.get('is_lab', False)
+    span = data.get('span', 1)
+    
+    conn = get_db_connection()
+    try:
+        # Remove existing slot
+        conn.execute("DELETE FROM timetable WHERE batch=%s AND day=%s AND period=%s", (batch, day, period))
+        
+        # If subject code is empty, we just deleted it
+        if subject_code:
+            conn.execute(
+                "INSERT INTO timetable (batch, day, period, subject_code, faculty_code, is_lab, span) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (batch, day, period, subject_code, faculty_code, is_lab, span)
+            )
+        conn.commit()
+        return jsonify({"success": True})
+    finally:
+        conn.close()
 
 # ─────────────────────────────────────────────────
 # ADMIN DASHBOARD (with all data)
@@ -919,7 +1117,10 @@ def admin_panel():
     interns_list = conn.execute("SELECT * FROM internships").fetchall()
     companies_list = conn.execute("SELECT * FROM placement_companies").fetchall()
     summary_list = conn.execute("SELECT * FROM placement_summary").fetchall()
+    batches_raw  = conn.execute("SELECT batch, is_image FROM timetable_meta").fetchall()
     conn.close()
+    
+    all_batches = [dict(b) for b in batches_raw]
 
     programs = []
     for p in programs_raw:
@@ -979,6 +1180,7 @@ def admin_panel():
         summary_list=summary_list,
         transactions=transactions,
         admin_notifs=admin_notifs,
+        all_batches=all_batches,
     )
 
 @app.route('/admin/users/edit/<int:uid>', methods=["POST"])
