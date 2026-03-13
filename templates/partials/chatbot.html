@@ -1,12 +1,11 @@
 {# =========================================
-FLOATING CHATBOT WIDGET — loaded on every page via base.html
-JS is in static/js/chatbot.js
-========================================= #}
+   PREMIUM CHATBOT WIDGET
+   Loaded on every page via base.html
+   ========================================= #}
 
 <!-- Floating Chatbot Button -->
 <div class="chatbot-float" id="chatbotFloat" onclick="toggleFloatingChat()">
     💬
-    <span class="chat-notification" id="chatNotification" style="display: none">1</span>
 </div>
 
 <!-- Floating Chat Window -->
@@ -21,11 +20,11 @@ JS is in static/js/chatbot.js
             </div>
         </div>
         <div class="floating-chat-controls">
-            <button class="floating-control-btn" onclick="clearFloatingChat()" title="Clear">
-                <i class="fas fa-trash"></i>
+            <button class="floating-control-btn" onclick="clearFloatingChat()" title="Clear Conversation">
+                <i class="fas fa-trash-alt"></i>
             </button>
-            <button class="floating-control-btn" onclick="toggleFloatingChat()" title="Close">
-                <i class="fas fa-times"></i>
+            <button class="floating-control-btn" onclick="toggleFloatingChat()" title="Minimize">
+                <i class="fas fa-minus"></i>
             </button>
         </div>
     </div>
@@ -35,27 +34,33 @@ JS is in static/js/chatbot.js
         <!-- Welcome Message -->
         <div class="floating-welcome" id="floatingWelcome">
             <div class="floating-welcome-icon">👋</div>
-            <h4>Hi! I'm your CS CONNECT Assistant</h4>
-            <p>How can I help you today?</p>
+            <h4>
+                {% if session.get('name') %}
+                    Hi, {{ session.get('name') }}!
+                {% else %}
+                    Hi there!
+                {% endif %}
+            </h4>
+            <p>I'm your **CS Connect Assistant**. How can I help you explore CSE AISAT today?</p>
+            
             <div class="floating-welcome-options">
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Admissions')">
-                    <i class="fas fa-graduation-cap"></i><span>Admissions</span>
+                <div class="floating-welcome-option" onclick="sendFloatingQuick('Who is the HOD?')">
+                    <i class="fas fa-user-tie"></i><span>HOD Info</span>
                 </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Syllabus')">
-                    <i class="fas fa-book"></i><span>Syllabus</span>
+                <div class="floating-welcome-option" onclick="sendFloatingQuick('Tell me about placements')">
+                    <i class="fas fa-briefcase"></i><span>Placements</span>
                 </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Faculty')">
-                    <i class="fas fa-chalkboard-teacher"></i><span>Faculty</span>
+                <div class="floating-welcome-option" onclick="sendFloatingQuick('Where is the CSE office?')">
+                    <i class="fas fa-map-marker-alt"></i><span>Location</span>
                 </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Library')">
-                    <i class="fas fa-book-reader"></i><span>Library</span>
+                <div class="floating-welcome-option" onclick="sendFloatingQuick('Search for Python notes')">
+                    <i class="fas fa-file-pdf"></i><span>Notes</span>
                 </div>
             </div>
         </div>
 
-        <!-- Typing Indicator -->
+        <!-- Typing Indicator (Template) -->
         <div class="floating-typing" id="floatingTyping">
-            <div class="floating-message-avatar" style="background: var(--primary-red); color: white">🤖</div>
             <div class="floating-typing-dots">
                 <div class="floating-typing-dot"></div>
                 <div class="floating-typing-dot"></div>
@@ -67,8 +72,8 @@ JS is in static/js/chatbot.js
     <!-- Input Area -->
     <div class="floating-chat-input">
         <div class="floating-input-wrapper">
-            <input type="text" id="floatingInput" placeholder="Type your message..."
-                onkeypress="handleFloatingEnter(event)" />
+            <input type="text" id="floatingInput" placeholder="Ask me anything..."
+                onkeypress="handleFloatingEnter(event)" autocomplete="off">
             <button class="floating-send-btn" onclick="sendFloatingMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>

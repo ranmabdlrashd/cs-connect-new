@@ -83,7 +83,7 @@
   <div class="event-slider reveal">
     {% for event in events %}
     <div class="event-card">
-     <div style="height:180px; background-color: {{ event.bg_color or '#eee' }};"></div>
+     <div style="height: 180px; background-color: {{ event.bg_color|default('#eee') }};"></div>
       <div class="event-info">
         <span class="date-badge">{{ event.date }}</span>
         <h4>{{ event.title }}</h4>

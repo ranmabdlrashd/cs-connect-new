@@ -15,6 +15,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "csconnectsecret")
 
 from routes.library_routes import library_bp
 from routes.admin_routes import admin_bp
+import llm_engine
 
 app.register_blueprint(library_bp)
 app.register_blueprint(admin_bp)
@@ -1540,6 +1541,38 @@ def admin_internships_delete(iid):
     flash("Internship deleted!", "warning")
     return redirect(url_for("admin_panel") + "#placements")
 
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    """AI Chatbot Endpoint with Session History"""
+    user_msg = request.json.get('message', '').strip()
+    if not user_msg:
+        return jsonify({'response': "I didn't catch that. Could you please say it again?"})
+
+    # Initialize chat history in session if not present
+    if 'chat_history' not in session:
+        session['chat_history'] = []
+
+    # Get recent history
+    chat_history = session['chat_history']
+    is_logged_in = bool(session.get('user_id'))
+    
+    try:
+        # Generate response passing the history
+        response_text = llm_engine.generate_response(user_msg, chat_history, is_logged_in)
+        
+        # Update history
+        chat_history.append({"role": "user", "content": user_msg})
+        chat_history.append({"role": "assistant", "content": response_text})
+        
+        # Limit history size to prevent session cookie overflow (max 10 messages)
+        session['chat_history'] = chat_history[-10:]
+        session.modified = True
+        
+        return jsonify({'response': response_text})
+    except Exception as e:
+        print(f"Chat Route Error: {e}")
+        return jsonify({'response': "I'm having a bit of trouble thinking right now. Please try again later or visit the CSE office!"})
 
 # ─────────────────────────────────────────────────
 # RUN
