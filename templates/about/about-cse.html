@@ -149,6 +149,46 @@
   </div>
 </section>
 
+<!-- MOUs Section -->
+<section class="overview-section" style="padding: 60px 0;">
+  <div class="container">
+    <div class="section-title reveal">
+      <h2>Memorandum of Understanding (MOUs)</h2>
+      <div class="section-title-line"></div>
+      <p>Industry partnerships and academic collaborations</p>
+    </div>
+    <div class="reveal" style="overflow-x:auto;">
+      <table
+        style="width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.08); font-size:0.92rem;">
+        <thead>
+          <tr style="background:linear-gradient(135deg, #c0392b, #922b21); color:#fff;">
+            <th style="padding:14px 16px; text-align:center; font-weight:600; width:60px;">Sl. No.</th>
+            <th style="padding:14px 16px; text-align:left; font-weight:600;">Name of Organization</th>
+            <th style="padding:14px 16px; text-align:center; font-weight:600; width:140px;">Date of Signing</th>
+            <th style="padding:14px 16px; text-align:center; font-weight:600; width:100px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mou in mous %}
+          <tr style="border-bottom:1px solid #f0f0f0; {% if loop.index is even %}background:#fafafa;{% endif %}">
+            <td style="padding:12px 16px; text-align:center; color:#666; font-weight:600;">{{ loop.index }}</td>
+            <td style="padding:12px 16px; color:#2c3e50; font-weight:500;">{{ mou.organization }}</td>
+            <td style="padding:12px 16px; text-align:center; color:#666;">{{ mou.date_of_signing }}</td>
+            <td style="padding:12px 16px; text-align:center;">
+              <span
+                style="display:inline-block; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;
+                {% if mou.status == 'Active' %}background:#d5f5e3; color:#27ae60;{% else %}background:#fadbd8; color:#e74c3c;{% endif %}">
+                {{ mou.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 <!-- Department Stats -->
 <section class="dept-stats-section">
   <div class="section-title reveal">

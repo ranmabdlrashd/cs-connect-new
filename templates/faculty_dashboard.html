@@ -26,10 +26,27 @@
             <h2>💬</h2>
             <p>Announcements</p>
         </div>
-        <div style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
+        <a href="{{ url_for('timetable') }}"
+            style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s; text-decoration:none;"
             onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <h2>📅</h2>
             <p>Timetable</p>
+        </a>
+    </div>
+
+    <!-- Timetable Quick Access -->
+    <div
+        style="background:#fff; border-radius:10px; padding:25px; margin-bottom:30px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border-top:4px solid #e67e22;">
+        <h2 style="color:#e67e22; margin-top:0;">📅 Class Timetables</h2>
+        <p style="color:#666; font-size:14px; margin-bottom:16px;">Quick access to all batch timetables</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px;">
+            {% for batch in all_batches %}
+            <a href="{{ url_for('timetable', batch=batch) }}"
+                style="display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#e67e22,#d35400); color:#fff; padding:14px 16px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.9rem; transition:transform .15s;"
+                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                📋 {{ batch }}
+            </a>
+            {% endfor %}
         </div>
     </div>
 
@@ -142,23 +159,146 @@
         </ul>
     </div>
 
+    <!-- MOU Management Panel -->
+    <div
+        style="background:#fff; border-radius:10px; padding:25px; margin-top:30px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border-top:4px solid #1abc9c;">
+        <h2 style="color:#1abc9c; margin-top:0;">🤝 MOU Management</h2>
+        <p style="color:#666; font-size:14px; margin-bottom:16px;">Add, edit, or delete Memorandums of Understanding</p>
+
+        <!-- Add MOU Form -->
+        <form action="{{ url_for('faculty_mou_add') }}" method="POST"
+            style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:20px; padding:16px; background:#f8f9fa; border-radius:8px;">
+            <div style="flex:2; min-width:200px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Organization Name
+                    *</label>
+                <input type="text" name="organization" required placeholder="e.g. ICT Academy of Kerala"
+                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div style="flex:1; min-width:140px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Date of
+                    Signing</label>
+                <input type="text" name="date_of_signing" placeholder="DD-MM-YYYY"
+                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div style="flex:0.5; min-width:100px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Status</label>
+                <select name="status"
+                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem;">
+                    <option value="Active">Active</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+            <button type="submit"
+                style="background:#1abc9c; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer; white-space:nowrap;">
+                + Add MOU
+            </button>
+        </form>
+
+        <!-- MOU Table -->
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                <thead>
+                    <tr style="background:#2c3e50; color:#fff;">
+                        <th style="padding:10px 12px; text-align:center; width:40px;">#</th>
+                        <th style="padding:10px 12px; text-align:left;">Organization</th>
+                        <th style="padding:10px 12px; text-align:center; width:120px;">Date</th>
+                        <th style="padding:10px 12px; text-align:center; width:80px;">Status</th>
+                        <th style="padding:10px 12px; text-align:center; width:120px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mou in mous %}
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:9px 12px; text-align:center; color:#888;">{{ loop.index }}</td>
+                        <td style="padding:9px 12px; font-weight:500;">{{ mou.organization }}</td>
+                        <td style="padding:9px 12px; text-align:center; color:#666;">{{ mou.date_of_signing }}</td>
+                        <td style="padding:9px 12px; text-align:center;">
+                            <span
+                                style="padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;
+                                {% if mou.status == 'Active' %}background:#d5f5e3; color:#27ae60;{% else %}background:#fadbd8; color:#e74c3c;{% endif %}">
+                                {{ mou.status }}
+                            </span>
+                        </td>
+                        <td style="padding:9px 12px; text-align:center; display:flex; gap:6px; justify-content:center;">
+                            <button
+                                onclick="openMouEdit({{ mou.id }}, '{{ mou.organization|e }}', '{{ mou.date_of_signing|e }}', '{{ mou.status }}')"
+                                style="background:#3498db; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">Edit</button>
+                            <form method="POST" action="{{ url_for('faculty_mou_delete', mid=mou.id) }}"
+                                onsubmit="return confirm('Delete this MOU?');" style="display:inline; margin:0;">
+                                <button type="submit"
+                                    style="background:#e74c3c; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="padding:20px; text-align:center; color:#999;">No MOUs added yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- MOU Edit Modal -->
+<div id="mou-edit-modal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:14px; padding:28px; width:min(500px, 94vw);">
+        <button onclick="closeMouEdit()"
+            style="float:right; background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
+        <h3 style="margin:0 0 18px; color:#1abc9c;">Edit MOU</h3>
+        <form id="mou-edit-form" method="POST">
+            <div style="margin-bottom:12px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px;">Organization *</label>
+                <input id="mou-edit-org" name="organization" required
+                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px;">Date of Signing</label>
+                <input id="mou-edit-date" name="date_of_signing" placeholder="DD-MM-YYYY"
+                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-weight:bold; display:block; margin-bottom:4px;">Status</label>
+                <select id="mou-edit-status" name="status"
+                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+                    <option value="Active">Active</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+            <button type="submit"
+                style="background:#1abc9c; color:#fff; border:none; padding:11px 24px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">
+                Save Changes
+            </button>
+        </form>
+    </div>
 </div>
 
 <script>
     function togglePanel(panelId) {
-        // Toggle the visibility of the specific panel based on its ID
         var panel = document.getElementById(panelId);
         if (panel.style.display === "none") {
-            // First hide both, so they don't stack awkwardly
             document.getElementById('courses-panel').style.display = 'none';
             document.getElementById('announcements-panel').style.display = 'none';
-            // Show the clicked one
             panel.style.display = 'block';
             panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-            // If it's already visible, just hide it
             panel.style.display = "none";
         }
+    }
+
+    function openMouEdit(id, org, date, status) {
+        document.getElementById('mou-edit-form').action = '/faculty/mou/edit/' + id;
+        document.getElementById('mou-edit-org').value = org;
+        document.getElementById('mou-edit-date').value = date;
+        document.getElementById('mou-edit-status').value = status;
+        document.getElementById('mou-edit-modal').style.display = 'flex';
+    }
+
+    function closeMouEdit() {
+        document.getElementById('mou-edit-modal').style.display = 'none';
     }
 </script>
 {% endblock %}

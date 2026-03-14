@@ -2,8 +2,89 @@
 
 {% block title %}Student Dashboard - CS Connect{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dash-page {
+        max-width: 900px;
+        margin: 60px auto;
+        padding: 20px;
+    }
+
+    /* Timetable Section */
+    .tt-dash-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px 28px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+        margin-bottom: 28px;
+    }
+
+    .tt-dash-section h2 {
+        margin: 0 0 6px;
+        font-size: 1.15rem;
+        color: #2c3e50;
+    }
+
+    .tt-dash-section .sub {
+        font-size: .85rem;
+        color: #888;
+        margin-bottom: 16px;
+    }
+
+    .batch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .batch-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        padding: 16px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: transform .15s, box-shadow .15s;
+    }
+
+    .batch-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, .4);
+    }
+
+    .batch-card .icon {
+        font-size: 1.4rem;
+    }
+
+    .events-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px 28px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+    }
+
+    .events-section h2 {
+        margin: 0 0 14px;
+        font-size: 1.15rem;
+        color: #2c3e50;
+    }
+
+    .event-item {
+        background: #f9f9f9;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-left: 4px solid #2ecc71;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:900px; margin: 60px auto; padding: 20px;">
+<div class="dash-page">
 
     <h1 style="color: var(--primary-red); margin-bottom: 10px; display: none;">
         🧑‍🎓 Student Dashboard
@@ -12,21 +93,27 @@
 
     <hr style="margin: 20px 0;">
 
-    <h2>📢 Upcoming Events</h2>
-    <ul style="list-style:none; padding:0;">
-        <li
-            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
-            🗓️ Seminar on AI trends – 12th March 2026
-        </li>
-        <li
-            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
-            🗓️ Campus Placement Drive – 18th March 2026
-        </li>
-        <li
-            style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #2ecc71; border-radius:4px;">
-            🗓️ Internal Examinations – 25th March 2026
-        </li>
-    </ul>
+    <!-- Timetable Quick Access -->
+    <div class="tt-dash-section">
+        <h2>📅 Class Timetables</h2>
+        <p class="sub">Select a batch to view its full timetable</p>
+        <div class="batch-grid">
+            {% for batch in all_batches %}
+            <a class="batch-card" href="{{ url_for('timetable', batch=batch) }}">
+                <span class="icon">📋</span>
+                {{ batch }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="events-section">
+        <h2>📢 Upcoming Events</h2>
+        <div class="event-item">🗓️ Seminar on AI trends – 12th March 2026</div>
+        <div class="event-item">🗓️ Campus Placement Drive – 18th March 2026</div>
+        <div class="event-item">🗓️ Internal Examinations – 25th March 2026</div>
+    </div>
 
 </div>
 {% endblock %}

@@ -450,6 +450,16 @@ def init_db():
             ('S2 CSE A', False, None)
         )
 
+    # 17. mous (Memorandum of Understanding)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mous (
+            id SERIAL PRIMARY KEY,
+            organization TEXT NOT NULL,
+            date_of_signing TEXT,
+            status TEXT DEFAULT 'Active'
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -530,8 +540,9 @@ def timetable():
 
     conn.close()
 
-    # Color mapping per subject code
+    # Color mapping per subject code (covers all batches)
     COLORS = {
+        # ── S2 subjects ──
         'MAT-2':            '#3498db',
         'PHY':              '#9b59b6',
         'FOC':              '#e67e22',
@@ -547,6 +558,66 @@ def timetable():
         'CP/IT W/S':        '#c0392b',
         'DMS(T)':           '#c0392b',
         'HW(P)':            '#a29bfe',
+        # ── S4 subjects ──
+        'MAT-4':            '#3498db',
+        'DBMS':             '#e74c3c',
+        'OS':               '#9b59b6',
+        'COA':              '#e67e22',
+        'SE':               '#1abc9c',
+        'EESD':             '#f39c12',
+        'OS LAB':           '#8e44ad',
+        'DBMS LAB':         '#c0392b',
+        'OS LAB/DBMS LAB':  '#6c5ce7',
+        'DBMS(R)':          '#e74c3c',
+        'DBMS(T)':          '#e74c3c',
+        'OS(R)':            '#9b59b6',
+        'OS(T)':            '#9b59b6',
+        'COA(R)':           '#e67e22',
+        'SE(R)':            '#1abc9c',
+        # ── S8 CSE subjects ──
+        'DC':               '#2980b9',
+        'CCV':              '#d35400',
+        'NSP':              '#16a085',
+        'CSA':              '#8e44ad',
+        'DM':               '#e74c3c',
+        'BCT':              '#27ae60',
+        'IOT':              '#f39c12',
+        'PROJECT':          '#2c3e50',
+        'DM/CSA':           '#c0392b',
+        'BCT/IOT':          '#6c5ce7',
+        'NSP(R)':           '#16a085',
+        'NSP(T)':           '#16a085',
+        'DC(R)':            '#2980b9',
+        'DC(T)':            '#2980b9',
+        'DM/CSA(R)':        '#c0392b',
+        'DM/CSA(T)':        '#c0392b',
+        'BCT/IOT(R)':       '#6c5ce7',
+        'BCT/IOT(T)':       '#6c5ce7',
+        # ── S6 CSE subjects ──
+        'CD':               '#e74c3c',
+        'CG':               '#27ae60',
+        'CG & IP':          '#27ae60',
+        'AAD':              '#3498db',
+        'DA':               '#9b59b6',
+        'IEF':              '#e67e22',
+        'CCW':              '#d35400',
+        'N/W LAB':          '#16a085',
+        'MINI PROJECT':     '#2c3e50',
+        'N/W LAB/MINI PROJECT': '#6c5ce7',
+        'P&T':              '#95a5a6',
+        'CD(R)':            '#e74c3c',
+        'CD(T)':            '#e74c3c',
+        'CG(R)':            '#27ae60',
+        'CG(T)':            '#27ae60',
+        'AAD(R)':           '#3498db',
+        'AAD(T)':           '#3498db',
+        'DA(R)':            '#9b59b6',
+        'DA(T)':            '#9b59b6',
+        # ── Lab room subjects ──
+        'CP LAB':           '#27ae60',
+        'CP LAB DIPLOMA AIML': '#27ae60',
+        'CP LAB DIPLOMA CS':   '#27ae60',
+        'S8EEE':            '#95a5a6',
     }
 
     return render_template(
@@ -582,6 +653,11 @@ def faculty():
 
 @app.route('/about-cse')
 def about_cse():
+    conn = get_db_connection()
+    mous_raw = conn.execute("SELECT * FROM mous ORDER BY id ASC").fetchall()
+    conn.close()
+    mous = [dict(m) for m in mous_raw]
+
     return render_template(
         'about/about-cse.html',
         active_page='about_cse',
@@ -590,6 +666,7 @@ def about_cse():
         peos=get_site_data('peos'),
         psos=get_site_data('psos'),
         milestones=get_site_data('milestones'),
+        mous=mous,
     )
 
 
@@ -849,8 +926,18 @@ def faculty_dashboard():
         flash("Access denied! Faculty only.", "danger")
         return redirect(url_for("login"))
 
+    # Fetch all batches for the timetable widget
+    conn = get_db_connection()
+    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta ORDER BY batch").fetchall()
+    all_batches = [b['batch'] for b in batches_raw] if batches_raw else []
+    mous_raw = conn.execute("SELECT * FROM mous ORDER BY id ASC").fetchall()
+    mous = [dict(m) for m in mous_raw]
+    conn.close()
+
     return render_template("faculty_dashboard.html",
-                           active_page='faculty_dashboard')
+                           active_page='faculty_dashboard',
+                           all_batches=all_batches,
+                           mous=mous)
 
 
 @app.route('/faculty/upload', methods=['POST'])
@@ -895,6 +982,63 @@ def faculty_upload():
     return redirect(url_for('faculty_dashboard'))
 
 
+# ─────────────────────────────────────────────────
+# FACULTY — MOU CRUD
+# ─────────────────────────────────────────────────
+@app.route('/faculty/mou/add', methods=['POST'])
+def faculty_mou_add():
+    if session.get('role') != 'faculty':
+        flash("Access denied! Faculty only.", "danger")
+        return redirect(url_for('login'))
+    org = request.form.get('organization', '').strip()
+    dos = request.form.get('date_of_signing', '').strip()
+    status = request.form.get('status', 'Active').strip()
+    if not org:
+        flash("Organization name is required.", "danger")
+        return redirect(url_for('faculty_dashboard'))
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO mous (organization, date_of_signing, status) VALUES (%s, %s, %s)",
+        (org, dos, status)
+    )
+    conn.commit()
+    conn.close()
+    flash(f"✅ MOU with '{org}' added successfully.", "success")
+    return redirect(url_for('faculty_dashboard'))
+
+
+@app.route('/faculty/mou/edit/<int:mid>', methods=['POST'])
+def faculty_mou_edit(mid):
+    if session.get('role') != 'faculty':
+        flash("Access denied! Faculty only.", "danger")
+        return redirect(url_for('login'))
+    org = request.form.get('organization', '').strip()
+    dos = request.form.get('date_of_signing', '').strip()
+    status = request.form.get('status', 'Active').strip()
+    conn = get_db_connection()
+    conn.execute(
+        "UPDATE mous SET organization=%s, date_of_signing=%s, status=%s WHERE id=%s",
+        (org, dos, status, mid)
+    )
+    conn.commit()
+    conn.close()
+    flash(f"✅ MOU updated successfully.", "success")
+    return redirect(url_for('faculty_dashboard'))
+
+
+@app.route('/faculty/mou/delete/<int:mid>', methods=['POST'])
+def faculty_mou_delete(mid):
+    if session.get('role') != 'faculty':
+        flash("Access denied! Faculty only.", "danger")
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    conn.execute("DELETE FROM mous WHERE id=%s", (mid,))
+    conn.commit()
+    conn.close()
+    flash("MOU deleted.", "success")
+    return redirect(url_for('faculty_dashboard'))
+
+
 @app.route('/student-dashboard')
 def student_dashboard():
     # STEP 4: only students can access this
@@ -902,8 +1046,15 @@ def student_dashboard():
         flash("Access denied! Students only.", "danger")
         return redirect(url_for("login"))
 
+    # Fetch all batches for the timetable widget
+    conn = get_db_connection()
+    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta ORDER BY batch").fetchall()
+    all_batches = [b['batch'] for b in batches_raw] if batches_raw else []
+    conn.close()
+
     return render_template("student_dashboard.html",
-                           active_page='student_dashboard')
+                           active_page='student_dashboard',
+                           all_batches=all_batches)
 
 
 # ─────────────────────────────────────────────────
