@@ -92,3 +92,24 @@ def send_request_message(request_id):
             flash("This book is not currently issued.", "warning")
 
     return redirect(request.referrer or url_for("admin_bp.admin_library"))
+
+@admin_bp.route("/admin/users")
+def admin_users():
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for("login"))
+    return render_template("admin_user_management.html", active_page="admin_dashboard")
+
+@admin_bp.route("/admin/fees")
+def admin_fees():
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for("login"))
+    return render_template("admin_fee_management.html", active_page="admin_dashboard")
+
+@admin_bp.route("/admin/analytics")
+def admin_analytics():
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for("login"))
+    return render_template("admin_analytics.html", active_page="admin_dashboard")

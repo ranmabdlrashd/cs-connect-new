@@ -1,0 +1,155 @@
+/* =============================================================================
+   STUDENT DASHBOARD — DARK ACADEMIC THEME
+   Strict adherence to CS Connect Design System
+   ============================================================================= */
+
+.dash-page {
+  background: #0A0A0A;
+  color: #F5E6BE;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+.dash-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* 1. Profile Header */
+.prof-header {
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.08);
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.prof-header::before {
+  content: ''; position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: #8B1D1D;
+}
+.prof-avatar {
+  background: linear-gradient(135deg, #8B1D1D 0%, #4a0d0d 100%);
+  width: 100px; height: 100px; border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #F5E6BE;
+  border: 2px solid rgba(245,230,190,0.2); box-shadow: 0 8px 24px rgba(139,29,29,0.3);
+}
+.prof-info { flex: 1; }
+.prof-name { font-family: 'Playfair Display', serif; font-size: 32px; margin: 0 0 8px; color: #F5E6BE; }
+.prof-meta { display: flex; gap: 20px; font-size: 14px; color: #A0A0A0; margin-bottom: 20px; flex-wrap: wrap; }
+.meta-chip { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.03); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(245,230,190,0.05);}
+.meta-chip strong { color: #fff; font-weight: 500;}
+
+.edit-prof-btn {
+  background: rgba(139,29,29,0.1); color: #F5E6BE; border: 1px solid rgba(139,29,29,0.4);
+  padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+.edit-prof-btn:hover { background: #8B1D1D; box-shadow: 0 4px 12px rgba(139,29,29,0.3); }
+
+/* 2. Grid Layout */
+.dashboard-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;
+}
+
+/* Base Section Styling */
+.dash-section {
+  background: #121212; border: 1px solid rgba(245,230,190,0.05); border-radius: 16px; padding: 28px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 20px; color: #F5E6BE;
+  padding-bottom: 12px; border-bottom: 1px dashed rgba(245,230,190,0.1); display: flex; justify-content: space-between; align-items: center;
+}
+
+/* 3. Academic & Placement Tracker */
+.tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;}
+.track-card {
+  background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 8px; border: 1px solid transparent;
+}
+.track-label { font-size: 11px; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+.track-val { font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700; color: #F5E6BE; }
+.track-good { border-color: rgba(46,204,113,0.3); background: rgba(46,204,113,0.05); }
+
+/* Eligibility Banner */
+.eligibility-banner {
+  background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.4); padding: 16px; border-radius: 8px;
+  display: flex; align-items: center; gap: 12px; color: #2ecc71; font-weight: 600; font-size: 14px;
+}
+.eligibility-icon { font-size: 20px; }
+
+/* 4. Project Showcase */
+.proj-list { display: flex; flex-direction: column; gap: 16px; }
+.proj-card {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(245,230,190,0.05); padding: 20px;
+  border-radius: 12px; transition: 0.3s;
+}
+.proj-card:hover { border-color: rgba(139,29,29,0.3); transform: translateY(-3px); }
+.proj-title { font-size: 16px; color: #fff; margin: 0 0 12px; font-weight: 600; }
+.proj-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.ptag {
+  background: #8B1D1D; border: 1px solid #F5E6BE; color: #F5E6BE;
+  font-size: 10px; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px;
+}
+
+/* 5. Document Vault */
+.doc-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px;}
+.doc-item {
+  display: flex; justify-content: space-between; align-items: center; padding: 14px 16px;
+  background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(245,230,190,0.05); transition: 0.3s;
+}
+.doc-item:hover { background: rgba(255,255,255,0.05); }
+.doc-name { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #ccc; }
+.doc-action { color: #8B1D1D; text-decoration: none; font-size: 12px; font-weight: 600; }
+.doc-action:hover { color: #e53935; }
+
+.upload-btn {
+  width: 100%; padding: 14px; background: transparent; border: 2px dashed rgba(245,230,190,0.2);
+  color: #F5E6BE; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600;
+}
+.upload-btn:hover { border-color: #8B1D1D; background: rgba(139,29,29,0.05); }
+
+/* Quick Access / Timetables */
+.batch-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+.batch-card {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(245,230,190,0.1); padding: 12px 20px;
+  border-radius: 8px; color: #A0A0A0; text-decoration: none; font-size: 13px; transition: 0.3s;
+}
+.batch-card:hover { color: #F5E6BE; border-color: #8B1D1D; background: rgba(139,29,29,0.1); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
+}
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal-content {
+  background: #121212; border: 1px solid rgba(139,29,29,0.4); border-radius: 16px; width: 100%; max-width: 500px;
+  padding: 32px; transform: translateY(20px); transition: 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+.modal-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 16px;}
+.modal-hdr h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin: 0; color: #F5E6BE;}
+.close-modal { background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+.close-modal:hover { color: #8B1D1D; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 12px; color: #A0A0A0; margin-bottom: 8px; letter-spacing: 0.5px;}
+.form-group input { 
+  width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.5); border: 1px solid rgba(245,230,190,0.1); 
+  border-radius: 8px; color: #fff; outline: none; transition: 0.3s;
+}
+.form-group input:focus { border-color: #8B1D1D; }
+.save-btn {
+  background: #8B1D1D; color: #fff; border: none; border-radius: 8px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+.save-btn:hover { background: #6b1515; }
+
+@media (max-width: 768px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .prof-header { flex-direction: column; text-align: center; }
+  .prof-meta { justify-content: center; }
+}

@@ -1,0 +1,158 @@
+/* =============================================================================
+   VERIFY OTP PAGE — DARK ACADEMIC THEME
+   ============================================================================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0A0A0A;
+  font-family: 'Inter', sans-serif;
+  color: #F5E6BE;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.verify-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100vw;
+  min-height: 100vh;
+  background: #0A0A0A;
+}
+
+/* LEFT PANEL (Branding & Expiry) */
+.verify-left {
+  position: relative;
+  background-image: 
+    linear-gradient(to right, rgba(139,29,29,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139,29,29,0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.verify-left::before {
+  content: '';
+  position: absolute;
+  top: 10%; right: 10%; width: 60%; height: 60%;
+  background: radial-gradient(circle, rgba(139,29,29,0.1) 0%, transparent 60%);
+}
+
+.verify-left-content { position: relative; z-index: 10; max-width: 480px; }
+
+.expiry-info {
+  background: rgba(139,29,29,0.05);
+  border: 1px solid rgba(139,29,29,0.2);
+  padding: 24px;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.expiry-info h4 { color: #8B1D1D; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
+.expiry-info p { margin: 0; color: #A0A0A0; font-size: 14px; line-height: 1.6; }
+
+/* RIGHT PANEL (OTP Container) */
+.verify-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0A0A0A;
+  padding: 40px;
+}
+
+.verify-card {
+  width: 100%;
+  max-width: 460px;
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.08);
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+}
+
+.otp-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 40px 0;
+}
+
+.otp-inp {
+  width: 50px;
+  height: 60px;
+  background: #0A0A0A;
+  border: 1px solid rgba(245,230,190,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: 0.3s;
+  font-family: 'Inter', sans-serif;
+}
+
+.otp-inp:focus {
+  border-color: #8B1D1D;
+  background: #160808;
+  box-shadow: 0 0 0 3px rgba(139,29,29,0.15);
+}
+
+.otp-inp.filled {
+  border-color: #8B1D1D;
+  background: #160808;
+}
+
+.countdown-text {
+  font-size: 13px;
+  color: #666;
+  margin-top: 24px;
+}
+
+#resendBtn {
+  color: #8B1D1D;
+  font-weight: 600;
+  text-decoration: none;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: 0.3s;
+}
+
+#resendBtn.active {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #8B1D1D, #6b1515);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 32px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(139,29,29,0.3);
+}
+
+@media (max-width: 900px) {
+  .verify-split { grid-template-columns: 1fr; }
+  .verify-left { display: none; }
+  .verify-right { padding: 24px; }
+  .verify-card { border: none; padding: 0; background: transparent; box-shadow: none; }
+}

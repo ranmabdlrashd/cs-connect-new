@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="search-page">
+
+  <!-- Header -->
+  <div class="search-header">
+    <h1 class="search-title">Search Results</h1>
+    <form action="/search" method="GET" style="max-width: 600px; margin: 16px 0; display: flex; gap: 12px;">
+      <input type="text" name="q" placeholder="Search faculty, placements, syllabus..." value="" id="navSearchInput" style="flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(245,230,190,0.1); border-radius: 8px; padding: 12px 16px; color: #fff; font-family: 'Inter'; outline: none;">
+      <button type="submit" style="background: #8B1D1D; color: #fff; border: none; padding: 0 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Search</button>
+    </form>
+    <p class="search-meta">Showing <span id="rsCount">0</span> results for '<span id="rsQueryDisplay">...</span>'</p>
+  </div>
+
+  <div class="search-container">
+    
+    <!-- Sidebar -->
+    <aside class="search-sidebar">
+      
+      <!-- Filters -->
+      <div class="rs-filter-widget">
+        <h3>Categories</h3>
+        <div class="rs-filter-list" id="filterPills">
+          <button class="filter-pill active" data-filter="all">All</button>
+          <button class="filter-pill" data-filter="faculty">Faculty & Staff</button>
+          <button class="filter-pill" data-filter="placement">Placement Records (Batches 4-10)</button>
+          <button class="filter-pill" data-filter="academic">Academic Resources (Syllabus/Labs)</button>
+          <button class="filter-pill" data-filter="achievements">Student Achievements</button>
+        </div>
+      </div>
+
+      <!-- Intelligent Tips -->
+      <div class="search-tips">
+        <h4 class="tips-title">Intelligent Search Tips</h4>
+        <ul class="tips-list">
+          <li>Use <strong>'CST401'</strong> to find the S6 CS Syllabus.</li>
+          <li>Search <strong>'Sutherland'</strong> to see all 68 placed students in Batch 10.</li>
+          <li>Type <strong>'NVIDIA'</strong> to explore the Edge AI Lab resources.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Results Feed -->
+    <main class="rs-feed">
+      
+      <!-- Container for dynamic JS results -->
+      <div id="resultsContainer"></div>
+
+      <!-- Empty State -->
+      <div class="rs-empty" id="emptyState">
+        <h2 class="empty-code">404</h2>
+        <h3 class="empty-title">Logic Error: No Results Found</h3>
+        <p class="empty-sub">Our computational search engine couldn't compile a match for your query.</p>
+        <div class="sugg-searches">
+          <button class="sugg-pill" onclick="triggerSearch('Cyber')">Try 'Cyber'</button>
+          <button class="sugg-pill" onclick="triggerSearch('Amazon')">Try 'Amazon'</button>
+          <button class="sugg-pill" onclick="triggerSearch('Germany')">Try 'Germany'</button>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // 1. DUMMY DATA ENGINE (Mirroring actual department data structures)
+  const SEARCH_DB = [
+    {
+      id: 1,
+      categoryFilter: "faculty",
+      categoryDisplay: "Faculty & Staff",
+      title: "Dr. Sheeba A.",
+      snippet: "Specialization: Ph.D. in Cybersecurity & Cryptography. Head of InfoSec research group and Senior Lecturer."
+    },
+    {
+      id: 2,
+      categoryFilter: "placement",
+      categoryDisplay: "Placement · 2025",
+      title: "Placement Record: Amazon Development Center",
+      snippet: "Batch 10 (2025) - 1 Student placed. Historical data: Batch 4 (1 student), Batch 5 (1 student)."
+    },
+    {
+      id: 3,
+      categoryFilter: "achievements",
+      categoryDisplay: "Higher Studies",
+      title: "Sreelakshmi P B (ECE)",
+      snippet: "Successfully secured admission at Kempten University of Applied Sciences, Germany for Masters in Electrical Engineering."
+    },
+    {
+      id: 4,
+      categoryFilter: "academic",
+      categoryDisplay: "Syllabus",
+      title: "Artificial Intelligence (CST401)",
+      snippet: "S6 CS Complete Syllabus covering uninformed search, neural nets, and AI ethics."
+    },
+    {
+      id: 5,
+      categoryFilter: "placement",
+      categoryDisplay: "Placement · 2025",
+      title: "Placement Record: Sutherland",
+      snippet: "Outstanding performance capturing 68 placed students in Batch 10. Core recruiter since 2019."
+    },
+    {
+      id: 6,
+      categoryFilter: "academic",
+      categoryDisplay: "Lab Resources",
+      title: "Edge AI Lab powered by NVIDIA",
+      snippet: "Access standard operating procedures, container images, and NVIDIA Jetson Nano guides."
+    }
+  ];
+
+  // Parse URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const rawQuery = urlParams.get('q') || '';
+  let CURRENT_FILTER = 'all';
+
+  function triggerSearch(newQ) {
+    window.location.search = '?q=' + encodeURIComponent(newQ);
+  }
+
+  // <mark> Highlighter Logic Regex
+  function highlightText(text, keyword) {
+    if (!keyword) return text;
+    // Escape regex characters
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(${escaped})`, 'gi');
+    // Wrap in <mark> tag
+    return text.replace(re, '<mark>$1</mark>');
+  }
+
+  function renderResults() {
+    const qStr = rawQuery.trim().toLowerCase();
+    document.getElementById('rsQueryDisplay').innerText = rawQuery || '*';
+    if(document.getElementById('navSearchInput')) {
+      document.getElementById('navSearchInput').value = rawQuery;
+    }
+    
+    const container = document.getElementById('resultsContainer');
+    const emptyState = document.getElementById('emptyState');
+    container.innerHTML = '';
+    
+    let matchCount = 0;
+
+    SEARCH_DB.forEach(item => {
+      // 1. Text Search matching
+      const contentStr = (item.title + " " + item.snippet).toLowerCase();
+      const textMatch = qStr === '' || contentStr.includes(qStr);
+      
+      // 2. Filter matching
+      const filterMatch = CURRENT_FILTER === 'all' || item.categoryFilter === CURRENT_FILTER;
+
+      if (textMatch && filterMatch) {
+        matchCount++;
+        
+        // Build DOM
+        const card = document.createElement('div');
+        card.className = 'rs-card active';
+        
+        const catNode = document.createElement('span');
+        catNode.className = 'rs-cat';
+        catNode.innerText = item.categoryDisplay;
+        
+        const titleNode = document.createElement('h3');
+        titleNode.className = 'rs-title';
+        titleNode.innerHTML = highlightText(item.title, rawQuery);
+        
+        const pNode = document.createElement('p');
+        pNode.className = 'rs-snippet';
+        pNode.innerHTML = highlightText(item.snippet, rawQuery);
+        
+        card.appendChild(catNode);
+        card.appendChild(titleNode);
+        card.appendChild(pNode);
+        container.appendChild(card);
+      }
+    });
+
+    document.getElementById('rsCount').innerText = matchCount;
+
+    // Toggle Empty State
+    if (matchCount === 0) {
+      emptyState.classList.add('active');
+    } else {
+      emptyState.classList.remove('active');
+    }
+  }
+
+  // Bind Filters
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // toggle visual
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      // update state
+      CURRENT_FILTER = e.target.getAttribute('data-filter');
+      renderResults();
+    });
+  });
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    renderResults();
+  });
+
+</script>
+{% endblock %}

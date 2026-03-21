@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}About CSE Department | CS CONNECT{% endblock %}
+{% block title %}About CSE Department | CS Connect · AISAT{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/aboutcse.css') }}" />
@@ -8,203 +8,419 @@
 
 {% block content %}
 
-<!-- Department Banner -->
-<section class="dept-banner">
-  <div class="banner-content">
-    <div class="dept-icon">💻</div>
-    <h1>Department of Computer Science &amp; Engineering</h1>
-    <p>
-      Empowering innovation through cutting-edge technology and research
-      excellence. Building the next generation of software engineers and
-      tech leaders.
-    </p>
-  </div>
-</section>
+{# ── DUMMY DATA ────────────────────────────────────────────────────── #}
+{% set dummy_stats = [
+  {"value": "500+",  "label": "Students Enrolled"},
+  {"value": "25+",   "label": "Years of Excellence"},
+  {"value": "50+",   "label": "Expert Faculty"},
+  {"value": "15+",   "label": "Research Labs"}
+] %}
 
-<!-- Overview Section -->
-<section class="overview-section">
-  <div class="container">
-    <div class="section-title reveal">
-      <h2>Department Overview</h2>
-      <div class="section-title-line"></div>
-      <p>Excellence in computing education since 2002</p>
+{% set dummy_programs = [
+  {
+    "badge": "Flagship Program",
+    "name": "B.Tech Computer Science & Engineering",
+    "meta": "4 Years · 160 Credits · KTU Affiliated",
+    "desc": "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software engineering with strong lab and project components.",
+    "featured": true
+  },
+  {
+    "badge": "Postgraduate",
+    "name": "M.Tech Computer Science & Engineering",
+    "meta": "2 Years · KTU Affiliated",
+    "desc": "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems with research thesis component.",
+    "featured": false
+  },
+  {
+    "badge": "Doctoral",
+    "name": "Ph.D. Computer Science",
+    "meta": "3–5 Years · Full-time / Part-time",
+    "desc": "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals. Supervision by experienced research guides.",
+    "featured": false
+  }
+] %}
+
+{% set dummy_faculty = [
+  {
+    "initials": "MJ",
+    "name": "Dr. Mathew Joseph",
+    "role": "Head of Department · Professor",
+    "qual": "Ph.D. IIT Bombay · M.Tech (CS) · 18+ years experience",
+    "tags": ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"]
+  },
+  {
+    "initials": "AR",
+    "name": "Dr. Anitha R.",
+    "role": "Associate Professor · PG Coordinator",
+    "qual": "Ph.D. NIT Calicut · M.Tech (AI) · 12+ years experience",
+    "tags": ["Machine Learning", "NLP", "Research Guide", "8 Publications"]
+  }
+] %}
+
+{# ── Use backend data if available, else dummy ─────────────────────── #}
+{% set page_stats  = dept_stats if dept_stats else dummy_stats %}
+{% set page_programs = programs if programs else dummy_programs %}
+
+<div class="aboutcse-page">
+
+  {# ─── 3.1 BREADCRUMB ─────────────────────────────────────────────── #}
+  <div class="aboutcse-breadcrumb">
+    <a href="/">Home</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-active">About CSE</span>
+  </div>
+
+  {# ─── 3.2 PAGE HERO ──────────────────────────────────────────────── #}
+  <section class="aboutcse-hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Department of Computer Science &amp; Engineering</div>
+      <h1 class="hero-title">About <span class="crimson">CSE</span></h1>
+      <p class="hero-subtitle">
+        Established in 2000, the Department of Computer Science and Engineering at AISAT has been at
+        the forefront of technical education in Kerala, nurturing innovation, research, and
+        industry-ready talent for over two decades.
+      </p>
     </div>
-    <div class="overview-content reveal">
-      <p>
-        The Department of Computer Science and Engineering at AISAT is
-        dedicated to fostering excellence in computing education, research,
-        and innovation. Established in 2002, our department has consistently
-        produced skilled engineers who excel in both industry and academia.
-      </p>
-      <p>
-        With state-of-the-art laboratories, experienced faculty, and strong
-        industry collaborations, we provide a comprehensive learning
-        environment that nurtures technical expertise, problem-solving
-        skills, and ethical values. Our curriculum is designed to meet
-        global standards while addressing local industry needs.
-      </p>
-      <div class="overview-stats">
-        {% for stat in dept_stats %}
-        <div class="stat-box reveal">
-          <span class="stat-number">{{ stat.value }}</span>
-          <span class="stat-label">{{ stat.label }}</span>
-        </div>
-        {% endfor %}
+  </section>
+
+  {# ─── MAIN CONTENT WRAPPER ───────────────────────────────────────── #}
+  <div class="aboutcse-content">
+
+    {# ─── 3.3 KEY STATS BAR ──────────────────────────────────────────── #}
+    <div class="stats-bar" id="statsBar">
+      {% for s in page_stats %}
+      <div class="stat-card-sm">
+        <div class="stat-num">{{ s.value }}</div>
+        <div class="stat-label">{{ s.label }}</div>
       </div>
+      {% endfor %}
     </div>
-  </div>
-</section>
 
-<!-- Vision & Mission -->
-<section class="vm-section">
-  <div class="container">
-    <div class="section-title reveal">
-      <h2>Vision &amp; Mission</h2>
-      <div class="section-title-line"></div>
-      <p>Guiding our department towards excellence</p>
-    </div>
+    {# ─── 3.4 VISION & MISSION ───────────────────────────────────────── #}
     <div class="vm-grid">
-      <div class="vm-card reveal">
-        <div class="vm-icon"><i class="fas fa-eye"></i></div>
-        <h3>Vision</h3>
-        <p>To develop a leading centre for creating highly competent computer science and engineering professionals who
-          are technically sound, employable and socially committed towards sustainable development and growth.</p>
-      </div>
-      <div class="vm-card reveal">
-        <div class="vm-icon"><i class="fas fa-bullseye"></i></div>
-        <h3>Mission</h3>
-        <ul>
-          <li>Groom competent computer science engineers by providing high-quality professional training and a
-            research-oriented ambience in alignment with sustainable development initiatives.</li>
-          <li>Enhance innovation, leadership qualities, team spirit, and ethical value-based living through
-            multidisciplinary collaboration for sustainable societal progress.</li>
-          <li>Promote IT industry interaction and encourage entrepreneurship skills among students.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PEOs -->
-<section class="peos-section">
-  <div class="container">
-    <div class="section-title reveal">
-      <h2>Program Educational Objectives (PEOs)</h2>
-      <div class="section-title-line"></div>
-      <p>Graduates of Computer Science and Engineering shall</p>
-    </div>
-    <div class="peos-grid">
-      {% for peo in peos %}
-      <div class="peo-card reveal">
-        <div class="peo-number">{{ loop.index }}</div>
-        <h4>{{ peo.title }}</h4>
-        <p>{{ peo.description }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<!-- PSOs -->
-<section class="psos-section">
-  <div class="container">
-    <div class="section-title reveal" style="margin-top: 5rem">
-      <h2>Program Specific Outcomes (PSOs)</h2>
-      <div class="section-title-line"></div>
-      <p>Graduates of Computer Science and Engineering will be able to</p>
-    </div>
-    <div class="pos-grid">
-      {% for pso in psos %}
-      <div class="po-card reveal">
-        <div class="po-icon" style="background: linear-gradient(135deg, var(--primary-red), #c92a1e); color: white;">
-          {{ pso.code }}
+      {# Vision #}
+      <div class="vm-card">
+        <div class="vm-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
         </div>
-        <p>{{ pso.description }}</p>
+        <h3 class="vm-title">Our Vision</h3>
+        <p class="vm-text">
+          To be a centre of excellence in Computer Science education and research, producing globally
+          competent engineers who are ethically grounded and socially responsible, capable of driving
+          digital transformation across industries.
+        </p>
+      </div>
+      {# Mission #}
+      <div class="vm-card">
+        <div class="vm-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <h3 class="vm-title">Our Mission</h3>
+        <p class="vm-text">
+          To provide quality technical education through an innovative curriculum, state-of-the-art
+          infrastructure, and industry-academia collaboration. We are committed to fostering research,
+          creativity, and entrepreneurship among our students and faculty.
+        </p>
+      </div>
+    </div>
+
+    {# ─── 3.5 PROGRAMS OFFERED ───────────────────────────────────────── #}
+    <div class="section-header">
+      <h2 class="section-title-h">Programs Offered</h2>
+      <div class="section-sub">Undergraduate &amp; Postgraduate Degrees</div>
+    </div>
+    <div class="programs-grid" id="programsGrid">
+      {% for p in page_programs %}
+      <div class="prog-card {% if p.featured %}prog-featured{% endif %}">
+        <span class="prog-badge">{{ p.badge }}</span>
+        <div class="prog-name">{{ p.name }}</div>
+        <div class="prog-meta">{{ p.meta }}</div>
+        <p class="prog-desc">{{ p.desc }}</p>
+        <a href="#" class="prog-link">View Curriculum →</a>
+      </div>
+      {% else %}
+      {# JS fallback fills this if empty #}
+      {% endfor %}
+    </div>
+
+    {# ─── 3.6 FACILITIES ─────────────────────────────────────────────── #}
+    <div class="section-header">
+      <h2 class="section-title-h">Department Facilities</h2>
+      <div class="section-sub">State-of-the-art infrastructure</div>
+    </div>
+    <div class="facilities-grid">
+
+      <div class="facility-card">
+        <div class="facility-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="facility-name">AI &amp; ML Research Lab</div>
+          <div class="facility-desc">NVIDIA GPU cluster, 20 high-end workstations, deep learning frameworks</div>
+        </div>
+      </div>
+
+      <div class="facility-card">
+        <div class="facility-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="facility-name">Cybersecurity Lab</div>
+          <div class="facility-desc">Ethical hacking environment, Kali Linux, network simulation tools, Cisco partner</div>
+        </div>
+      </div>
+
+      <div class="facility-card">
+        <div class="facility-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="facility-name">Cloud &amp; DevOps Lab</div>
+          <div class="facility-desc">AWS, Azure sandbox environments, Docker, Kubernetes, CI/CD pipelines</div>
+        </div>
+      </div>
+
+      <div class="facility-card">
+        <div class="facility-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+        </div>
+        <div>
+          <div class="facility-name">IoT &amp; Embedded Lab</div>
+          <div class="facility-desc">Arduino, Raspberry Pi, ESP32 kits, sensor arrays, wireless modules</div>
+        </div>
+      </div>
+
+    </div>
+
+    {# ─── 3.7 DEPARTMENT LEADERSHIP ──────────────────────────────────── #}
+    <div class="section-header">
+      <h2 class="section-title-h">Department Leadership</h2>
+      <div class="section-sub">Guiding the future of computer science education</div>
+    </div>
+    <div class="leadership-grid" id="leadershipGrid">
+      {% set ldr_list = faculty_leadership if faculty_leadership is defined and faculty_leadership else dummy_faculty %}
+      {% for lead in ldr_list %}
+      <div class="leader-card">
+        <div class="leader-avatar">{{ lead.initials }}</div>
+        <div class="leader-info">
+          <div class="leader-name">{{ lead.name }}</div>
+          <div class="leader-role">{{ lead.role }}</div>
+          <div class="leader-qual">{{ lead.qual }}</div>
+          <div class="leader-tags">
+            {% for t in lead.tags %}
+            <span class="spec-tag">{{ t }}</span>
+            {% endfor %}
+          </div>
+        </div>
       </div>
       {% endfor %}
     </div>
-  </div>
-</section>
 
-<!-- Milestones Timeline -->
-<section class="timeline-section">
-  <div class="container">
-    <div class="section-title reveal">
-      <h2>Department Milestones</h2>
-      <div class="section-title-line"></div>
-      <p>Key achievements marking our journey of excellence</p>
+    {# ─── PEOs ──────────────────────────────────────────────────────── #}
+    {% if peos %}
+    <div class="section-header">
+      <h2 class="section-title-h">Program Educational Objectives</h2>
+      <div class="section-sub">Graduates of Computer Science and Engineering shall</div>
+    </div>
+    <div class="peo-grid">
+      {% for peo in peos %}
+      <div class="peo-card">
+        <div class="peo-num">{{ loop.index }}</div>
+        <div class="peo-body">
+          <div class="peo-title">{{ peo.title }}</div>
+          <div class="peo-desc">{{ peo.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ─── PSOs ──────────────────────────────────────────────────────── #}
+    {% if psos %}
+    <div class="section-header">
+      <h2 class="section-title-h">Program Specific Outcomes</h2>
+      <div class="section-sub">Graduates will be able to</div>
+    </div>
+    <div class="pso-grid">
+      {% for pso in psos %}
+      <div class="pso-card">
+        <div class="pso-code">{{ pso.code }}</div>
+        <p class="pso-desc">{{ pso.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ─── MILESTONES ─────────────────────────────────────────────────── #}
+    {% if milestones %}
+    <div class="section-header">
+      <h2 class="section-title-h">Department Milestones</h2>
+      <div class="section-sub">Key achievements marking our journey of excellence</div>
     </div>
     <div class="timeline">
-      {% for item in milestones %}
-      <div class="timeline-item {{ 'left' if loop.index is odd else 'right' }} reveal">
-        <div class="timeline-content">
-          <div class="timeline-year">{{ item.year }}</div>
-          <h4>{{ item.title }}</h4>
-          <p>{{ item.description }}</p>
+      {% for m in milestones %}
+      <div class="tl-item">
+        <div class="tl-year">{{ m.year }}</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">{{ m.title }}</div>
+          <p class="tl-desc">{{ m.description }}</p>
         </div>
-        <div class="timeline-icon"><i class="{{ item.icon }}"></i></div>
       </div>
       {% endfor %}
     </div>
-  </div>
-</section>
+    {% endif %}
 
-<!-- MOUs Section -->
-<section class="overview-section" style="padding: 60px 0;">
-  <div class="container">
-    <div class="section-title reveal">
-      <h2>Memorandum of Understanding (MOUs)</h2>
-      <div class="section-title-line"></div>
-      <p>Industry partnerships and academic collaborations</p>
+    {# ─── MOUs ──────────────────────────────────────────────────────── #}
+    {% if mous %}
+    <div class="section-header">
+      <h2 class="section-title-h">Memoranda of Understanding</h2>
+      <div class="section-sub">Industry partnerships and academic collaborations</div>
     </div>
-    <div class="reveal" style="overflow-x:auto;">
-      <table
-        style="width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.08); font-size:0.92rem;">
+    <div class="mou-table-wrap">
+      <table class="mou-table">
         <thead>
-          <tr style="background:linear-gradient(135deg, #c0392b, #922b21); color:#fff;">
-            <th style="padding:14px 16px; text-align:center; font-weight:600; width:60px;">Sl. No.</th>
-            <th style="padding:14px 16px; text-align:left; font-weight:600;">Name of Organization</th>
-            <th style="padding:14px 16px; text-align:center; font-weight:600; width:140px;">Date of Signing</th>
-            <th style="padding:14px 16px; text-align:center; font-weight:600; width:100px;">Status</th>
+          <tr>
+            <th>#</th>
+            <th>Organization</th>
+            <th>Date of Signing</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {% for mou in mous %}
-          <tr style="border-bottom:1px solid #f0f0f0; {% if loop.index is even %}background:#fafafa;{% endif %}">
-            <td style="padding:12px 16px; text-align:center; color:#666; font-weight:600;">{{ loop.index }}</td>
-            <td style="padding:12px 16px; color:#2c3e50; font-weight:500;">{{ mou.organization }}</td>
-            <td style="padding:12px 16px; text-align:center; color:#666;">{{ mou.date_of_signing }}</td>
-            <td style="padding:12px 16px; text-align:center;">
-              <span
-                style="display:inline-block; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;
-                {% if mou.status == 'Active' %}background:#d5f5e3; color:#27ae60;{% else %}background:#fadbd8; color:#e74c3c;{% endif %}">
-                {{ mou.status }}
-              </span>
-            </td>
+          <tr>
+            <td class="mou-idx">{{ loop.index }}</td>
+            <td class="mou-org">{{ mou.organization }}</td>
+            <td class="mou-date">{{ mou.date_of_signing }}</td>
+            <td><span class="mou-status {% if mou.status == 'Active' %}mou-active{% else %}mou-expired{% endif %}">{{ mou.status }}</span></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </div>
-</section>
+    {% endif %}
 
-<!-- Department Stats -->
-<section class="dept-stats-section">
-  <div class="section-title reveal">
-    <h2 style="color: white">Department at a Glance</h2>
-    <div class="section-title-line" style="background: white"></div>
-    <p style="color: rgba(255, 255, 255, 0.9)">Key numbers that define our excellence</p>
-  </div>
-  <div class="stats-grid">
-    {% for stat in dept_glance %}
-    <div class="stat-card reveal">
-      <div class="stat-card-icon">{{ stat.icon }}</div>
-      <span class="stat-card-number">{{ stat.value }}</span>
-      <span class="stat-card-label">{{ stat.label }}</span>
-    </div>
-    {% endfor %}
-  </div>
-</section>
+  </div>{# end .aboutcse-content #}
+</div>{# end .aboutcse-page #}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── About CSE — Client-side fallback & fetch logic ────────────────── */
+
+// ── Dept Stats — fetch from backend, fallback to inline dummy ────────
+(async function loadStats() {
+  const dummy = [
+    { value: "500+", label: "Students Enrolled" },
+    { value: "25+",  label: "Years of Excellence" },
+    { value: "50+",  label: "Expert Faculty" },
+    { value: "15+",  label: "Research Labs" }
+  ];
+
+  // Stats are already rendered server-side (Jinja). Only override if bar is empty.
+  const bar = document.getElementById("statsBar");
+  if (!bar || bar.querySelectorAll(".stat-card-sm").length > 0) return;
+
+  dummy.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "stat-card-sm";
+    div.innerHTML = `<div class="stat-num">${s.value}</div><div class="stat-label">${s.label}</div>`;
+    bar.appendChild(div);
+  });
+})();
+
+// ── Programs — fetch from /api equivalent; or already rendered ───────
+(async function loadPrograms() {
+  const grid = document.getElementById("programsGrid");
+  if (!grid || grid.querySelectorAll(".prog-card").length > 0) return;
+
+  const dummy = [
+    { badge: "Flagship Program", name: "B.Tech Computer Science & Engineering",
+      meta: "4 Years · 160 Credits · KTU Affiliated", featured: true,
+      desc: "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software engineering with strong lab and project components." },
+    { badge: "Postgraduate", name: "M.Tech Computer Science & Engineering",
+      meta: "2 Years · KTU Affiliated", featured: false,
+      desc: "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems with research thesis component." },
+    { badge: "Doctoral", name: "Ph.D. Computer Science",
+      meta: "3–5 Years · Full-time / Part-time", featured: false,
+      desc: "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals. Supervision by experienced research guides." }
+  ];
+
+  let programs = dummy;
+  try {
+    const res = await fetch("/api/programs");
+    if (res.ok) { const d = await res.json(); if (d && d.length) programs = d; }
+  } catch (_) {}
+
+  programs.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = "prog-card" + (p.featured || i === 0 ? " prog-featured" : "");
+    card.innerHTML = `
+      <span class="prog-badge">${p.badge || ""}</span>
+      <div class="prog-name">${p.name}</div>
+      <div class="prog-meta">${p.meta || p.duration || ""}</div>
+      <p class="prog-desc">${p.desc || p.description || ""}</p>
+      <a href="#" class="prog-link">View Curriculum →</a>`;
+    grid.appendChild(card);
+  });
+})();
+
+// ── Leadership — fetch faculty, filter for leadership ────────────────
+(async function loadLeadership() {
+  const grid = document.getElementById("leadershipGrid");
+  if (!grid || grid.querySelectorAll(".leader-card").length > 0) return;
+
+  const dummy = [
+    { initials: "MJ", name: "Dr. Mathew Joseph", role: "Head of Department · Professor",
+      qual: "Ph.D. IIT Bombay · M.Tech (CS) · 18+ years experience",
+      tags: ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"] },
+    { initials: "AR", name: "Dr. Anitha R.", role: "Associate Professor · PG Coordinator",
+      qual: "Ph.D. NIT Calicut · M.Tech (AI) · 12+ years experience",
+      tags: ["Machine Learning", "NLP", "Research Guide", "8 Publications"] }
+  ];
+
+  let leaders = dummy;
+  try {
+    const res = await fetch("/api/faculty?designation=hod,professor");
+    if (res.ok) { const d = await res.json(); if (d && d.length) {
+      leaders = d.slice(0, 4).map(f => ({
+        initials: f.name.split(" ").map(w => w[0]).slice(0,2).join(""),
+        name: f.name, role: f.designation,
+        qual: f.qualification || "",
+        tags: f.research ? [f.research] : []
+      }));
+    }}
+  } catch (_) {}
+
+  leaders.forEach(l => {
+    const card = document.createElement("div");
+    card.className = "leader-card";
+    const tagsHtml = (l.tags || []).map(t => `<span class="spec-tag">${t}</span>`).join("");
+    card.innerHTML = `
+      <div class="leader-avatar">${l.initials}</div>
+      <div class="leader-info">
+        <div class="leader-name">${l.name}</div>
+        <div class="leader-role">${l.role}</div>
+        <div class="leader-qual">${l.qual}</div>
+        <div class="leader-tags">${tagsHtml}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+})();
+</script>
 {% endblock %}

@@ -1,149 +1,408 @@
 {% extends "base.html" %}
 
-{% block title %}CS Connect | Academics{% endblock %}
+{% block title %}Academics | CS Connect · AISAT{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/academics.css') }}" />
 {% endblock %}
 
 {% block content %}
+<div class="academics-page">
 
-<!-- Page Header -->
-<section class="page-header">
-  <div class="header-overlay">
-    <h1 class="page-title">Academics</h1>
-    <p class="page-subtitle">Comprehensive curriculum designed to shape future tech leaders</p>
+  <!-- BREADCRUMB -->
+  <div class="academics-breadcrumb" id="acadBreadcrumbs">
+    <a href="/">Home</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-active">Academics</span>
   </div>
-</section>
 
-<!-- Programs Section -->
-<section class="programs-section">
-  <div class="container">
-    <div class="section-header">
-      <h2>Programs Offered</h2>
-      <div class="header-line"></div>
+  <!-- HERO SECTION -->
+  <section class="academics-hero">
+    <div class="hero-glow-ac"></div>
+    <h1 class="hero-title-ac fade-up">Academic Excellence</h1>
+    <p class="hero-sub-ac fade-up" style="animation-delay: 0.1s;">
+      Curriculum designed by APJ Abdul Kalam Technological University (KTU), enhanced by AISAT's industry-aligned pedagogy.
+    </p>
+    <div class="scheme-tabs fade-up" style="animation-delay: 0.2s;">
+      <div class="scheme-tab active" data-scheme="2019">KTU 2019 Scheme</div>
+      <div class="scheme-tab" data-scheme="2024">KTU 2024 Scheme</div>
     </div>
-    {% for program in programs %}
-    <div class="program-card reveal">
-      <div class="program-icon"><span class="icon-grad">🎓</span></div>
-      <div class="program-content">
-        <h3>{{ program.name }}</h3>
-        <div class="program-details">
-          <div class="detail-item">
-            <span class="detail-icon">🕐</span>
-            <div><strong>Duration:</strong>
-              <p>{{ program.duration }}</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">👥</span>
-            <div><strong>Intake:</strong>
-              <p>{{ program.intake }}</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">📋</span>
-            <div><strong>Eligibility:</strong>
-              <p>{{ program.eligibility }}</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">{{ program.extra_icon }}</span>
-            <div><strong>{{ program.extra_label }}:</strong>
-              <p>{{ program.extra_value }}</p>
+  </section>
+
+  <!-- CURRICULUM EXPLORER -->
+  <section id="curriculum" class="acad-section fade-up" style="animation-delay: 0.3s;">
+    <div class="section-hdr">
+      <h2 class="hdr-title">Curriculum Explorer</h2>
+      <p class="hdr-sub">Navigate core subjects and electives for your B.Tech CSE journey (160 Credits).</p>
+    </div>
+    <div class="curriculum-wrap">
+      
+      <!-- S1 & S2 Combined Example -->
+      <div class="sem-accordion">
+        <div class="sem-header">
+          <h3>Semester 1 & 2</h3>
+          <span class="sem-icon">▼</span>
+        </div>
+        <div class="sem-content">
+          <div class="sem-content-inner">
+            <div class="subject-grid">
+              <div class="subj-group">
+                <h4>Core Engineering</h4>
+                <ul class="subj-list">
+                  <li><span>Linear Algebra & Calculus</span> <span class="subj-code">MAT101</span></li>
+                  <li><span>Engineering Physics A</span> <span class="subj-code">PHT100</span></li>
+                  <li><span>Engineering Chemistry</span> <span class="subj-code">CYT100</span></li>
+                  <li><span>Engineering Graphics</span> <span class="subj-code">EST110</span></li>
+                </ul>
+              </div>
+              <div class="subj-group">
+                <h4>Computing Fundamentals</h4>
+                <ul class="subj-list">
+                  <li><span>Programming in C</span> <span class="subj-code">EST102</span></li>
+                  <li><span>Basics of Electrical & Electronics</span> <span class="subj-code">EST130</span></li>
+                  <li><span>Design & Engineering</span> <span class="subj-code">EST200</span></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-        <div class="program-highlights">
-          <h4>Program Highlights:</h4>
-          <ul>
-            {% for highlight in program.highlights %}
-            <li>{{ highlight }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-        <a href="#syllabus" class="btn-view-syllabus">View Semester-wise Syllabus</a>
       </div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
 
-<!-- Syllabus Section -->
-<section class="syllabus-section" id="syllabus">
-  <div class="container">
-    <div class="section-header">
-      <h2>Semester-wise Syllabus</h2>
-      <div class="header-line"></div>
-      <p class="section-desc">B.Tech CSE - KTU 2019 Scheme</p>
-    </div>
-    <div class="syllabus-container">
-      {% for sem in semesters %}
-      <div class="semester-accordion reveal">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
-          <div class="semester-info">
-            <span class="semester-badge">S{{ loop.index }}</span>
-            <h3>{{ sem.title }}</h3>
-          </div>
-          <span class="accordion-icon">▼</span>
+      <!-- S3 Example -->
+      <div class="sem-accordion">
+        <div class="sem-header">
+          <h3>Semester 3</h3>
+          <span class="sem-icon">▼</span>
         </div>
-        <div class="accordion-content">
-          <div class="subjects-grid">
-            {% for subject in sem.subjects %}
-            <div class="subject-card">
-              <div class="subject-code">{{ subject.code }}</div>
-              <div class="subject-name">{{ subject.name }}</div>
-              <div class="subject-credits">{{ subject.credits }} Credits</div>
+        <div class="sem-content">
+          <div class="sem-content-inner">
+            <div class="subject-grid">
+              <div class="subj-group">
+                <h4>Core Subjects</h4>
+                <ul class="subj-list">
+                  <li><span>Discrete Mathematical Structures</span> <span class="subj-code">MAT203</span></li>
+                  <li><span>Data Structures</span> <span class="subj-code">CST201</span></li>
+                  <li><span>Logic System Design</span> <span class="subj-code">CST203</span></li>
+                  <li><span>Object Oriented Programming using Java</span> <span class="subj-code">CST205</span></li>
+                </ul>
+              </div>
+              <div class="subj-group">
+                <h4>Labs & Associated</h4>
+                <ul class="subj-list">
+                  <li><span>Data Structures Lab</span> <span class="subj-code">CSL201</span></li>
+                  <li><span>Object Oriented Programming Lab (in Java)</span> <span class="subj-code">CSL203</span></li>
+                </ul>
+              </div>
             </div>
-            {% endfor %}
           </div>
-          {% if session.get('user_id') %}
-          <button class="btn-download">📥 Download Semester {{ loop.index }} Syllabus (PDF)</button>
-          {% else %}
-          <div
-            style="margin-top: 14px; padding: 10px 16px; background: #fff8f0; border: 1px solid #ffd8a8; border-radius: 8px; font-size: 0.85rem; color: #8a5700; text-align: center;">
-            🔒 <a href="{{ url_for('login') }}" style="color: #c0392b; font-weight: 600;">Login</a> to download semester
-            notes & syllabus.
-          </div>
-          {% endif %}
         </div>
       </div>
-      {% endfor %}
 
-      <div class="more-semesters-note reveal">
-        <p>📚 Semesters 5-8 follow similar structure with advanced specialization courses</p>
-        <button class="btn-view-all">View Complete Curriculum (S5-S8)</button>
+       <!-- S5 Example -->
+       <div class="sem-accordion">
+        <div class="sem-header">
+          <h3>Semester 5</h3>
+          <span class="sem-icon">▼</span>
+        </div>
+        <div class="sem-content">
+          <div class="sem-content-inner">
+            <div class="subject-grid">
+              <div class="subj-group">
+                <h4>Core Subjects</h4>
+                <ul class="subj-list">
+                  <li><span>Formal Languages and Automata Theory</span> <span class="subj-code">CST301</span></li>
+                  <li><span>Computer Networks</span> <span class="subj-code">CST303</span></li>
+                  <li><span>System Software</span> <span class="subj-code">CST305</span></li>
+                  <li><span>Microprocessors and Microcontrollers</span> <span class="subj-code">CST307</span></li>
+                  <li><span>Management of Software Systems</span> <span class="subj-code">CST309</span></li>
+                </ul>
+              </div>
+              <div class="subj-group">
+                <h4>Labs & Associated</h4>
+                <ul class="subj-list">
+                  <li><span>System Software and Microprocessors Lab</span> <span class="subj-code">CSL331</span></li>
+                  <li><span>Database Management Systems Lab</span> <span class="subj-code">CSL333</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESOURCE VAULT -->
+  <section class="acad-section fade-up" style="animation-delay: 0.1s;" id="resources">
+    <div class="section-hdr">
+      <h2 class="hdr-title">Resource Vault</h2>
+      <p class="hdr-sub">Central repository for syllabus, high-end lab manuals (including NVIDIA Edge AI), and question banks.</p>
+    </div>
+    
+    <div class="vault-controls">
+      <div class="vault-tabs" id="vaultTabs">
+        <div class="vault-tab active" data-filter="all">All Resources</div>
+        <div class="vault-tab" data-filter="syllabus">Syllabus</div>
+        <div class="vault-tab" data-filter="labs">Lab Manuals</div>
+        <div class="vault-tab" data-filter="qbank">Question Banks</div>
+      </div>
+      <div class="vault-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="resSearchInput" placeholder="Search resources...">
       </div>
     </div>
-  </div>
-</section>
 
-<!-- Academic Calendar -->
-<section class="calendar-section">
-  <div class="container">
-    <div class="section-header">
-      <h2>Academic Calendar 2025-26</h2>
-      <div class="header-line"></div>
+    <div class="vault-grid" id="resourceGrid">
+      
+      <!-- Generated via JS for easier filtering rendering, see below -->
     </div>
-    <div class="calendar-card reveal">
-      <div class="calendar-icon">📅</div>
-      <h3>Current Academic Year Calendar</h3>
-      <p>View important dates, exam schedules, and semester timelines</p>
-      {% if session.get('user_id') %}
-      <a href="#" class="btn-download-calendar">📥 Download Academic Calendar (PDF)</a>
-      {% else %}
-      <div
-        style="margin-top: 14px; padding: 10px 16px; background: #fff8f0; border: 1px solid #ffd8a8; border-radius: 8px; font-size: 0.85rem; color: #8a5700; text-align: center;">
-        🔒 <a href="{{ url_for('login') }}" style="color: #c0392b; font-weight: 600;">Login</a> to download the Academic
-        Calendar.
+    
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📂</div>
+      <div class="empty-text">No resources found for your search criteria.</div>
+      <button class="req-btn" onclick="alert('Resource request submitted to department admin.')">Request Resource</button>
+    </div>
+
+  </section>
+
+  <!-- HIGHER STUDIES HIGHLIGHTS -->
+  <section class="acad-section fade-up" style="animation-delay: 0.15s;" id="higher-studies">
+    <div class="section-hdr">
+      <h2 class="hdr-title">Higher Studies Highlights</h2>
+      <p class="hdr-sub">Celebrating our alumni pursuing advanced degrees at premier global institutions.</p>
+    </div>
+    <div class="vault-grid">
+      <!-- Batch 10 -->
+      <div class="res-row" style="border-left: 3px solid #8B1D1D;">
+        <div class="res-left">
+          <div class="res-icon">🎓</div>
+          <div class="res-info">
+            <h3>M. Yazhini</h3>
+            <span class="res-meta">Batch 10 · Admitted to NIT Suratkal</span>
+          </div>
+        </div>
       </div>
-      {% endif %}
+      <div class="res-row" style="border-left: 3px solid #8B1D1D;">
+        <div class="res-left">
+          <div class="res-icon">🎓</div>
+          <div class="res-info">
+            <h3>Sreelakshmi P B</h3>
+            <span class="res-meta">Batch 10 · Admitted to Kempten University, Germany</span>
+          </div>
+        </div>
+      </div>
+      <!-- Batch 9 -->
+      <div class="res-row" style="border-left: 3px solid #F5E6BE; margin-top: 10px;">
+        <div class="res-left">
+          <div class="res-icon">🎓</div>
+          <div class="res-info">
+            <h3>Abdul Rafi Rahman</h3>
+            <span class="res-meta">Batch 9 · IOWA State University, USA (MS Cyber Security)</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
+  <!-- ACADEMIC CALENDAR & NOTICES -->
+  <section id="calendar" class="acad-section fade-up" style="animation-delay: 0.2s;">
+    <div class="cal-notice-wrap">
+      
+      <!-- Calendar -->
+      <div class="acad-panel">
+        <h3>April 2026 Academic Planner</h3>
+        <div class="cal-grid">
+          <div class="cal-day-head">Su</div><div class="cal-day-head">Mo</div><div class="cal-day-head">Tu</div><div class="cal-day-head">We</div><div class="cal-day-head">Th</div><div class="cal-day-head">Fr</div><div class="cal-day-head">Sa</div>
+          
+          <div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div>
+          <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div><div class="cal-day assign" title="OS Assignment Due">4</div>
+          <div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day exam" title="Internal Series Test 1 Starts">7</div><div class="cal-day exam" title="Internal Series">8</div><div class="cal-day exam" title="Internal Series">9</div><div class="cal-day">10</div><div class="cal-day">11</div>
+          <div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day">16</div><div class="cal-day assign" title="Lab Project Submission">17</div><div class="cal-day">18</div>
+          <div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div><div class="cal-day">25</div>
+          <div class="cal-day">26</div><div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day exam" title="University Prelim Commences">29</div><div class="cal-day exam">30</div>
+        </div>
+        <div class="cal-legend">
+          <div class="leg-item"><div class="leg-dot exam"></div> Internal Exams</div>
+          <div class="leg-item"><div class="leg-dot assign"></div> Deadlines</div>
+        </div>
+      </div>
+
+      <!-- Notices -->
+      <div class="acad-panel">
+        <h3>Academic Notifications</h3>
+        <div class="notice-list">
+          <div class="notice-item">
+            <div class="notice-date">APR 02, 2026</div>
+            <div class="notice-text">Registration for Supplementary Exams begins on KTU Portal. Last date without fine is April 15.</div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-date">MAR 28, 2026</div>
+            <div class="notice-text">S4 and S6 Project Milestone 1 Review scheduled for the first week of April. Prepare initial documentation.</div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-date">MAR 20, 2026</div>
+            <div class="notice-text">New Elective choices open for S7 B.Tech CSE (2024 Scheme) starting next Monday via college LMS.</div>
+          </div>
+          <div class="notice-item">
+            <div class="notice-date">MAR 15, 2026</div>
+            <div class="notice-text">Mandatory library orientation for lateral entry students on Thursday, 2 PM at Seminar Hall.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/academics.js') }}"></script>
+<script>
+/**
+ * ACADEMICS PAGE LOGIC
+ */
+
+// 1. Accordion Logic
+document.querySelectorAll('.sem-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const accordion = header.parentElement;
+    const content = accordion.querySelector('.sem-content');
+    const isActive = accordion.classList.contains('active');
+    
+    // Close all others
+    document.querySelectorAll('.sem-accordion').forEach(acc => {
+      acc.classList.remove('active');
+      acc.querySelector('.sem-content').style.maxHeight = null;
+    });
+
+    // Toggle current
+    if (!isActive) {
+      accordion.classList.add('active');
+      content.style.maxHeight = content.scrollHeight + "px";
+      
+      // Update dynamic breadcrumb
+      const semTitle = accordion.querySelector('h3').innerText;
+      document.getElementById('acadBreadcrumbs').innerHTML = `
+        <a href="/">Home</a> <span class="bc-sep">›</span>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('acadBreadcrumbs').innerHTML='<a href=\\'/\\'>Home</a> <span class=\\'bc-sep\\'>›</span> <span class=\\'bc-active\\'>Academics</span>'">Academics</a> <span class="bc-sep">›</span>
+        <span class="bc-active">${semTitle}</span>
+      `;
+    } else {
+      // Reset if closing
+      document.getElementById('acadBreadcrumbs').innerHTML = `
+        <a href="/">Home</a> <span class="bc-sep">›</span>
+        <span class="bc-active">Academics</span>
+      `;
+    }
+  });
+});
+
+// Scheme Toggle Logic (Dummy implementation for UI)
+document.querySelectorAll('.scheme-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.scheme-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    // In a real scenario, this would filter the 2019 vs 2024 curriculum arrays.
+    alert("Switched to " + tab.innerText);
+  });
+});
+
+// 2. Resource Vault Logic
+const RESOURCES = [
+  { cat: 'syllabus', ext: 'pdf', title: 'S6 Complete Syllabus — CSE (KTU 2019 Scheme)', meta: 'B.Tech / Syllabus', size: '2.4 MB' },
+  { cat: 'syllabus', ext: 'pdf', title: 'KTU 2024 Minor/Honors Regulations', meta: 'B.Tech / Regs', size: '1.1 MB' },
+  { cat: 'labs', ext: 'pdf', title: 'Machine Learning Lab Manual (S6 · 2024–25)', meta: 'S6 / Manual', size: '4.8 MB' },
+  { cat: 'labs', ext: 'pdf', title: 'Database Management Lab Protocol', meta: 'S5 / Manual', size: '1.8 MB' },
+  { cat: 'labs', ext: 'zip', title: 'Cloud Computing Lab Resources & Images', meta: 'S6 / Virtual Box Files', size: '540 MB' },
+  { cat: 'qbank', ext: 'zip', title: 'University Series Exams (2020-2023)', meta: 'KTU Previous Papers', size: '8.4 MB' },
+  { cat: 'qbank', ext: 'pdf', title: 'Previous Year Papers - FLAA (CST301)', meta: 'S5 / Exam Prep', size: '3.2 MB' },
+];
+
+function getIconForExt(ext) {
+  if(ext === 'pdf') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+  } else if (ext === 'zip') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+  } else {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+  }
+}
+
+function renderResources(filterStr, searchStr = '') {
+  const grid = document.getElementById('resourceGrid');
+  const empty = document.getElementById('emptyState');
+  grid.innerHTML = '';
+  
+  let filtered = RESOURCES;
+  if (filterStr !== 'all') {
+    filtered = filtered.filter(r => r.cat === filterStr);
+  }
+  if (searchStr.trim() !== '') {
+    const q = searchStr.toLowerCase();
+    filtered = filtered.filter(r => r.title.toLowerCase().includes(q) || r.meta.toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    empty.classList.add('active');
+  } else {
+    empty.classList.remove('active');
+    filtered.forEach(r => {
+      grid.innerHTML += `
+        <div class="res-row">
+          <div class="res-left">
+            <div class="res-icon ${r.ext}">
+              ${getIconForExt(r.ext)}
+            </div>
+            <div class="res-info">
+              <h3>${r.title}</h3>
+              <span class="res-meta">${r.meta}</span>
+            </div>
+          </div>
+          <div class="res-right">
+            <span class="res-size">${r.size}</span>
+            <a href="#" class="dl-btn" onclick="event.preventDefault(); alert('Downloading '+ '${r.title}')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Download
+            </a>
+          </div>
+        </div>
+      `;
+    });
+  }
+}
+
+// 3. Bind Vault Controls
+const tabs = document.querySelectorAll('.vault-tab');
+let activeFilter = 'all';
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeFilter = tab.dataset.filter;
+    renderResources(activeFilter, document.getElementById('resSearchInput').value);
+  });
+});
+
+document.getElementById('resSearchInput').addEventListener('input', (e) => {
+  renderResources(activeFilter, e.target.value);
+});
+
+// Init Vault
+renderResources('all');
+
+// Fade up animation observer
+document.addEventListener("DOMContentLoaded", () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.style.opacity = 1;
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+});
+
+</script>
 {% endblock %}

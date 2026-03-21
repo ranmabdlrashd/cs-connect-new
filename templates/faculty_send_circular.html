@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty_send_circular.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 12 12 17 22 12"></polyline>
+        <polyline points="2 17 12 22 22 17"></polyline>
+      </svg>
+    </div>
+    <nav class="nav-items">
+      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <div class="nav-item" data-tip="My Students" onclick="location.href='/faculty/my-students'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Attendance" onclick="location.href='/faculty/mark-attendance'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item active" data-tip="Send Circular">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="nav-item" data-tip="Settings" onclick="location.href='/faculty/settings'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="user-avatar" onclick="location.href='/faculty/profile'">{{ initials }}</div>
+    </div>
+  </aside>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div class="main-content">
+    
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect · Faculty Portal · <b>Dept. Circulars</b></span>
+    </header>
+
+    <div class="page-header">
+      <h1 class="page-title">Broadcast Circular</h1>
+      <p class="page-subtitle">Draft and distribute official department announcements, immediate notices, and academic directives.</p>
+    </div>
+
+    <div class="page-content">
+
+      <!-- LEFT PANE: Composer -->
+      <section class="um-card">
+        <div class="card-header">
+          <div class="ch-left">
+            <svg class="ch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <h2 class="ch-title">Compose Circular</h2>
+          </div>
+        </div>
+        
+        <form id="circularForm" onsubmit="sendCircular(event)">
+          
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="fg-label">Message Subject</label>
+            <input type="text" class="fg-inp" id="circSubject" required placeholder="e.g. Schedule for Internal Assessment II">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="fg-label">Target Audiences</label>
+            <div class="tags-container" id="recipientTags">
+              <div class="recp-tag active" data-val="All Batches">All Enrolled</div>
+              <div class="recp-tag" data-val="S6 CSE A">S6 CSE A</div>
+              <div class="recp-tag" data-val="S6 CSE B">S6 CSE B</div>
+              <div class="recp-tag" data-val="S4 CSE A">S4 CSE A</div>
+              <div class="recp-tag" data-val="S8 CSE Alpha">S8 CSE Alpha</div>
+              <div class="recp-tag" data-val="Faculty Only">Faculty Only</div>
+            </div>
+            <!-- Hidden input to store selected audiences -->
+            <input type="hidden" id="circAudiences" value="All Batches" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="fg-label">Category</label>
+              <select class="fg-sel" id="circCategory" required>
+                <option value="Academic">Academic</option>
+                <option value="Event">Event</option>
+                <option value="Administrative">Administrative</option>
+                <option value="Placement">Placement</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="fg-label">Priority Level</label>
+              <select class="fg-sel" id="circPriority" onchange="togglePriorityWarning()" required>
+                <option value="Normal">Normal</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent (Push Required)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="urgentNotice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div>
+              <strong>Urgent Trigger Active</strong><br>
+              Selecting this will blast an immediate push notification and email alert to all matched recipients, overriding their 'Do Not Disturb' settings. Use responsibly.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 20px;">
+            <label class="fg-label">Message Body</label>
+            <textarea class="fg-inp fg-textarea" id="circBody" required placeholder="Type out your circular here... formatting is preserved."></textarea>
+          </div>
+
+          <div class="action-row">
+            <button type="button" class="btn-draft" onclick="saveDraft()">Save as Draft</button>
+            <button type="submit" class="btn-submit" id="submitBtn">
+              Broadcast Message
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </form>
+      </section>
+
+
+      <!-- RIGHT PANE: Sent History -->
+      <section class="um-card" style="align-self:stretch;">
+        <div class="card-header">
+          <div class="ch-left">
+            <svg class="ch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <h2 class="ch-title">Sent Circulars</h2>
+          </div>
+        </div>
+
+        <div class="history-list" id="historyList">
+          <!-- Sent Mock Item -->
+          <div class="hist-item">
+            <div class="hi-top">
+              <div class="hi-title">Schedule for Internal Assessment II (Revised)</div>
+              <div class="hi-badge bg-sent">Sent</div>
+            </div>
+            <div class="hi-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Mar 19, 2026 &middot; 09:15 AM</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> 214 Recipients</span>
+            </div>
+          </div>
+
+          <!-- Draft Mock Item -->
+          <div class="hist-item" style="border-style: dashed;">
+            <div class="hi-top">
+              <div class="hi-title">Reminder: Mini-Project Presentation Next Week</div>
+              <div class="hi-badge bg-draft">Draft</div>
+            </div>
+            <div class="hi-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Edited 2 hrs ago</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> S6 CSE A, S6 CSE B</span>
+            </div>
+          </div>
+
+          <!-- Sent Mock Item -->
+          <div class="hist-item">
+            <div class="hi-top">
+              <div class="hi-title">Placement Talk: Infosys Recruitment Drive</div>
+              <div class="hi-badge bg-sent">Sent</div>
+            </div>
+            <div class="hi-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Mar 14, 2026 &middot; 02:30 PM</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> 68 Recipients</span>
+            </div>
+          </div>
+
+          <!-- Sent Mock Item -->
+          <div class="hist-item">
+            <div class="hi-top">
+              <div class="hi-title">Updates on AI Lab Registration Protocol</div>
+              <div class="hi-badge bg-sent">Sent</div>
+            </div>
+            <div class="hi-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Mar 10, 2026 &middot; 11:00 AM</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> 120 Recipients</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- page-content -->
+  </div><!-- main-content -->
+</div>
+
+<!-- Scripts for UI Logic -->
+<script>
+  // Tag Selection Logic
+  document.querySelectorAll('.recp-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      tag.classList.toggle('active');
+      updateAudiences();
+    });
+  });
+
+  function updateAudiences() {
+    const actives = document.querySelectorAll('.recp-tag.active');
+    const vals = Array.from(actives).map(t => t.getAttribute('data-val'));
+    document.getElementById('circAudiences').value = vals.join(', ');
+  }
+
+  // Priority Warning Logic
+  function togglePriorityWarning() {
+    const pri = document.getElementById('circPriority').value;
+    const warn = document.getElementById('urgentNotice');
+    if(pri === 'Urgent') {
+      warn.style.display = 'flex';
+    } else {
+      warn.style.display = 'none';
+    }
+  }
+
+  // File Submission Logic
+  async function sendCircular(e) {
+    e.preventDefault();
+    const auds = document.getElementById('circAudiences').value;
+    if(!auds) {
+      alert("Please select at least one target audience.");
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Broadcasting...';
+    btn.style.opacity = '0.5';
+
+    const payload = {
+      subject: document.getElementById('circSubject').value,
+      audiences: auds,
+      category: document.getElementById('circCategory').value,
+      priority: document.getElementById('circPriority').value,
+      body: document.getElementById('circBody').value
+    };
+
+    try {
+      const resp = await fetch('/api/faculty/send-circular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      if(data.ok) {
+        alert(data.message);
+        document.getElementById('circularForm').reset();
+        document.getElementById('urgentNotice').style.display = 'none';
+        
+        // Add optimistic mock item to history
+        const dateStr = new Date().toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+        const timeStr = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+        
+        const list = document.getElementById('historyList');
+        const countMap = { "All Batches": 340, "S6 CSE A": 64, "S4 CSE A": 65, "Faculty Only": 42 };
+        let count = countMap[payload.audiences.split(', ')[0]] || 120; // Mock count based on first select
+
+        const newItem = `
+          <div class="hist-item" style="animation: fade-in 0.5s;">
+            <div class="hi-top">
+              <div class="hi-title">${escapeHTML(payload.subject)}</div>
+              <div class="hi-badge bg-sent">Sent</div>
+            </div>
+            <div class="hi-meta">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${dateStr} &middot; ${timeStr}</span>
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> ${count} Recipients</span>
+            </div>
+          </div>
+        `;
+        list.insertAdjacentHTML('afterbegin', newItem);
+
+      } else {
+        alert("Broadcast failed: " + data.error);
+      }
+    } catch(err) {
+      alert("Error contacting the server.");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Broadcast Message <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
+      btn.style.opacity = '1';
+    }
+  }
+
+  function saveDraft() {
+    alert("Draft saved successfully! You can resume editing from the History pane later.");
+  }
+  
+  function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+  }
+</script>
+
+{% include 'partials/chatbot.html' %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+
+</body>
+</html>

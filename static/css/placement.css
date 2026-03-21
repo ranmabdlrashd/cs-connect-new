@@ -1,671 +1,423 @@
-:root {
-  --primary-red: #a41f13;
-  --primary-light: #c92a1e;
-  --bg-off-white: #faf5f1;
-  --neutral-gray: #e0dbd8;
-  --dark-charcoal: #292f36;
-  --taupe-brown: #8f7a6e;
-  --success-green: #2ecc71;
-  --glass-white: rgba(255, 255, 255, 0.9);
+/* =============================================================================
+   PLACEMENT & CAREER PAGE — DARK ACADEMIC THEME
+   Strict adherence to CS Connect Design System
+   ============================================================================= */
+
+/* --- 1. BASE LAYOUT & BREADCRUMBS --- */
+.placement-page {
+  background: #0A0A0A;
+  color: #F5E6BE;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: var(--bg-off-white);
-  color: var(--dark-charcoal);
-  font-family: 'Inter', system-ui, sans-serif;
-  overflow-x: hidden;
-}
-
-.page-header {
-  height: 40vh;
-  background: linear-gradient(135deg, var(--primary-red), var(--dark-charcoal));
+.placement-breadcrumb {
+  padding: 12px 48px;
+  border-bottom: 1px solid rgba(245,230,190,0.04);
+  font-size: 10px;
+  color: #444;
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  gap: 6px;
 }
+.placement-breadcrumb a { color: #444; text-decoration: none; transition: 0.2s; }
+.placement-breadcrumb a:hover { color: #8B1D1D; }
+.bc-sep { color: #8B1D1D; font-size: 12px; }
+.bc-active { color: #8B1D1D; }
 
-.header-content {
-  text-align: center;
-  color: #fff;
+/* --- 2. HERO SECTION & KEY METRICS --- */
+.placement-hero {
+  position: relative;
+  padding: 64px 48px;
+  background: linear-gradient(180deg, #0d0d0d 0%, #0A0A0A 100%);
+  border-bottom: 1px solid rgba(245,230,190,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.hero-glow {
+  position: absolute;
+  top: -150px;
+  left: -50px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139,29,29,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-header {
+  max-width: 800px;
+  position: relative;
   z-index: 2;
 }
-
-.header-content h1 {
-  font-size: 4rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  letter-spacing: -1px;
-}
-
-.header-content p {
-  font-size: 1.4rem;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  opacity: 0.9;
-}
-
-.header-badges {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-}
-
-.badge {
-  background: var(--primary-red);
-  padding: 0.6rem 1.2rem;
-  border-radius: 50px;
-  font-size: 0.95rem;
+.hero-eyebrow {
+  font-size: 9px;
+  color: #8B1D1D;
+  letter-spacing: 4px;
+  text-transform: uppercase;
   font-weight: 600;
+  margin-bottom: 14px;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: #F5E6BE;
+  line-height: 1.1;
+  margin-bottom: 20px;
 }
 
-/* Stats Dash */
-.stats-section {
-  padding: 4rem 0;
-  margin-top: -80px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 5%;
-}
-
-.stats-grid {
+/* Stats Row */
+.stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  position: relative;
+  z-index: 2;
 }
-
 .stat-card {
-  background: #fff;
-  padding: 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  text-align: center;
-  transition: 0.3s;
-}
-
-.stat-card:hover {
-  transform: translateY(-10px);
-}
-
-.stat-card.highlight {
-  background: var(--primary-red);
-  color: #fff;
-}
-
-.stat-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.stat-number {
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.stat-company {
-  font-size: 0.85rem;
-  margin-top: 10px;
-  opacity: 0.8;
-}
-
-/* Section Headers */
-.section-header {
-  text-align: center;
-  margin-bottom: 4rem;
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: var(--dark-charcoal);
-}
-
-.header-line {
-  width: 60px;
-  height: 4px;
-  background: var(--primary-red);
-  margin: 0 auto;
-  border-radius: 2px;
-}
-
-/* Company Marquee */
-.marquee-section {
-  padding: 4rem 0;
-  background: #fff;
-}
-
-.company-categories {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
-.cat-btn {
-  padding: 0.7rem 1.5rem;
-  border: 2px solid var(--neutral-gray);
-  background: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.cat-btn.active,
-.cat-btn:hover {
-  background: var(--primary-red);
-  color: #fff;
-  border-color: var(--primary-red);
-}
-
-.marquee-wrapper {
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 2rem 0;
-  position: relative;
-}
-
-.marquee-wrapper::before,
-.marquee-wrapper::after {
-  content: "";
-  position: absolute;
-  height: 100%;
-  width: 100px;
-  z-index: 2;
-  top: 0;
-}
-
-.marquee-wrapper::before {
-  left: 0;
-  background: linear-gradient(to right, #fff, transparent);
-}
-
-.marquee-wrapper::after {
-  right: 0;
-  background: linear-gradient(to left, #fff, transparent);
-}
-
-.marquee-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 4rem;
-  animation: marquee 30s linear infinite;
-}
-
-.company-logo {
-  width: 150px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.company-logo img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  filter: grayscale(1);
-  opacity: 0.6;
-  transition: 0.3s;
-}
-
-.company-logo:hover img {
-  filter: grayscale(0);
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-/* Yearwise Performance */
-.yearwise-section {
-  padding: 6rem 0;
-}
-
-.year-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
-.year-tab {
-  padding: 1rem 2rem;
-  border: none;
-  background: #fff;
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.06);
   border-radius: 12px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.year-tab.active {
-  background: var(--primary-red);
-  color: #fff;
-}
-
-.year-content {
-  display: none;
-}
-
-.year-content.active {
-  display: block;
-  animation: fadeIn 0.5s;
-}
-
-.year-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  margin-bottom: 4rem;
-  align-items: center;
-}
-
-.year-stats-mini {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.year-stats-mini .stat-item {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 20px;
+  padding: 32px 24px;
   text-align: center;
-}
-
-.year-stats-mini h4 {
-  font-size: 2rem;
-  color: var(--primary-red);
-}
-
-.chart-box {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
-
-/* Table Styling */
-.table-container {
-  background: #fff;
-  padding: 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-}
-
-.placement-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5rem;
-}
-
-.placement-table th {
-  text-align: left;
-  padding: 1.2rem;
-  border-bottom: 2px solid var(--neutral-gray);
-  color: var(--taupe-brown);
-  text-transform: uppercase;
-  font-size: 0.85rem;
-}
-
-.placement-table td {
-  padding: 1.2rem;
-  border-bottom: 1px solid var(--neutral-gray);
-}
-
-.count-pill {
-  background: var(--bg-off-white);
-  padding: 0.3rem 0.8rem;
-  border-radius: 50px;
-  font-weight: 700;
-  color: var(--primary-red);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Alumni Section */
-.alumni-section {
-  padding: 6rem 0;
-  background: var(--dark-charcoal);
-  color: #fff;
-}
-
-.alumni-section h2 {
-  color: #fff;
-}
-
-.alumni-slider {
-  position: relative;
-  padding: 0 50px;
-}
-
-.alumni-wrapper {
-  overflow: hidden;
-}
-
-.alumni-track {
-  display: flex;
-  gap: 2rem;
-  transition: 0.5s ease;
-}
-
-.alumni-card {
-  flex: 0 0 calc(33.333% - 1.5rem);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 3rem 2rem;
-  border-radius: 24px;
-  text-align: center;
-}
-
-.alumni-photo {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 3px solid var(--primary-red);
-  margin: 0 auto 1.5rem;
-  overflow: hidden;
-}
-
-.alumni-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.batch-tag {
-  font-size: 0.85rem;
-  color: var(--primary-red);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-.placement-tag {
-  font-weight: 600;
-  margin: 10px 0;
-  font-size: 0.95rem;
-}
-
-.testimonial {
-  font-style: italic;
-  opacity: 0.7;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--primary-red);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  z-index: 5;
-}
-
-.prev {
-  left: -10px;
-}
-
-.next {
-  right: -10px;
-}
-
-/* Internship Grid */
-.internship-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
-}
-
-.internship-card {
-  background: #fff;
-  padding: 2.5rem;
-  border-radius: 24px;
-  border: 2px solid transparent;
   transition: 0.3s;
 }
-
-.internship-card:hover {
-  border-color: var(--primary-red);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+.stat-card:hover { border-color: #8B1D1D; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.stat-card.highlight {
+  background: linear-gradient(135deg, rgba(139,29,29,0.1), transparent);
+  border-color: rgba(139,29,29,0.3);
 }
-
-.domain-tag {
-  background: var(--bg-off-white);
-  color: var(--primary-red);
-  padding: 0.4rem 1rem;
-  border-radius: 50px;
-  font-size: 0.8rem;
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  color: #F5E6BE;
+  margin-bottom: 8px;
   font-weight: 700;
-  text-transform: uppercase;
 }
+.stat-label { color: #A0A0A0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
 
-.company-sub {
-  color: var(--taupe-brown);
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+/* --- 3. ACTIVE DRIVES TABLE --- */
+.drives-section {
+  padding: 64px 48px;
 }
-
-.intern-desc {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #555;
-  margin-bottom: 2rem;
-}
-
-.card-bottom {
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--neutral-gray);
-  padding-top: 1.5rem;
+  margin-bottom: 32px;
 }
-
-.btn-sm {
-  background: var(--dark-charcoal);
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: #F5E6BE;
 }
-
-/* Preparation Resources */
-.resources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.res-card {
-  background: #fff;
-  padding: 3rem 2rem;
-  border-radius: 24px;
-  text-align: center;
-}
-
-.res-card.highlight {
-  background: var(--primary-red);
-  color: #fff;
-}
-
-.res-icon {
-  font-size: 3rem;
-  color: var(--primary-red);
-  margin-bottom: 1.5rem;
-}
-
-.res-card.highlight .res-icon {
-  color: #fff;
-}
-
-.res-card ul {
-  list-style: none;
-  margin-top: 1rem;
-}
-
-.res-card a {
-  color: var(--primary-red);
-  font-weight: 600;
-  text-decoration: none;
-  display: block;
-  margin: 8px 0;
-}
-
-.btn-res {
-  margin-top: 1.5rem;
-  padding: 0.8rem 2rem;
-  border-radius: 50px;
-  border: none;
-  background: var(--dark-charcoal);
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.res-card.highlight .btn-res {
-  background: #fff;
-  color: var(--primary-red);
-}
-
-/* Team Section */
-.team-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-.faculty-lead {
-  text-align: center;
-  background: #fff;
-  padding: 3rem;
-  border-radius: 30px;
-}
-
-.team-photo-sq {
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 2rem;
-  border-radius: 30px;
-  overflow: hidden;
-  border: 5px solid var(--primary-red);
-}
-
-.team-photo-sq img {
+.table-container {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  overflow-x: auto;
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 12px;
+  background: #121212;
+}
+.drives-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.drives-table th {
+  background: #0d0d0d;
+  color: #666;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(245,230,190,0.06);
+}
+.drives-table td {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(245,230,190,0.03);
+  vertical-align: middle;
+}
+.drives-table tr:last-child td { border-bottom: none; }
+.drives-table tr { transition: 0.3s; }
+.drives-table tr:hover { background: rgba(245,230,190,0.02); }
+
+.company-cell { display: flex; align-items: center; gap: 12px; }
+.company-logo {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  background: #1a1a1a;
+  display: flex; align-items: center; justify-content: center;
+  color: #F5E6BE; font-weight: 700; font-size: 14px;
+}
+.company-name { font-family: 'Playfair Display', serif; font-size: 16px; color: #F5E6BE; }
+.role-text { font-size: 13px; color: #A0A0A0; }
+.pkg-text { color: #8B1D1D; font-weight: 600; font-size: 14px; }
+.elg-text { font-size: 12px; color: #666; }
+.date-text { font-size: 12px; color: #888; }
+
+/* Status Badges */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.status-open { color: #4CAF50; background: rgba(76, 175, 80, 0.1); }
+.status-warn { color: #FF9800; background: rgba(255, 152, 0, 0.1); }
+.status-closed { color: #F44336; background: rgba(244, 67, 54, 0.1); }
+
+/* Buttons & Tooltips */
+.apply-btn {
+  background: #8B1D1D; color: #fff;
+  border: none; padding: 8px 24px; border-radius: 6px;
+  font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+.apply-btn:hover:not(:disabled) { background: #6B1010; }
+.apply-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+.tooltip { position: relative; display: inline-block; }
+.tooltip .tooltiptext {
+  visibility: hidden; width: 120px; background-color: #1a1a1a; color: #fff;
+  text-align: center; border-radius: 6px; padding: 5px 0; font-size: 10px;
+  position: absolute; z-index: 1; bottom: 125%; left: 50%; transform: translateX(-50%);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+/* --- Mobile Card View Fallback for Table (Below 768px) --- */
+@media (max-width: 768px) {
+  .drives-table thead { display: none; }
+  .drives-table, .drives-table tbody, .drives-table tr, .drives-table td { display: block; width: 100%; }
+  .drives-table tr { margin-bottom: 20px; border: 1px solid rgba(245,230,190,0.06); border-radius: 12px; background: #121212; padding: 16px; }
+  .drives-table td {
+    padding: 8px 0; border-bottom: none; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .drives-table td::before {
+    content: attr(data-label);
+    font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600;
+  }
+  .drives-table td:first-child { border-bottom: none; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(139,29,29,0.2); justify-content: flex-start; }
+  .drives-table td:last-child { border-bottom: none; padding-top: 16px; justify-content: center; }
+  .company-cell { gap: 16px; width: 100%; }
 }
 
-.role {
-  font-weight: 700;
-  color: var(--primary-red);
-  margin: 5px 0 15px;
+/* --- 4. TOP RECRUITERS (MARQUEE) --- */
+.marquee-section {
+  padding: 60px 0;
+  background: #0d0d0d;
+  border-top: 1px solid rgba(245,230,190,0.04);
+  border-bottom: 1px solid rgba(245,230,190,0.04);
+  overflow: hidden;
+}
+.marquee-hdr { text-align: center; font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px; }
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 30s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+.marquee-item {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700; color: #444; margin: 0 48px;
+  transition: 0.3s; cursor: default;
+}
+.marquee-item:hover { color: #8B1D1D; }
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Assuming content is duplicated */
 }
 
-.student-list {
+/* --- 5. ALUMNI SUCCESS STORIES --- */
+.alumni-section { padding: 80px 48px; }
+.alumni-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+.alumni-card {
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 16px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+.quote-icon { position: absolute; top: 32px; right: 32px; color: rgba(139,29,29,0.1); font-size: 64px; line-height: 1; font-family: serif; pointer-events: none;}
+.alumni-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: #F5E6BE; line-height: 1.6; font-style: italic; z-index: 2;
+}
+.alumni-author { display: flex; align-items: center; gap: 16px; margin-top: auto; z-index: 2;}
+.author-avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; }
+.author-info h4 { font-family: 'Inter', sans-serif; font-size: 14px; color: #F5E6BE; margin-bottom: 4px;}
+.author-info p { font-size: 11px; color: #8B1D1D; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+
+/* --- 6. LOADING AND FALLBACK --- */
+.loader-pulse {
+  height: 40px; background: rgba(245,230,190,0.03); border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out; margin-bottom: 12px;
+}
+@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+/* --- 7. RESPONSIVE --- */
+@media (max-width: 1024px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .alumni-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .placement-breadcrumb, .placement-hero, .drives-section, .alumni-section { padding-left: 24px; padding-right: 24px; }
+  .hero-title { font-size: 36px; }
+}
+
+/* --- 8. HISTORICAL ANALYTICS --- */
+.analytics-section {
+  padding: 64px 48px;
+}
+.analytics-glass {
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 16px;
+  padding: 40px;
+}
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.batch-select {
+  background: #0d0d0d;
+  color: #F5E6BE;
+  border: 1px solid rgba(139,29,29,0.3);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.batch-select:hover, .batch-select:focus {
+  border-color: #F5E6BE;
+}
+.charts-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 40px;
+  margin-bottom: 40px;
 }
-
-.student-item {
-  background: var(--neutral-gray);
-  padding: 1.5rem;
-  border-radius: 15px;
+.chart-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(245,230,190,0.05);
+  border-radius: 12px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
 }
-
-/* Responsive */
-@media (max-width: 968px) {
-  .header-content h1 {
-    font-size: 2.5rem;
-  }
-
-  .year-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .team-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .alumni-card {
-    flex: 0 0 calc(50% - 1rem);
-  }
+.chart-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(245,230,190,0.05);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
 }
-
-@media (max-width: 600px) {
-  .alumni-card {
-    flex: 0 0 100%;
-  }
-
-  .student-list {
-    grid-template-columns: 1fr;
-  }
-
-  .company-categories {
-    overflow-x: auto;
-    white-space: nowrap;
-    justify-content: flex-start;
-    padding-bottom: 1rem;
-  }
+.chart-tools h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: #F5E6BE;
+  margin: 0;
 }
-
-/* Scroll Reveal classes */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: 1s all ease;
+.chart-container {
+  position: relative;
+  flex: 1;
 }
+.historical-table-wrap {
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(245,230,190,0.03);
+  max-height: 400px;
+  overflow-y: auto;
+}
+.directory-section { margin-top: 40px; }
+.subsection-title { font-family: 'Playfair Display', serif; font-size: 24px; color: #F5E6BE; margin-bottom: 24px;}
+.dir-filters { display: flex; gap: 16px; align-items: center; margin-bottom: 20px;}
 
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
+.hist-search {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(245,230,190,0.1);
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: #F5E6BE;
+  font-size: 12px;
+  outline: none;
+}
+.hist-search:focus { border-color: #8B1D1D; }
+.hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #A0A0A0;
+}
+.hist-table th {
+  text-align: left;
+  padding: 12px;
+  color: #F5E6BE;
+  border-bottom: 1px solid rgba(139,29,29,0.2);
+  cursor: pointer;
+  user-select: none;
+}
+.hist-table th:hover { color: #8B1D1D; }
+.hist-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(245,230,190,0.02);
+}
+.hist-table tr:hover { background: rgba(139,29,29,0.05); }
+
+/* --- 9. GLOBAL PATHWAYS --- */
+.pathways-section {
+  padding: 64px 48px;
+}
+.pathways-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.pathway-card {
+  background: linear-gradient(135deg, #121212, #0A0A0A);
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.pathway-card:hover {
+  transform: translateY(-5px);
+  border-color: #8B1D1D;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.pw-icon { font-size: 32px; color: #8B1D1D; margin-bottom: 16px; }
+.pw-univ { font-family: 'Playfair Display', serif; font-size: 18px; color: #F5E6BE; line-height: 1.3; margin-bottom: 8px;}
+.pw-loc { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px;}
+
+@media (max-width: 1024px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .pathways-grid { grid-template-columns: repeat(2, 1fr); }
+  .pathway-card { padding: 24px 16px; }
+}
+@media (max-width: 768px) {
+  .charts-row, .pathways-grid { grid-template-columns: 1fr; }
+  .analytics-section, .pathways-section { padding: 40px 24px; }
+  .dir-filters { flex-direction: column; align-items: stretch; }
 }

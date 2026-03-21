@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Management - CS Connect Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .fm-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .fm-header { margin-bottom: 30px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 20px; }
+    .fm-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0; font-size: 28px; }
+    .fm-header p { color: #A0A0A0; margin: 8px 0 0; font-size: 14px; }
+    
+    .fm-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+    .fm-stat-card { background: #121212; padding: 24px; border-radius: 12px; border: 1px solid rgba(40,167,69,0.2); border-left: 4px solid #28a745; }
+    .fm-stat-card.warning { border-color: rgba(255,193,7,0.2); border-left-color: #ffc107; }
+    .fm-stat-card.danger { border-color: rgba(220,53,69,0.2); border-left-color: #dc3545; }
+    .fm-stat-val { font-size: 32px; color: #fff; font-family: 'Playfair Display', serif; font-weight: 700; margin-bottom: 4px; }
+    .fm-stat-lbl { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+    .fm-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
+    
+    .fm-panel { background: #121212; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); padding: 24px; }
+    .fm-panel h3 { color: #F5E6BE; margin: 0 0 20px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
+    
+    .fm-table { width: 100%; border-collapse: collapse; }
+    .fm-table th { color: #A0A0A0; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .fm-table td { padding: 12px; color: #D0D0D0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+    
+    .fm-form-group { margin-bottom: 16px; }
+    .fm-form-group label { display: block; color: #A0A0A0; font-size: 13px; margin-bottom: 8px; }
+    .fm-form-group input, .fm-form-group select { width: 100%; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 6px; outline: none; }
+    .fm-btn { width: 100%; background: #8B1D1D; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 8px; }
+    .fm-btn:hover { background: #a32222; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fm-page">
+    <div class="fm-header">
+        <h2>Fee Management Platform</h2>
+        <p>Monitor semester fee collections, dues, and record manual payments.</p>
+    </div>
+
+    <div class="fm-stats">
+        <div class="fm-stat-card">
+            <div class="fm-stat-val">₹42.5 L</div>
+            <div class="fm-stat-lbl">Total Collected (S6)</div>
+        </div>
+        <div class="fm-stat-card warning">
+            <div class="fm-stat-val">64</div>
+            <div class="fm-stat-lbl">Pending Students</div>
+        </div>
+        <div class="fm-stat-card danger">
+            <div class="fm-stat-val">₹3.2 L</div>
+            <div class="fm-stat-lbl">Total Overdue</div>
+        </div>
+    </div>
+
+    <div class="fm-grid">
+        <div class="fm-panel">
+            <h3>Recent Transactions</h3>
+            <table class="fm-table">
+                <thead>
+                    <tr>
+                        <th>Txn ID</th>
+                        <th>Student</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#TXN-8821</td>
+                        <td>Arjun Kumar (S6)</td>
+                        <td>₹35,000</td>
+                        <td>Today, 10:45 AM</td>
+                        <td style="color:#4ade80;">Success</td>
+                    </tr>
+                    <tr>
+                        <td>#TXN-8820</td>
+                        <td>Meera Prasad (S6)</td>
+                        <td>₹35,000</td>
+                        <td>Yesterday</td>
+                        <td style="color:#4ade80;">Success</td>
+                    </tr>
+                    <tr>
+                        <td>#TXN-8819</td>
+                        <td>Varun J (S8)</td>
+                        <td>₹1,500</td>
+                        <td>2 Days Ago</td>
+                        <td style="color:#facc15;">Processing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="fm-panel">
+            <h3>Record Manual Payment</h3>
+            <div class="fm-form-group">
+                <label>Student Roll Number</label>
+                <input type="text" placeholder="e.g. AIS-CS-...">
+            </div>
+            <div class="fm-form-group">
+                <label>Fee Category</label>
+                <select>
+                    <option>Semester Tuition Fee</option>
+                    <option>Exam Registration Fee</option>
+                    <option>Library Fine</option>
+                    <option>Other Dues</option>
+                </select>
+            </div>
+            <div class="fm-form-group">
+                <label>Amount (₹)</label>
+                <input type="number" placeholder="0.00">
+            </div>
+            <div class="fm-form-group">
+                <label>Payment Method</label>
+                <select>
+                    <option>Cash (Office)</option>
+                    <option>Demand Draft</option>
+                    <option>Bank Transfer (NEFT/RTGS)</option>
+                </select>
+            </div>
+            <button class="fm-btn" onclick="alert('Payment Recorded Successfully.')">Submit Record</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

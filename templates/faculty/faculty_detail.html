@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Profile | CS Connect · AISAT{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faculty_detail.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="faculty-detail-page">
+  <a href="/faculty" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    Back to Faculty
+  </a>
+
+  <!-- SKELETON LOADER -->
+  <div id="skeletonLoader">
+    <div class="profile-card-sticky pulse-skeleton" style="height: 480px;"></div>
+    <div class="sections-flow" style="flex:1;">
+      <div class="pulse-skeleton" style="height: 120px; margin-bottom: 40px;"></div>
+      <div class="pulse-skeleton" style="height: 200px; margin-bottom: 40px;"></div>
+      <div class="pulse-skeleton" style="height: 80px;"></div>
+    </div>
+  </div>
+
+  <!-- REAL CONTENT (Hidden initially) -->
+  <div id="realContent" class="detail-layout" style="display: none;">
+    <!-- Left Column -->
+    <aside class="profile-card-sticky fade-up">
+      <div class="profile-img-box" id="profImgBox">
+        <!-- Rendered by JS -->
+      </div>
+      <h1 class="profile-name" id="profName"></h1>
+      <div class="profile-designation" id="profDesignation"></div>
+      
+      <div class="contact-btns">
+        <a href="#" class="contact-btn" id="emailBtn">Email</a>
+        <a href="#" class="contact-btn" style="padding: 8px 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+        </a>
+      </div>
+
+      <p class="profile-bio" id="profBio"></p>
+    </aside>
+
+    <!-- Right Column -->
+    <div class="sections-flow">
+      
+      <!-- Academic Background -->
+      <section class="fade-up" style="animation-delay: 0.1s;">
+        <div class="detail-section-hdr">
+          <div class="section-dot"></div>
+          <h2 class="section-title">Academic Background</h2>
+        </div>
+        <div class="acad-list" id="acadList"></div>
+      </section>
+
+      <!-- Research & Publications -->
+      <section class="fade-up" style="animation-delay: 0.2s;" id="researchSection">
+        <div class="detail-section-hdr">
+          <div class="section-dot"></div>
+          <h2 class="section-title">Research & Publications</h2>
+        </div>
+        <div class="pub-list" id="pubList"></div>
+      </section>
+
+      <!-- Areas of Interest -->
+      <section class="fade-up" style="animation-delay: 0.3s;">
+        <div class="detail-section-hdr">
+          <div class="section-dot"></div>
+          <h2 class="section-title">Areas of Interest</h2>
+        </div>
+        <div class="tags-wrap" id="interestTags"></div>
+      </section>
+
+      <!-- Professional Activities -->
+      <section class="fade-up" style="animation-delay: 0.4s;">
+        <div class="detail-section-hdr">
+          <div class="section-dot"></div>
+          <h2 class="section-title">Professional Activities</h2>
+        </div>
+        <ul class="activity-list" id="activityList"></ul>
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const FID = {{ fid }};
+
+async function loadFacultyDetail() {
+  const skeleton = document.getElementById('skeletonLoader');
+  const content = document.getElementById('realContent');
+
+  try {
+    const res = await fetch(`/api/faculty/${FID}`);
+    if (!res.ok) throw new Error("Faculty not found");
+    const data = await res.json();
+
+    renderDetail(data);
+
+    // Artificial delay to show smooth transition
+    setTimeout(() => {
+      skeleton.style.display = 'none';
+      content.style.display = 'grid';
+    }, 600);
+
+  } catch (err) {
+    document.querySelector('.faculty-detail-page').innerHTML = `
+      <div style="text-align:center; padding: 100px 0;">
+        <h2 style="color:#8B1D1D;">Error 404</h2>
+        <p style="color:#666;">Professor profile not found in our records.</p>
+        <a href="/faculty" class="contact-btn" style="margin-top:20px; display:inline-block;">Return to Faculty</a>
+      </div>`;
+  }
+}
+
+function renderDetail(f) {
+  // Left Column
+  document.getElementById('profName').textContent = f.name;
+  document.getElementById('profDesignation').textContent = f.designation;
+  document.getElementById('profBio').textContent = f.bio;
+  document.getElementById('emailBtn').href = `mailto:${f.email}`;
+  
+  const imgBox = document.getElementById('profImgBox');
+  if (f.photo) {
+    imgBox.innerHTML = `<img src="${f.photo}" class="profile-img" alt="${f.name}">`;
+  } else {
+    imgBox.innerHTML = `<div class="profile-initials">${getShortInitials(f.name)}</div>`;
+  }
+
+  // Right Column - Academic
+  const acadList = document.getElementById('acadList');
+  (f.education || []).forEach(ed => {
+    acadList.innerHTML += `
+      <div class="acad-item">
+        <div class="acad-degree">${ed.degree}</div>
+        <div class="acad-major">${ed.major}</div>
+        <div class="acad-univ">${ed.univ}</div>
+      </div>`;
+  });
+
+  // Research (Conditional)
+  const pubList = document.getElementById('pubList');
+  if (f.publications && f.publications.length > 0) {
+    f.publications.forEach(p => {
+      pubList.innerHTML += `
+        <div class="pub-card">
+          <div class="pub-title">"${p.title}"</div>
+          <div class="pub-meta">
+            <span>${p.journal} · ${p.year}</span>
+            <a href="${p.link}" class="pub-link">DOI →</a>
+          </div>
+        </div>`;
+    });
+  } else {
+    document.getElementById('researchSection').style.display = 'none';
+  }
+
+  // Interests
+  const tagWrap = document.getElementById('interestTags');
+  (f.interests || []).forEach(i => {
+    if (i.trim()) tagWrap.innerHTML += `<span class="interest-tag">${i.trim()}</span>`;
+  });
+
+  // Activities
+  const actList = document.getElementById('activityList');
+  (f.activities || []).forEach(a => {
+    actList.innerHTML += `<li>${a}</li>`;
+  });
+}
+
+function getShortInitials(name) {
+  return name.split(' ')
+             .filter(n => !n.includes('.'))
+             .map(n => n[0])
+             .slice(0, 1)
+             .join('')
+             .toUpperCase();
+}
+
+loadFacultyDetail();
+</script>
+{% endblock %}

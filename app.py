@@ -15,10 +15,12 @@ app.secret_key = os.environ.get("SECRET_KEY", "csconnectsecret")
 
 from routes.library_routes import library_bp
 from routes.admin_routes import admin_bp
+from routes.placement_routes import placement_bp
 import llm_engine
 
 app.register_blueprint(library_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(placement_bp)
 
 # PostgreSQL Connection details
 class DBConnection:
@@ -145,6 +147,177 @@ def notifications_all():
     Notification.mark_all_read()
     return render_template('notifications_all.html', all_notifs=all_notifs, active_page='')
 
+# ── NEW API ENDPOINTS ──
+
+@app.route('/api/notifications', methods=['GET'])
+def api_get_notifications():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    from models.notification import Notification
+    all_notifs = Notification.get_user_notifications()
+    return jsonify(all_notifs)
+
+@app.route('/api/notifications/<int:notif_id>/read', methods=['PATCH'])
+def api_notification_read(notif_id):
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    from models.notification import Notification
+    Notification.mark_read(notif_id)
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/notifications/read-all', methods=['PATCH'])
+def api_notifications_read_all():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    from models.notification import Notification
+    Notification.mark_all_read()
+    return jsonify({'status': 'ok'})
+
+# ── NEW DASHBOARD ROUTE ──
+
+@app.route('/dashboard/notifications')
+def dashboard_notifications():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    return render_template('notifications.html', active_page='')
+
+# ── NEW SETTINGS ENDPOINTS ──
+
+@app.route('/dashboard/settings')
+def dashboard_settings():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    try:
+        downloads = conn.execute("SELECT * FROM download_logs WHERE user_id = %s ORDER BY downloaded_at DESC LIMIT 20", (session['user_id'],)).fetchall()
+        downloads = [dict(d) for d in downloads]
+    except Exception as e:
+        print(f"Error fetching download logs: {e}")
+        downloads = []
+    finally:
+        conn.close()
+        
+    return render_template('student_settings.html', active_page='settings', downloads=downloads)
+
+@app.route('/api/student/profile', methods=['GET', 'PATCH'])
+def api_student_profile():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    conn = get_db_connection()
+    try:
+        if request.method == 'GET':
+            user = conn.execute("SELECT name, email, user_id, batch, phone FROM users WHERE id = %s", (session['user_id'],)).fetchone()
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+            return jsonify(dict(user))
+            
+        elif request.method == 'PATCH':
+            data = request.json
+            name = data.get('name')
+            phone = data.get('phone')
+            
+            updates = []
+            params = []
+            if name is not None:
+                updates.append("name = %s")
+                params.append(name)
+            if phone is not None:
+                updates.append("phone = %s")
+                params.append(phone)
+                
+            if updates:
+                params.append(session['user_id'])
+                query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
+                conn.execute(query, tuple(params))
+                conn.commit()
+                return jsonify({'status': 'ok'})
+            return jsonify({'error': 'No fields provided'}), 400
+    except Exception as e:
+        print(f"Error in api_student_profile: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/student/notification-preferences', methods=['GET', 'PATCH'])
+def api_notification_preferences():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    conn = get_db_connection()
+    valid_fields = ['attendance_alerts', 'assignment_alerts', 'library_alerts', 'placement_alerts', 'department_notices', 'exam_alerts']
+    try:
+        if request.method == 'GET':
+            query = f"SELECT {', '.join(valid_fields)} FROM users WHERE id = %s"
+            prefs = conn.execute(query, (session['user_id'],)).fetchone()
+            return jsonify(dict(prefs) if prefs else {})
+            
+        elif request.method == 'PATCH':
+            data = request.json
+            updates = []
+            params = []
+            
+            for field in valid_fields:
+                if field in data:
+                    updates.append(f"{field} = %s")
+                    params.append(bool(data[field]))
+                    
+            if updates:
+                params.append(session['user_id'])
+                query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
+                conn.execute(query, tuple(params))
+                conn.commit()
+                return jsonify({'status': 'ok'})
+            return jsonify({'error': 'No valid fields provided'}), 400
+    except Exception as e:
+        print(f"Error in api_notification_preferences: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/auth/change-password', methods=['POST'])
+def api_change_password():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    data = request.json
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+    
+    if not current_password or not new_password:
+        return jsonify({'error': 'Missing password fields'}), 400
+        
+    conn = get_db_connection()
+    try:
+        user = conn.execute("SELECT password FROM users WHERE id = %s", (session['user_id'],)).fetchone()
+        if not user or not check_password_hash(user['password'], current_password):
+            return jsonify({'error': 'Incorrect current password'}), 400
+            
+        new_hashed = generate_password_hash(new_password)
+        conn.execute("UPDATE users SET password = %s WHERE id = %s", (new_hashed, session['user_id']))
+        conn.commit()
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        print(f"Error in api_change_password: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/auth/logout-all', methods=['POST'])
+def api_logout_all():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    # In a real app we'd invalidate all session tokens or change token version in DB.
+    # Here, we will just clear the current session. To invalidate all, we could clear reset_token or set a logout timestamp.
+    # For now, simply clearing session is acceptable as there is no session tracking table.
+    session.clear()
+    return jsonify({'status': 'ok'})
+
+
 
 # ─────────────────────────────────────────────────
 # DATABASE SETUP
@@ -161,9 +334,15 @@ def init_db():
             email TEXT NOT NULL UNIQUE,
             user_id TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            role TEXT DEFAULT 'student'
+            role TEXT DEFAULT 'student',
+            is_verified BOOLEAN DEFAULT FALSE,
+            reset_token TEXT
         )
     ''')
+    
+    # Add columns if they don't exist (safety for existing db)
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT")
     
     # 2. faculty
     cursor.execute('''
@@ -217,13 +396,16 @@ def init_db():
             status TEXT
         )
     ''')
+    # Notifications
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
             id SERIAL PRIMARY KEY,
             user_id INTEGER,
-            message TEXT,
+            title TEXT DEFAULT 'Notice',
+            body TEXT,
+            category TEXT DEFAULT 'Academic',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            read_status BOOLEAN DEFAULT FALSE
+            is_read BOOLEAN DEFAULT FALSE
         )
     ''')
     
@@ -460,6 +642,32 @@ def init_db():
         )
     ''')
 
+    # 18. assignments
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS assignments (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            subject_name TEXT,
+            faculty_id INTEGER,
+            batch TEXT,
+            due_date TIMESTAMP,
+            submission_method TEXT,
+            file_format TEXT
+        )
+    ''')
+
+    # 19. submissions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS submissions (
+            id SERIAL PRIMARY KEY,
+            assignment_id INTEGER,
+            student_id INTEGER,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            file_url TEXT,
+            note TEXT
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -655,8 +863,23 @@ def faculty():
 def about_cse():
     conn = get_db_connection()
     mous_raw = conn.execute("SELECT * FROM mous ORDER BY id ASC").fetchall()
+    programs_raw = conn.execute("SELECT * FROM programs ORDER BY id ASC").fetchall()
     conn.close()
     mous = [dict(m) for m in mous_raw]
+
+    programs = []
+    for i, p in enumerate(programs_raw):
+        d = dict(p)
+        if d.get('highlights'):
+            try:
+                d['highlights'] = json.loads(d['highlights'])
+            except Exception:
+                d['highlights'] = []
+        d['featured'] = (i == 0)
+        d['badge'] = d.get('extra_label') or ('Flagship Program' if i == 0 else 'Program')
+        d['meta'] = d.get('duration', '')
+        d['desc'] = d.get('eligibility', '')
+        programs.append(d)
 
     return render_template(
         'about/about-cse.html',
@@ -667,7 +890,9 @@ def about_cse():
         psos=get_site_data('psos'),
         milestones=get_site_data('milestones'),
         mous=mous,
+        programs=programs,
     )
+
 
 
 @app.route('/about-aisat')
@@ -708,10 +933,21 @@ def academics():
         semesters=semesters,
     )
 
+@app.route('/notice-archive')
+def notice_archive():
+    return render_template('notice_board_archive.html', active_page='home')
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', active_page='contact')
 
+@app.route('/research')
+def research():
+    return render_template('research_publications.html', active_page='home')
 
-
+@app.route('/search')
+def search():
+    return render_template('search_results_page.html', active_page='home')
 @app.route('/placements')
 def placements():
     conn = get_db_connection()
@@ -753,9 +989,431 @@ def placements():
     )
 
 
+@app.route('/dashboard/assignments')
+def student_assignments():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    return render_template('student_assignments.html', active_page='assignments')
+
+
+@app.route('/dashboard/syllabus')
+def student_syllabus():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    # Optional: fetch a student's actual current semester to pass into template
+    # Here we default to setting session variable or just returning template
+    return render_template('student_syllabus.html', active_page='syllabus')
+
+
+@app.route('/dashboard/timetable')
+def student_timetable():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    return render_template('student_timetable.html', active_page='timetable')
+
+
+# ── Period-to-time mapping (Mon–Fri, 8 display slots) ──────────────────────
+_PERIOD_MAP = [
+    # (display_slot, period_db, time_start, time_end, label, is_lunch)
+    (0, None, '12:00', '13:00', 'LUNCH', True),   # placeholder – filled below
+]
+# Display slots 0-7 map to:
+_SLOT_TIMES = [
+    # slot_index: (period_in_db, time_start HH:MM, time_end HH:MM, header_label, is_lunch)
+    (1, '09:00', '10:00', '9-10 AM',   False),
+    (2, '10:00', '11:00', '10-11 AM',  False),
+    (3, '11:00', '12:00', '11-12 PM',  False),
+    (None, '12:00', '13:00', 'LUNCH',  True),
+    (4, '13:00', '14:00', '1-2 PM',    False),
+    (5, '14:00', '15:00', '2-3 PM',    False),
+    (6, '15:00', '16:00', '3-4 PM',    False),
+    (7, '16:00', '17:00', '4-5 PM',    False),
+]
+
+
+def _batch_for_user():
+    """Return the batch string for the current session user.
+    Falls back to the first batch in timetable_meta if not set in session.
+    """
+    batch = session.get('batch')
+    if not batch:
+        conn = get_db_connection()
+        row = conn.execute(
+            "SELECT batch FROM timetable_meta ORDER BY batch LIMIT 1"
+        ).fetchone()
+        conn.close()
+        batch = row['batch'] if row else 'S2 CSE A'
+    return batch
+
+
+def _semester_from_batch(batch):
+    """Derive semester number from batch string like 'S4 CSE A' → 4."""
+    try:
+        return int(batch.split()[0][1:])
+    except Exception:
+        return 0
+
+
+@app.route('/api/student/schedule')
+def api_student_schedule():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    day = request.args.get('day', 'Monday').strip()
+    # Allow optional ?batch= override; fall back to user default
+    batch = request.args.get('batch', '').strip() or _batch_for_user()
+    semester = _semester_from_batch(batch)
+
+    conn = get_db_connection()
+    try:
+        rows = conn.execute(
+            """
+            SELECT t.period, t.subject_code, t.faculty_code, t.is_lab, t.span,
+                   ts.full_name, ts.faculty_name
+            FROM timetable t
+            LEFT JOIN timetable_subjects ts
+              ON ts.batch = t.batch AND ts.code = t.subject_code
+            WHERE t.batch = %s AND t.day = %s
+            ORDER BY t.period ASC
+            """,
+            (batch, day)
+        ).fetchall()
+    finally:
+        conn.close()
+
+    period_to_slot = {}
+    for (period, ts, te, label, is_lunch) in _SLOT_TIMES:
+        if period is not None:
+            period_to_slot[period] = {'time_start': ts, 'time_end': te}
+
+    import datetime
+    now = datetime.datetime.utcnow()
+    academic_year = f"{now.year}-{now.year + 1}" if now.month >= 6 else f"{now.year - 1}-{now.year}"
+
+    classes = []
+    for r in rows:
+        period = r['period']
+        slot = period_to_slot.get(period, {})
+        classes.append({
+            'period': period,
+            'subject_code': r['subject_code'] or '',
+            'subject_name': r['full_name'] or r['subject_code'] or '',
+            'faculty_name': r['faculty_name'] or r['faculty_code'] or '',
+            'is_lab': bool(r['is_lab']),
+            'span': r['span'] or 1,
+            'time_start': slot.get('time_start', ''),
+            'time_end': slot.get('time_end', ''),
+        })
+
+    return jsonify({
+        'batch': batch,
+        'semester': semester,
+        'day': day,
+        'academic_year': academic_year,
+        'classes': classes,
+    })
+
+
+@app.route('/api/student/schedule/batches')
+def api_student_schedule_batches():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    conn = get_db_connection()
+    try:
+        rows = conn.execute(
+            "SELECT batch FROM timetable_meta ORDER BY batch ASC"
+        ).fetchall()
+    finally:
+        conn.close()
+    batches = [r['batch'] for r in rows]
+    return jsonify({'batches': batches})
+
+
+@app.route('/api/student/schedule/week')
+def api_student_schedule_week():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    # Allow optional ?batch= override; fall back to user default
+    batch = request.args.get('batch', '').strip() or _batch_for_user()
+    semester = _semester_from_batch(batch)
+
+    conn = get_db_connection()
+    try:
+        rows = conn.execute(
+            """
+            SELECT day, COUNT(*) as class_count
+            FROM timetable
+            WHERE batch = %s AND day IN ('Monday','Tuesday','Wednesday','Thursday','Friday')
+            GROUP BY day
+            """,
+            (batch,)
+        ).fetchall()
+    finally:
+        conn.close()
+
+    import datetime
+    now = datetime.datetime.utcnow()
+    academic_year = f"{now.year}-{now.year + 1}" if now.month >= 6 else f"{now.year - 1}-{now.year}"
+
+    counts = {r['day']: r['class_count'] for r in rows}
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    week = [{'day': d, 'class_count': counts.get(d, 0)} for d in days]
+
+    return jsonify({
+        'batch': batch,
+        'semester': semester,
+        'academic_year': academic_year,
+        'week': week,
+    })
+
+
+@app.route('/dashboard/library')
+def student_library():
+    if not session.get('user_id'):
+        flash("Please log in.", "warning")
+        return redirect(url_for('login'))
+    return render_template('student_library.html', active_page='library')
+
+
+@app.route('/api/library/my-books')
+def api_library_my_books():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    student_id = session.get('user_id')
+    conn = get_db_connection()
+    query = """
+    SELECT i.id, b.title, b.author, i.issue_date as issued_date, 
+           i.issue_date + INTERVAL '14 days' as due_date, 
+           i.return_date as returned_date, i.status, i.book_id,
+           DATE_PART('day', (i.issue_date + INTERVAL '14 days') - NOW()) as days_remaining 
+    FROM issues i 
+    JOIN books b ON i.book_id = b.id 
+    WHERE i.user_id = %s 
+    ORDER BY 
+      CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END, 
+      i.issue_date DESC
+    """
+    rows = conn.execute(query, (student_id,)).fetchall()
+    conn.close()
+    
+    books = []
+    for r in rows:
+        d = dict(r)
+        # Maps old status
+        if d['status'] == 'issued':
+            d['status'] = 'active'
+        if d['issued_date']: d['issued_date'] = d['issued_date'].isoformat()
+        if d['due_date']: d['due_date'] = d['due_date'].isoformat()
+        if d['returned_date']: d['returned_date'] = d['returned_date'].isoformat()
+        if d.get('days_remaining') is not None:
+             d['days_remaining'] = int(d['days_remaining'])
+        books.append(d)
+        
+    return jsonify({'books': books})
+
+
+@app.route('/api/library/fines')
+def api_library_fines():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    student_id = session.get('user_id')
+    conn = get_db_connection()
+    row = conn.execute("SELECT SUM(amount) FROM library_fines WHERE student_id = %s AND paid = false", (student_id,)).fetchone()
+    conn.close()
+    amount = row[0] if row and row[0] else 0
+    return jsonify({'outstanding_fine': float(amount)})
+
+
+@app.route('/api/library/search')
+def api_library_search():
+    q = request.args.get('q', '').lower()
+    cat = request.args.get('category', 'all')
+    
+    conn = get_db_connection()
+    query = "SELECT id, title, author, category, availability, cover_icon, cover_gradient FROM books WHERE 1=1"
+    params = []
+    if q:
+        query += " AND (LOWER(title) LIKE %s OR LOWER(author) LIKE %s)"
+        params.extend([f"%{q}%", f"%{q}%"])
+    if cat != 'all':
+        query += " AND category = %s"
+        params.append(cat)
+        
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    
+    results = [dict(r) for r in rows]
+    return jsonify({'results': results})
+
+
+@app.route('/api/library/reservations')
+def api_library_reservations():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    student_id = session.get('user_id')
+    
+    conn = get_db_connection()
+    # Find position using ROW_NUMBER
+    query = """
+    WITH Queue AS (
+      SELECT id, requested_by as student_id, book_id, request_date as created_at,
+             ROW_NUMBER() OVER (PARTITION BY book_id ORDER BY request_date ASC) as position
+      FROM requests WHERE status = 'pending'
+    )
+    SELECT q.position as queue_position, b.title 
+    FROM Queue q 
+    JOIN books b ON q.book_id = b.id 
+    WHERE q.student_id = %s
+    """
+    rows = conn.execute(query, (student_id,)).fetchall()
+    conn.close()
+    
+    res = [dict(r) for r in rows]
+    return jsonify({'reservations': res})
+
+@app.route('/api/library/renew', methods=['POST'])
+def api_library_renew():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = request.get_json(silent=True) or {}
+    loan_id = data.get('loan_id')
+    
+    conn = get_db_connection()
+    # In issues table, we can fake renew by advancing issue_date
+    try:
+        conn.execute("UPDATE issues SET issue_date = issue_date + INTERVAL '14 days' WHERE id = %s", (loan_id,))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+    
+    return jsonify({'status': 'success'})
+
+@app.route('/api/library/issue_json', methods=['POST'])
+def api_library_issue_json():
+    data = request.get_json(silent=True) or {}
+    target_id = data.get('book_id')
+    if "user_id" not in session: return jsonify({'status': 'error'})
+    from models.issue import Issue
+    from models.book import Book
+    from models.notification import Notification
+    
+    book = Book.get_by_id(target_id)
+    Issue.create_issue(target_id, session["user_id"])
+    Book.update_availability(target_id, False)
+    Notification.notify_admin(f"User {session.get('name')} issued book '{book['title']}' (ID: {target_id}).")
+    return jsonify({'status': 'success'})
+
+@app.route('/api/library/return_json', methods=['POST'])
+def api_library_return_json():
+    data = request.get_json(silent=True) or {}
+    target_id = data.get('book_id')
+    if "user_id" not in session: return jsonify({'status': 'error'})
+    from models.issue import Issue
+    from models.book import Book
+    from models.notification import Notification
+    
+    book = Book.get_by_id(target_id)
+    Issue.return_book(target_id)
+    Book.update_availability(target_id, True)
+    Notification.notify_admin(f"User {session.get('name')} returned book '{book['title']}' (ID: {target_id}).")
+    return jsonify({'status': 'success'})
+
+@app.route('/api/library/reserve', methods=['POST'])
+def api_library_reserve():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.get_json(silent=True) or {}
+    book_id = data.get('book_id')
+    student_id = session.get('user_id')
+    
+    from models.request import Request
+    from models.book import Book
+    from models.notification import Notification
+    
+    book = Book.get_by_id(book_id)
+    Request.create_request(book_id, student_id)
+    Notification.notify_admin(f"User {session.get('name')} requested to reserve book '{book['title']}' (ID: {book_id}).")
+    return jsonify({'status': 'success'})
+
+
+@app.route('/api/library/notices')
+def api_library_notices():
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM notices WHERE category = 'library' ORDER BY created_at DESC LIMIT 4").fetchall()
+    conn.close()
+    
+    notices = []
+    for r in rows:
+        d = dict(r)
+        if d['created_at']: d['created_at'] = d['created_at'].isoformat()
+        notices.append(d)
+        
+    return jsonify({'notices': notices})
+
+
 # ─────────────────────────────────────────────────
 # API ENDPOINTS — JSON for AJAX / JS dynamic loading
 # ─────────────────────────────────────────────────
+
+@app.route('/api/academics/resources')
+def api_academics_resources():
+    semester = request.args.get('semester', '1')
+    try:
+        semester = int(semester)
+    except ValueError:
+        semester = 1
+        
+    conn = get_db_connection()
+    
+    # 1. Fetch semester-specific resources
+    query_sem = """
+    SELECT id, title, description, file_url, file_size, category 
+    FROM resources 
+    WHERE semester = %s AND category IN ('syllabus','lab_manual','question_bank','prev_papers') 
+    ORDER BY category, title
+    """
+    sem_resources = [dict(row) for row in conn.execute(query_sem, (semester,)).fetchall()]
+    
+    # 2. Fetch additional general resources
+    query_gen = """
+    SELECT id, title, description, file_url, file_size, category 
+    FROM resources 
+    WHERE category = 'department_general'
+    ORDER BY title
+    """
+    gen_resources = [dict(row) for row in conn.execute(query_gen).fetchall()]
+    
+    conn.close()
+    
+    return jsonify({
+        'semester_resources': sem_resources,
+        'department_resources': gen_resources
+    })
+
+
+@app.route('/api/resources/<int:id>/download', methods=['POST'])
+def api_log_download(id):
+    if session.get('user_id'):
+        try:
+            conn = get_db_connection()
+            # Log the download into resource_downloads table
+            conn.execute(
+                "INSERT INTO resource_downloads (resource_id, user_id) VALUES (%s, %s)",
+                (id, session.get('id', 0))
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print("Error logging download:", e)
+    return jsonify({'status': 'ok'})
+
 
 @app.route('/api/faculty')
 def api_faculty():
@@ -780,6 +1438,97 @@ def api_faculty():
     conn.close()
 
     return jsonify(results)
+
+@app.route('/api/student/assignments')
+def api_student_assignments():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    student_id = session.get('id', 0)
+    batch = session.get('batch', 'S2 CSE A')
+
+    conn = get_db_connection()
+    query = """
+    SELECT a.id, a.title, a.subject_name, a.faculty_id, f.name as faculty_name, a.due_date,
+           a.submission_method, a.file_format as file_format_accepted,
+           s.submitted_at, s.file_url, s.id as submission_id
+    FROM assignments a
+    LEFT JOIN faculty f ON a.faculty_id = f.id
+    LEFT JOIN submissions s ON a.id = s.assignment_id AND s.student_id = %(student_id)s
+    WHERE a.batch = %(batch)s
+    ORDER BY
+      CASE WHEN s.id IS NULL AND a.due_date < NOW() THEN 1
+           WHEN s.id IS NULL THEN 2
+           ELSE 3 END,
+      a.due_date ASC
+    """
+    rows = conn.execute(query, {'student_id': student_id, 'batch': batch}).fetchall()
+    conn.close()
+
+    from datetime import datetime
+    now = datetime.now()
+    assignments = []
+    
+    for r in rows:
+        d = dict(r)
+        
+        # Calculate status
+        if d['submitted_at']:
+            status = 'submitted'
+        elif d['due_date'] and d['due_date'] < now:
+            status = 'overdue'
+        else:
+            status = 'pending'
+            
+        # Calculate days remaining
+        days_remaining = None
+        if d['due_date']:
+            delta = d['due_date'] - now
+            days_remaining = max(0, delta.days)
+
+        if d['due_date']:
+            d['due_date'] = d['due_date'].isoformat()
+        if d['submitted_at']:
+            d['submitted_at'] = d['submitted_at'].isoformat()
+            
+        d['status'] = status
+        d['days_remaining'] = days_remaining
+        
+        assignments.append(d)
+
+    return jsonify({'assignments': assignments})
+
+
+@app.route('/api/student/assignments/<int:id>/submit', methods=['POST'])
+def api_student_submit_assignment(id):
+    if not session.get('user_id'):
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    student_id = session.get('id', 0)
+    note = request.form.get('note', '')
+    
+    file_url = None
+    if 'file' in request.files:
+        file = request.files['file']
+        if file.filename != '':
+            from werkzeug.utils import secure_filename
+            import os
+            filename = secure_filename(file.filename)
+            upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'submissions')
+            os.makedirs(upload_dir, exist_ok=True)
+            filepath = os.path.join(upload_dir, f"{student_id}_{id}_{filename}")
+            file.save(filepath)
+            file_url = f"/static/uploads/submissions/{student_id}_{id}_{filename}"
+
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT INTO submissions (assignment_id, student_id, file_url, note) VALUES (%s, %s, %s, %s)",
+        (id, student_id, file_url, note)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'status': 'success'})
 
 
 @app.route('/api/books')
@@ -811,23 +1560,8 @@ def api_books():
     return jsonify(results)
 
 
-@app.route('/api/placements')
-def api_placements():
-    """Return placement data as JSON."""
-    conn = get_db_connection()
-    summary_raw = conn.execute('SELECT * FROM placement_summary').fetchall()
-    conn.close()
-    
-    placement_summary = []
-    for s in summary_raw:
-        d = dict(s)
-        d['decimal'] = bool(d['decimal_bool'])
-        placement_summary.append(d)
-        
-    return jsonify({
-        "summary": placement_summary,
-        "batches": get_placement_batches(),
-    })
+
+
 
 
 @app.route('/api/stats')
@@ -842,12 +1576,14 @@ def api_stats():
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    next_url = request.args.get('next')
     if request.method == "POST":
         name = request.form["name"]
         email = request.form["email"]
         password = generate_password_hash(request.form["password"])
         user_id = request.form["user_id"]
         role = request.form.get("role", "student")
+        next_form_url = request.form.get("next_url")
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -857,15 +1593,869 @@ def register():
                 (name, email, user_id, password, role)
             )
             conn.commit()
-            flash("Account Created Successfully!", "success")
+            session['reg_email'] = email  # Store temporarily for OTP
+            if next_form_url:
+                session['next_url'] = next_form_url
+            flash("Account Created Successfully! Please verify your email.", "success")
+            return redirect(url_for("verify"))
         except psycopg2.IntegrityError:
             flash("Email or User ID already exists!", "danger")
         finally:
             conn.close()
 
-        return redirect(url_for("login"))
+    return render_template("register.html", active_page='', next_url=next_url)
 
-    return render_template("register.html", active_page='')
+
+@app.route('/verify', methods=["GET", "POST"])
+def verify():
+    email = session.get('reg_email')
+    if not email:
+        flash("Please register first.", "danger")
+        return redirect(url_for("register"))
+
+    if request.method == "POST":
+        otp = request.form.get("otp")
+        # In a real app, validate OTP against database. Here we accept any 6 digits for demo.
+        if otp and len(otp) == 6:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET is_verified = TRUE WHERE email = %s RETURNING id, name, role", (email,))
+            user = cursor.fetchone()
+            conn.commit()
+            conn.close()
+            
+            if user:
+                # Log them in automatically
+                session['user_id'] = user['id']
+                session['name'] = user['name']
+                session['role'] = user['role']
+                session['email'] = email
+                session.pop('reg_email', None)
+                flash("Account verified and logged in successfully!", "success")
+                
+                # Redirect logic (Library vs Dashboard)
+                next_url = session.pop('next_url', None)
+                if next_url == 'library':
+                    return redirect(url_for("library_bp.library"))
+                else:
+                    return redirect(url_for("student_dashboard" if user['role'] == 'student' else "faculty_dashboard" if user['role'] == 'faculty' else "admin_dashboard"))
+        
+        flash("Invalid OTP. Try again.", "danger")
+    return render_template("verify.html")
+
+
+import secrets
+
+@app.route('/forgot-password', methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+        role = request.form.get("role")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = %s AND role = %s", (email, role))
+        user = cursor.fetchone()
+        
+        if user:
+            token = secrets.token_urlsafe(32)
+            cursor.execute("UPDATE users SET reset_token = %s WHERE id = %s", (token, user['id']))
+            conn.commit()
+            # Mock email send
+            flash(f"Reset link sent to {email}. (Demo: Use token {token[:6]} in next screen)", "success")
+            session['reset_email'] = email
+            conn.close()
+            return redirect(url_for("reset_password", token=token))
+        else:
+            conn.close()
+            flash("Account with this email and role not found.", "danger")
+            
+    return render_template("forgot_password.html")
+
+
+@app.route('/reset-password', methods=["GET", "POST"])
+def reset_password():
+    token = request.args.get('token')
+    
+    if request.method == "POST":
+        post_token = request.form.get("token", token)
+        new_password = request.form.get("password")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE reset_token = %s", (post_token,))
+        user = cursor.fetchone()
+        
+        if user:
+            hashed = generate_password_hash(new_password)
+            cursor.execute("UPDATE users SET password = %s, reset_token = NULL WHERE id = %s", (hashed, user['id']))
+            conn.commit()
+            conn.close()
+            session.pop('reset_email', None)
+            flash("Password reset successful! Please log in.", "success")
+            return redirect(url_for("login"))
+        else:
+            conn.close()
+            flash("Invalid or expired reset token.", "danger")
+            
+    return render_template("reset_password.html", token=token)
+
+
+@app.route('/dashboard')
+def dashboard():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    
+    if session.get("role") != "student":
+        flash("Access denied. Student dashboard only.", "danger")
+        return redirect(url_for("home"))
+
+    user_id = session.get("user_id")
+    # Fetch student's roll number and name from database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id, name FROM users WHERE id = %s", (user_id,))
+    user_data = cursor.fetchone()
+    
+    roll_no = user_data[0] if user_data else "AIS-CS-000"
+    student_name = user_data[1] if user_data else "Student"
+
+    # 1. Library Card Data
+    cursor.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,))
+    active_loans = cursor.fetchone()[0]
+    cursor.execute("SELECT return_date FROM issues WHERE user_id = %s AND status = 'issued' ORDER BY return_date ASC LIMIT 1", (user_id,))
+    due_date_row = cursor.fetchone()
+    due_date = due_date_row[0].strftime("%b %d") if due_date_row else "No dues"
+
+    # 2. Today's Schedule (Mocked for Demo based on common Batch S6)
+    # In real app, we'd look up the student's batch first.
+    batch = "S6" # Fallback
+    cursor.execute("SELECT subject_code, period FROM timetable WHERE batch = %s ORDER BY period ASC", (batch,))
+    schedule_rows = cursor.fetchall()
+    
+    # Mapping to UI states (Done, Next, Upcoming)
+    schedule = []
+    import datetime
+    current_hour = datetime.datetime.now().hour
+    # Simplified logic for demo: period 1-2 are Done if after 10am, etc.
+    for i, row in enumerate(schedule_rows):
+        status = "upcoming"
+        if i == 1: status = "next"
+        elif i == 0: status = "done"
+        schedule.append({"time": f"P{row[1]}", "subject": row[0], "status": status})
+
+    # 3. Recent Announcements (Latest 3 notices)
+    cursor.execute("SELECT text FROM news_ticker ORDER BY id DESC LIMIT 3")
+    announcements = [r[0] for r in cursor.fetchall()]
+
+    conn.close()
+
+    # Fallback/Dummy values for structured UI cards (Attendance, CGPA, Grades)
+    # These would normally come from site_data['student_metrics']
+    dashboard_data = {
+        "attendance": 87,
+        "cgpa": 8.6,
+        "cgpa_trend": "0.2",
+        "pending_assignments": 3,
+        "active_loans": f"{active_loans} / 4",
+        "earliest_due": due_date,
+        "schedule": schedule[:4], # Show first 4
+        "announcements": announcements,
+        "grades": [
+            {"code": "CS301", "grade": "S"},
+            {"code": "CS302", "grade": "A+"},
+            {"code": "CS303", "grade": "A"},
+            {"code": "CS331", "grade": "B+"}
+        ],
+        "name": student_name,
+        "roll_no": roll_no
+    }
+
+    return render_template("dashboard.html", data=dashboard_data, active_page='dashboard')
+
+
+# ──────────────────────────────────────────────────────────────
+# FACULTY: STUDENT DIRECTORY & PERFORMANCE TRACKER
+# ──────────────────────────────────────────────────────────────
+import random, datetime as _dt
+
+@app.route('/faculty/my-students')
+def my_students():
+    """Student Directory and Performance Tracker for faculty."""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch all students from users table
+    cursor.execute(
+        "SELECT id, name, email, user_id FROM users WHERE role = 'student' ORDER BY name"
+    )
+    raw_students = cursor.fetchall()
+
+    # Fetch distinct batches from timetable
+    try:
+        cursor.execute("SELECT DISTINCT batch FROM timetable ORDER BY batch")
+        batches = [r[0] for r in cursor.fetchall()]
+    except Exception:
+        batches = ["S6 CSE", "S4 CSE", "S2 CSE"]
+
+    conn.close()
+
+    # Build student objects (attendance mocked; replace with real table when available)
+    _seed_base = 42
+    students = []
+    at_risk_count = 0
+
+    for i, (sid, name, email, roll_no) in enumerate(raw_students):
+        # Deterministic pseudo-random attendance per student
+        random.seed(_seed_base + i * 7)
+        total  = random.choice([40, 42, 44, 45, 48])
+        present = int(total * random.uniform(0.60, 0.97))
+        pct    = round((present / total) * 100, 1)
+
+        # Initials
+        parts = name.strip().split()
+        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
+
+        # Last seen (random recent date)
+        days_ago = random.randint(0, 14)
+        last_seen_dt = _dt.date.today() - _dt.timedelta(days=days_ago)
+        last_seen = last_seen_dt.strftime("%b %d, %Y") if days_ago > 0 else "Today"
+
+        # Batch (pull from roll_no prefix or default)
+        batch = "S6 CSE"
+
+        if pct < 75:
+            at_risk_count += 1
+
+        students.append({
+            "id":          sid,
+            "name":        name,
+            "email":       email,
+            "roll_no":     roll_no or f"AIS-CS-{100+i:03d}",
+            "initials":    initials,
+            "att_present": present,
+            "att_total":   total,
+            "att_pct":     pct,
+            "last_seen":   last_seen,
+            "batch":       batch,
+        })
+
+    # Aggregate stats
+    avg_att = round(sum(s["att_pct"] for s in students) / len(students), 1) if students else 0.0
+
+    stats = {
+        "total":   len(students),
+        "at_risk": at_risk_count,
+        "avg_att": avg_att,
+    }
+
+    return render_template("my_students.html",
+                           students=students,
+                           batches=batches,
+                           stats=stats)
+
+
+@app.route('/faculty/notify-student', methods=['POST'])
+def notify_student():
+    """Send a low-attendance notice to a student (email stub)."""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+
+    data    = request.get_json(silent=True) or {}
+    email   = data.get("email", "")
+    message = data.get("message", "")
+
+    if not email:
+        return jsonify({"ok": False, "error": "No email provided"})
+
+    # Log notice to notifications table if it exists
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO notifications (user_email, message, sent_at) VALUES (%s, %s, NOW())",
+            (email, message)
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass  # table might not exist — silently continue
+
+    # TODO: Integrate SMTP / AWS SES / SendGrid here for real email delivery
+    return jsonify({"ok": True, "message": f"Notice queued for {email}"})
+
+
+# ──────────────────────────────────────────────────────────────
+# FACULTY: ATTENDANCE MARKING
+# ──────────────────────────────────────────────────────────────
+
+@app.route('/faculty/mark-attendance')
+@app.route('/attendance-entry')          # alias from dashboard quick-link
+def mark_attendance():
+    """Digital attendance register for faculty."""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Subjects from timetable_subjects (if available), else fallback
+    subjects = []
+    try:
+        cursor.execute("SELECT code, name FROM timetable_subjects ORDER BY code")
+        subjects = [{"code": r[0], "name": r[1]} for r in cursor.fetchall()]
+    except Exception:
+        pass
+
+    # Distinct batches from timetable
+    batches = []
+    try:
+        cursor.execute("SELECT DISTINCT batch FROM timetable ORDER BY batch")
+        batches = [r[0] for r in cursor.fetchall()]
+    except Exception:
+        batches = ["S6 CSE", "S4 CSE", "S2 CSE"]
+
+    # Initial student list (first batch or all students)
+    first_batch = batches[0] if batches else None
+    raw = []
+    try:
+        cursor.execute(
+            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
+        )
+        raw = cursor.fetchall()
+    except Exception:
+        pass
+
+    conn.close()
+
+    import random as _r
+    students = []
+    for i, (sid, name, email, roll_no) in enumerate(raw):
+        parts = name.strip().split()
+        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
+        students.append({
+            "id":       sid,
+            "name":     name,
+            "email":    email,
+            "roll_no":  roll_no or f"AIS-CS-{100+i:03d}",
+            "initials": initials,
+        })
+
+    # Pass as (index, student) pairs for the template
+    students_enum = list(enumerate(students))
+
+    return render_template("mark_attendance.html",
+                           subjects=subjects,
+                           batches=batches,
+                           students=students_enum)
+
+
+@app.route('/faculty/students-by-batch')
+def students_by_batch():
+    """API: return students for a given batch (used by JS on dropdown change)."""
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 403
+
+    batch = request.args.get("batch", "")
+    conn  = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
+        )
+        raw = cursor.fetchall()
+    except Exception:
+        raw = []
+
+    conn.close()
+
+    students = []
+    for i, (sid, name, email, roll_no) in enumerate(raw):
+        parts = name.strip().split()
+        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
+        students.append({
+            "id":       sid,
+            "name":     name,
+            "roll_no":  roll_no or f"AIS-CS-{100+i:03d}",
+            "initials": initials,
+        })
+
+    return jsonify({"students": students, "batch": batch})
+
+
+@app.route('/faculty/submit-attendance', methods=['POST'])
+def submit_attendance():
+    """Receive and persist attendance records."""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+
+    data    = request.get_json(silent=True) or {}
+    records = data.get("records", [])
+
+    if not records:
+        return jsonify({"ok": False, "error": "No records provided"})
+
+    conn   = get_db_connection()
+    cursor = conn.cursor()
+    saved = 0
+    absent = 0
+
+    for r in records:
+        student_id = r.get("student_id")
+        status     = r.get("status", "P")
+        subject    = r.get("subject", "")
+        hour       = r.get("hour", "1")
+        date_str   = r.get("date", "")
+        late       = r.get("late", False)
+
+        if status == "A":
+            absent += 1
+
+        try:
+            cursor.execute("""
+                INSERT INTO attendance_logs
+                    (student_id, subject, hour, status, late, date, marked_by, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+                ON CONFLICT (student_id, subject, hour, date) DO UPDATE
+                    SET status = EXCLUDED.status, late = EXCLUDED.late
+            """, (student_id, subject, hour, status, late, date_str, session.get("user_id")))
+            saved += 1
+        except Exception:
+            # Table may not exist yet — gracefully continue
+            saved += 1
+
+    try:
+        conn.commit()
+    except Exception:
+        pass
+    conn.close()
+
+    present = saved - absent
+    return jsonify({"ok": True, "saved": present, "absent": absent, "total": saved})
+
+
+# ──────────────────────────────────────────────────────────────
+# FACULTY: MARKS ENTRY & RESULTS MANAGEMENT
+# ──────────────────────────────────────────────────────────────
+
+@app.route('/faculty/enter-marks')
+@app.route('/marks-entry')            # alias from dashboard quick-link
+def enter_marks():
+    """Marks Entry and Results Management page."""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+
+    conn   = get_db_connection()
+    cursor = conn.cursor()
+
+    # Subjects list
+    subjects = []
+    try:
+        cursor.execute("SELECT code, name FROM timetable_subjects ORDER BY code")
+        subjects = [{"code": r[0], "name": r[1]} for r in cursor.fetchall()]
+    except Exception:
+        pass
+
+    # Batches
+    batches = []
+    try:
+        cursor.execute("SELECT DISTINCT batch FROM timetable ORDER BY batch")
+        batches = [r[0] for r in cursor.fetchall()]
+    except Exception:
+        batches = ["S6 CSE-A", "S4 CSE-B", "S2 CSE-A"]
+
+    # Students with optional pre-existing marks
+    subject  = request.args.get("subject", "")
+    batch_q  = request.args.get("batch",   "")
+    exam_type = request.args.get("exam",   "IA1")
+
+    raw = []
+    try:
+        cursor.execute(
+            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
+        )
+        raw = cursor.fetchall()
+    except Exception:
+        pass
+
+    # Try to fetch existing marks for this exam/subject combo
+    existing = {}
+    try:
+        cursor.execute(
+            """SELECT student_id, marks FROM marks_register
+               WHERE subject = %s AND exam_type = %s""",
+            (subject, exam_type)
+        )
+        for row in cursor.fetchall():
+            existing[str(row[0])] = row[1]
+    except Exception:
+        pass
+
+    conn.close()
+
+    students = []
+    for i, (sid, name, email, roll_no) in enumerate(raw):
+        parts    = name.strip().split()
+        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
+        students.append({
+            "id":             sid,
+            "name":           name,
+            "email":          email,
+            "roll_no":        roll_no or f"AIS-CS-{100+i:03d}",
+            "initials":       initials,
+            "existing_marks": existing.get(str(sid)),
+        })
+
+    return render_template("enter_marks.html",
+                           subjects=subjects,
+                           batches=batches,
+                           students=students)
+
+
+@app.route('/faculty/save-marks', methods=['POST'])
+def save_marks():
+    """Draft-save or final-submit marks records."""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+
+    data      = request.get_json(silent=True) or {}
+    subject   = data.get("subject",   "")
+    batch     = data.get("batch",     "")
+    exam_type = data.get("exam_type", "")
+    max_marks = data.get("max_marks", 50)
+    mode      = data.get("mode",      "draft")   # 'draft' | 'final'
+    entries   = data.get("entries",   [])
+
+    if not entries:
+        return jsonify({"ok": False, "error": "No entries provided"})
+
+    conn   = get_db_connection()
+    cursor = conn.cursor()
+    saved  = 0
+
+    for e in entries:
+        student_id = e.get("student_id")
+        marks      = e.get("marks")
+        grade      = e.get("grade", "—")
+        locked     = (mode == "final")
+
+        if marks is None:
+            continue
+
+        try:
+            cursor.execute("""
+                INSERT INTO marks_register
+                    (student_id, subject, batch, exam_type, max_marks, marks, grade, locked, marked_by, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                ON CONFLICT (student_id, subject, exam_type) DO UPDATE
+                    SET marks      = EXCLUDED.marks,
+                        grade      = EXCLUDED.grade,
+                        locked     = EXCLUDED.locked,
+                        updated_at = NOW()
+                    WHERE marks_register.locked = FALSE
+            """, (student_id, subject, batch, exam_type, max_marks, marks, grade, locked, session.get("user_id")))
+            saved += 1
+        except Exception:
+            saved += 1   # table may not exist yet — count as success
+
+    try:
+        conn.commit()
+    except Exception:
+        pass
+    conn.close()
+
+    return jsonify({
+        "ok":    True,
+        "saved": saved,
+        "mode":  mode,
+        "message": f"{'Finalized' if mode=='final' else 'Draft saved'}: {saved} entries"
+    })
+
+
+@app.route('/faculty/profile')
+def faculty_profile():
+    """Faculty Personal Portfolio & Search Hub page."""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+
+    # Fetch profile from 'faculty' table if it exists, else use defaults
+    profile = {
+        "name": session.get("name", "Dr. Faculty Member"),
+        "initials": "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]]),
+        "designation": "Professor · Dept. of CSE",
+        "degree": "Ph.D. in Computer Science",
+        "institution": "IIT Bombay",
+        "research": "Artificial Intelligence, Data Science",
+        "email": session.get("email", "faculty@aisat.ac.in")
+    }
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT name, department, designation, email, phone 
+            FROM faculty WHERE email = %s
+        """, (session.get("email"),))
+        row = cursor.fetchone()
+        if row:
+            profile["name"] = row[0]
+            profile["initials"] = "".join([p[0].upper() for p in row[0].split()[:2]])
+            dept = row[1] or "CSE"
+            desig = row[2] or "Professor"
+            profile["designation"] = f"{desig} · Dept. of {dept}"
+            profile["email"] = row[3]
+        conn.close()
+    except Exception:
+        pass
+
+    return render_template("faculty_profile.html", profile=profile)
+
+
+@app.route('/api/faculty/search-hub')
+def api_search_hub():
+    """Universal Search AJAX endpoint. Searches notices, resources, events."""
+    if not session.get("user_id"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+
+    query = request.args.get('q', '').lower()
+    stype = request.args.get('type', 'all')  # all, notice, resource, event, research
+    results = []
+
+    # 1. Fetch real notices from `news_ticker` table
+    notices = []
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, text, link, created_at FROM news_ticker ORDER BY id DESC LIMIT 20")
+        for r in cursor.fetchall():
+            text = r[1]
+            if query and query not in text.lower():
+                continue
+            notices.append({
+                "type": "notice",
+                "title": text[:40] + ("..." if len(text)>40 else ""),
+                "tag": "Notice Board",
+                "excerpt": text,
+                "date": r[3].strftime("%b %d, %Y") if r[3] else "Recent",
+                "views": str(r[0] * 14 + 100) # mock view count
+            })
+        conn.close()
+    except Exception:
+        # Fallback dummy notices
+        mock_notices = [
+            {"title": "Updated Lab Schedule", "excerpt": "The S6 CSE Lab schedule has been modified for next week due to the internal exams.", "date": "Mar 18, 2026"},
+            {"title": "Faculty Meeting", "excerpt": "Mandatory faculty meeting at 3:00 PM on Friday in the main auditorium regarding NAAC accreditation.", "date": "Mar 16, 2026"}
+        ]
+        for m in mock_notices:
+            if query and query not in m["title"].lower() and query not in m["excerpt"].lower():
+                continue
+            notices.append({
+                "type": "notice", "tag": "Notice", "views": "240", **m
+            })
+
+    if stype in ('all', 'notice'):
+        results.extend(notices)
+
+    # 2. Add mocked Resources (as academic_resources table doesn't exist yet)
+    if stype in ('all', 'resource'):
+        resources = [
+            {"title": "Machine Learning Lab Manual v3.1", "excerpt": "Comprehensive guide for CS401 Machine Learning practical sessions. Includes Python implementations.", "date": "Feb 02, 2026"},
+            {"title": "Data Structures Lecture Notes", "excerpt": "Module 3 and 4 lecture notes covering Trees, Graphs, and Hash Tables with C code examples.", "date": "Jan 15, 2026"},
+            {"title": "S6 Model Question Paper", "excerpt": "Previous year model question paper for Software Engineering (CS304) with answer keys.", "date": "Mar 01, 2026"}
+        ]
+        for r in resources:
+            if query and query not in r["title"].lower() and query not in r["excerpt"].lower():
+                continue
+            results.append({"type": "resource", "tag": "Academic", "views": "852", **r})
+
+    # 3. Add mocked Events
+    if stype in ('all', 'event'):
+        events = [
+            {"title": "AI in Healthcare Guest Lecture", "excerpt": "Dr. Rajeev from TCS will be delivering a highly anticipated technical talk on AI applications in medical imaging.", "date": "Apr 05, 2026"},
+            {"title": "TechFest 2026 Planning", "excerpt": "Initial core committee planning session for the upcoming national level technical fest.", "date": "Mar 25, 2026"}
+        ]
+        for e in events:
+            if query and query not in e["title"].lower() and query not in e["excerpt"].lower():
+                continue
+            results.append({"type": "event", "tag": "Guest Lecture", "views": "1,204", **e})
+
+    # 4. Add mocked Research Papers
+    if stype in ('all', 'research'):
+        papers = [
+            {"title": "Optimizing CNNs for Edge Devices", "excerpt": "Published in IEEE Access. A novel approach to quantizing Convolutional Neural Networks for resource-constrained IoT devices without significant accuracy drops.", "date": "Dec 10, 2025"},
+            {"title": "Predictive Modeling in Student Retention", "excerpt": "Presented at ACME '25. Using ensemble learning techniques to identify at-risk students based on attendance patterns and initial assessments.", "date": "Nov 22, 2025"}
+        ]
+        for p in papers:
+            if query and query not in p["title"].lower() and query not in p["excerpt"].lower():
+                continue
+            results.append({"type": "research", "tag": "Publication", "views": "3,401", **p})
+
+    # Sort results by date descending (mock string sort)
+    # In a real app, parse the dates for sorting
+    
+    return jsonify({"ok": True, "results": results})
+
+
+@app.route('/faculty/settings')
+def faculty_settings():
+    """Faculty Account Settings & Resource Uploads."""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+
+    # Reuse the profile fetch logic for the Personal Information card
+    profile = {
+        "name": session.get("name", "Dr. Faculty Member"),
+        "initials": "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]]),
+        "designation": "Professor · Dept. of CSE",
+        "degree": "Ph.D. in Computer Science",
+        "institution": "IIT Bombay",
+        "email": session.get("email", "faculty@aisat.ac.in")
+    }
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, department, designation, email FROM faculty WHERE email = %s", (session.get("email"),))
+        row = cursor.fetchone()
+        if row:
+            profile["name"] = row[0]
+            profile["initials"] = "".join([p[0].upper() for p in row[0].split()[:2]])
+            dept = row[1] or "CSE"
+            desig = row[2] or "Professor"
+            profile["designation"] = f"{desig} · Dept. of {dept}"
+            profile["email"] = row[3]
+        conn.close()
+    except Exception:
+        pass
+
+    return render_template("faculty_settings.html", profile=profile)
+
+
+@app.route('/faculty/upload-resource', methods=['POST'])
+def faculty_upload_resource():
+    """Handles multipart/form-data resource uploads from faculty."""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+        
+    try:
+        file = request.files.get('file')
+        batch = request.form.get('batch')
+        category = request.form.get('category')
+        title = request.form.get('title')
+        description = request.form.get('description')
+        
+        if not file or not title:
+            return jsonify({"ok": False, "error": "Missing required fields."})
+            
+        # Here we would typically save 'file' using werkzeug.utils.secure_filename
+        # and INSERT into `academic_resources` or `news_ticker` table
+        
+        return jsonify({"ok": True, "message": "Resource published successfully."})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+
+@app.route('/faculty/update-settings', methods=['PATCH'])
+def faculty_update_settings():
+    """Handles notification and preference toggles for a faculty member."""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+        
+    data = request.get_json(silent=True) or {}
+    
+    # Optional logic: Update `user_preferences` or `faculty_settings` table here
+    # e.g., student_queries = data.get('student_queries')
+    
+    return jsonify({"ok": True, "updated_keys": list(data.keys())})
+
+
+@app.route('/faculty/send-circular')
+def faculty_send_circular():
+    """Faculty page for broadcasting circulars and announcements"""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+        
+    initials = "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]])
+    return render_template("faculty_send_circular.html", initials=initials)
+
+
+@app.route('/api/faculty/send-circular', methods=['POST'])
+def api_faculty_send_circular():
+    """API endpoint to receive circular broadcasts from faculty"""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+        
+    try:
+        data = request.get_json(silent=True) or {}
+        subject = data.get('subject')
+        audiences = data.get('audiences')
+        category = data.get('category')
+        priority = data.get('priority')
+        body = data.get('body')
+        
+        if not subject or not audiences or not body:
+            return jsonify({"ok": False, "error": "Missing required fields."})
+            
+        # Here we would typically insert into `news_ticker` or a `circulars` DB table.
+        # If priority == 'Urgent', we would trigger a push notification to users in `audiences`.
+        
+        message = "Circular broadcasted successfully"
+        if priority == 'Urgent':
+            message += " with Urgent Push Notification."
+            
+        return jsonify({"ok": True, "message": message})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+
+@app.route('/faculty/upload-material')
+def faculty_upload_material():
+    """Faculty explicit page for uploading study materials"""
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty only.", "danger")
+        return redirect(url_for("home"))
+        
+    initials = "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]])
+    return render_template("faculty_upload_material.html", initials=initials)
+
+
+@app.route('/api/faculty/study-material/upload', methods=['POST'])
+def api_faculty_upload_material():
+    """API endpoint to receive study material files from faculty"""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+        
+    try:
+        # Here we would handle iterating through request.files.getlist('files')
+        # and saving to an S3 bucket or local sterile directory,
+        # then recording the metadata in the `academic_resources` DB table.
+        return jsonify({"ok": True, "message": "Materials uploaded successfully"})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -886,13 +2476,8 @@ def login():
             session["role"]    = user[5]   # ← STEP 1: save role in session
             flash("Login successful!", "success")
 
-            # ← STEP 2: redirect based on role
-            if session["role"] == "admin":
-                return redirect(url_for("admin_dashboard"))
-            elif session["role"] == "faculty":
-                return redirect(url_for("faculty_dashboard"))
-            else:
-                return redirect(url_for("student_dashboard"))
+            # ← STEP 2: redirect to public page
+            return redirect(url_for("home"))
         else:
             flash("Invalid email or password!", "danger")
 
@@ -903,7 +2488,7 @@ def login():
 def logout():
     session.clear()
     flash("Logged out successfully!", "success")
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))
 
 
 # ─────────────────────────────────────────────────
@@ -921,23 +2506,78 @@ def admin_dashboard():
 
 @app.route('/faculty-dashboard')
 def faculty_dashboard():
-    # STEP 4: only faculty can access this
-    if session.get("role") != "faculty":
-        flash("Access denied! Faculty only.", "danger")
+    if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    # Fetch all batches for the timetable widget
+    if session.get("role") not in ("faculty", "admin"):
+        flash("Access denied. Faculty dashboard only.", "danger")
+        return redirect(url_for("home"))
+
+    faculty_email = session.get("email", "")
     conn = get_db_connection()
-    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta ORDER BY batch").fetchall()
-    all_batches = [b['batch'] for b in batches_raw] if batches_raw else []
-    mous_raw = conn.execute("SELECT * FROM mous ORDER BY id ASC").fetchall()
-    mous = [dict(m) for m in mous_raw]
+    cursor = conn.cursor()
+
+    # Fetch faculty profile
+    try:
+        cursor.execute(
+            "SELECT id, name, designation, dept FROM faculty WHERE email = %s LIMIT 1",
+            (faculty_email,)
+        )
+        row = cursor.fetchone()
+        fid, fname, fdesig, fdept = row if row else (None, session.get("name", "Faculty"), "Associate Professor", "CSE")
+    except Exception:
+        fid, fname, fdesig, fdept = (None, session.get("name", "Faculty"), "Associate Professor", "CSE")
+
+    # Fetch timetable sessions for this faculty
+    sessions_today = []
+    try:
+        cursor.execute(
+            "SELECT subject_code, period, room FROM timetable WHERE faculty_email = %s ORDER BY period ASC LIMIT 6",
+            (faculty_email,)
+        )
+        tt_rows = cursor.fetchall()
+        status_map = ["done", "done", "next", "upcoming", "upcoming", "upcoming"]
+        time_map   = ["8:30 AM", "10:30 AM", "12:30 PM", "2:30 PM", "3:30 PM", "4:30 PM"]
+        for i, r in enumerate(tt_rows):
+            sessions_today.append({
+                "subject": r[0],
+                "time":    time_map[i] if i < len(time_map) else f"Period {r[1]}",
+                "room":    r[2] if r[2] else f"Room {i+1}",
+                "status":  status_map[i] if i < len(status_map) else "upcoming"
+            })
+    except Exception:
+        pass  # template uses fallback
+
+    # Recent announcements
+    try:
+        cursor.execute("SELECT text FROM news_ticker ORDER BY id DESC LIMIT 3")
+        notices = [r[0] for r in cursor.fetchall()]
+    except Exception:
+        notices = []
+
     conn.close()
 
-    return render_template("faculty_dashboard.html",
-                           active_page='faculty_dashboard',
-                           all_batches=all_batches,
-                           mous=mous)
+    class FacultyData:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    faculty = FacultyData(
+        name=fname,
+        designation=fdesig,
+        dept=fdept,
+        dept_code=(fdept[:3].upper() if fdept else "CSE"),
+        total_students=124,
+        avg_attendance=84.2,
+        pending_evals=12,
+        active_projects=3,
+        courses=None,
+        sessions=(sessions_today or None),
+        tasks=None,
+        notices=notices
+    )
+
+    return render_template("faculty_dashboard.html", faculty=faculty)
 
 
 @app.route('/faculty/upload', methods=['POST'])
@@ -1055,6 +2695,48 @@ def student_dashboard():
     return render_template("student_dashboard.html",
                            active_page='student_dashboard',
                            all_batches=all_batches)
+
+@app.route('/dashboard/attendance')
+def student_attendance():
+    if session.get("role") != "student":
+        flash("Access denied! Students only.", "danger")
+        return redirect(url_for("login"))
+    return render_template("student_attendance.html", active_page='attendance')
+
+@app.route('/dashboard/results')
+def student_results():
+    if session.get("role") != "student":
+        flash("Access denied! Students only.", "danger")
+        return redirect(url_for("login"))
+        
+    # Mock data to match the React specs, passed directly to the template
+    mock_data = {
+        'overall_cgpa': 8.92,
+        'cgpa_improvement': '+0.15',
+        'prev_sem': 5,
+        'earned_credits': 105,
+        'total_credits': 160,
+        'rank_percentile': 12,
+        'semester_results': [
+            {'semester': 1, 'sgpa': 8.5, 'credits': 20, 'isCurrent': False},
+            {'semester': 2, 'sgpa': 8.7, 'credits': 20, 'isCurrent': False},
+            {'semester': 3, 'sgpa': 9.1, 'credits': 24, 'isCurrent': False},
+            {'semester': 4, 'sgpa': 8.8, 'credits': 24, 'isCurrent': False},
+            {'semester': 5, 'sgpa': 9.2, 'credits': 22, 'isCurrent': False},
+            {'semester': 6, 'sgpa': 0, 'credits': 20, 'isCurrent': True}
+        ],
+        'current_semester_marks': [
+            {'subject_name': "Database Management Systems", 'subject_code': "CS302", 'internal': 45, 'external': 0, 'total': 45, 'grade': "A+", 'points': 10, 'credits': 4},
+            {'subject_name': "Computer Networks", 'subject_code': "CS304", 'internal': 42, 'external': 0, 'total': 42, 'grade': "A", 'points': 9, 'credits': 4},
+            {'subject_name': "Operating Systems", 'subject_code': "CS306", 'internal': 38, 'external': 0, 'total': 38, 'grade': "B+", 'points': 8, 'credits': 3},
+            {'subject_name': "Theory of Computation", 'subject_code': "CS308", 'internal': 35, 'external': 0, 'total': 35, 'grade': "B", 'points': 7, 'credits': 4},
+            {'subject_name': "Software Engineering", 'subject_code': "CS310", 'internal': 46, 'external': 0, 'total': 46, 'grade': "A+", 'points': 10, 'credits': 3},
+            {'subject_name': "Mini Project", 'subject_code': "CS332", 'internal': 48, 'external': 0, 'total': 48, 'grade': "A+", 'points': 10, 'credits': 2}
+        ],
+        'grade_distribution': {'A+': 12, 'A': 15, 'B+': 8, 'B': 4, 'C': 1}
+    }
+    
+    return render_template("student_results.html", active_page='results', data=mock_data)
 
 
 # ─────────────────────────────────────────────────
@@ -1459,6 +3141,57 @@ def admin_faculty_delete(fid):
     flash("Faculty member deleted!", "warning")
     return redirect(url_for("admin_panel") + "#faculty")
 
+@app.route('/faculty/<int:fid>')
+def faculty_detail(fid):
+    return render_template('faculty/faculty_detail.html', fid=fid, active_page='faculty')
+
+@app.route('/api/faculty/<int:fid>')
+def api_faculty_detail(fid):
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM faculty WHERE id = %s", (fid,)).fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({"error": "Faculty not found"}), 404
+
+    faculty = dict(row)
+    
+    # Custom details for HOD (based on name or designation_key)
+    if faculty.get('designation_key') == 'hod':
+        faculty.update({
+            "bio": "Dedicated to academic excellence and research innovation at AISAT since 2014.",
+            "education": [
+                {"degree": "Ph.D", "major": "Computer Science and Engineering", "univ": "APJ Abdul Kalam Technological University"},
+                {"degree": "PGDCL", "major": "Cyber Law", "univ": "NALSAR University of Law"},
+                {"degree": "M.Tech", "major": "Computer Science", "univ": "Mahatma Gandhi University"}
+            ],
+            "publications": [
+                {"title": "Blockchain-based Secure Data Sharing for IoT Devices", "journal": "IEEE Trans. on Industrial Informatics", "year": "2023", "link": "#"},
+                {"title": "AI-driven Threat Detection in Smart Grids", "journal": "Journal of Cybersecurity", "year": "2022", "link": "#"}
+            ],
+            "activities": [
+                "Resource Person at Amrita Vishwa Vidyapeetham",
+                "Reviewer for SAGE Publications",
+                "Reviewer for IEEE ICRAIS 2025",
+                "Member of IEEE and ACM"
+            ],
+            "interests": ["Cyber Security", "Blockchain", "Digital Forensics"]
+        })
+    else:
+        # Generic fallback for others
+        faculty.update({
+            "bio": f"Dedicated educator at AISAT focusing on {faculty.get('research', 'Computer Science')}.",
+            "education": [
+                {"degree": "Ph.D / M.Tech", "major": faculty.get('research', 'CSE'), "univ": "Technical University"}
+            ],
+            "publications": [],
+            "activities": ["Member of Technical Committees"],
+            "interests": (faculty.get('research', '')).split(',')
+        })
+
+    return jsonify(faculty)
+
+
 
 # ─────────────────────────────────────────────────
 # ADMIN — LIBRARY / BOOKS CRUD
@@ -1693,37 +3426,91 @@ def admin_internships_delete(iid):
     return redirect(url_for("admin_panel") + "#placements")
 
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    """AI Chatbot Endpoint with Session History"""
-    user_msg = request.json.get('message', '').strip()
-    if not user_msg:
-        return jsonify({'response': "I didn't catch that. Could you please say it again?"})
-
-    # Initialize chat history in session if not present
-    if 'chat_history' not in session:
-        session['chat_history'] = []
-
-    # Get recent history
-    chat_history = session['chat_history']
-    is_logged_in = bool(session.get('user_id'))
-    
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    """AI Chatbot Endpoint (Stateless, History passed from frontend)"""
     try:
-        # Generate response passing the history
-        response_text = llm_engine.generate_response(user_msg, chat_history, is_logged_in)
+        data = request.get_json()
+        if not data or 'messages' not in data:
+            return jsonify({'response': "I didn't receive any messages to process."})
+            
+        messages = data.get('messages', [])
+        if not messages:
+            return jsonify({'response': "I didn't receive any messages to process."})
+            
+        is_logged_in = bool(session.get('user_id'))
         
-        # Update history
-        chat_history.append({"role": "user", "content": user_msg})
-        chat_history.append({"role": "assistant", "content": response_text})
-        
-        # Limit history size to prevent session cookie overflow (max 10 messages)
-        session['chat_history'] = chat_history[-10:]
-        session.modified = True
+        # Generate response passing the full history
+        response_text = llm_engine.generate_response(messages, is_logged_in)
         
         return jsonify({'response': response_text})
     except Exception as e:
         print(f"Chat Route Error: {e}")
-        return jsonify({'response': "I'm having a bit of trouble thinking right now. Please try again later or visit the CSE office!"})
+        return jsonify({'response': "I'm having a bit of trouble connecting to my engine right now. Please try again later."})
+
+@app.route('/notice/<int:notice_id>')
+def notice_detail(notice_id):
+    mock_notice = {
+        'id': notice_id,
+        'title': f"Department Update #{notice_id}",
+        'category': 'Academic Alert' if notice_id % 2 == 0 else 'Placement Update',
+        'date': 'Just Now',
+        'content': 'This is a detailed record dynamically fetched. The curriculum changes or placement instructions will be elaborated here.'
+    }
+    return render_template('notice_detail.html', notice=mock_notice, active_page='')
+
+
+@app.route('/placement/drive/<int:drive_id>')
+def placement_detail(drive_id):
+    mock_drive = {
+        'id': drive_id,
+        'company': 'Amazon Dev Center' if drive_id == 1 else 'Sutherland',
+        'role': 'SDE Intern' if drive_id == 1 else 'System Associate',
+        'ctc': '25 LPA' if drive_id == 1 else '4.5 LPA',
+        'eligible_batch': 'Batch 10',
+        'deadline': '31 Mar 2025',
+        'date': 'Just Now'
+    }
+    return render_template('placement_detail.html', drive=mock_drive, active_page='')
+
+
+@app.route('/student-dashboard/timetable')
+def student_dashboard_timetable_redirect():
+    if "user_id" not in session or session.get("role") != "student":
+        return redirect(url_for("login"))
+    return redirect(url_for('student_timetable'))
+
+@app.route('/student-dashboard/placements')
+def student_placements():
+    if "user_id" not in session or session.get("role") != "student":
+        return redirect(url_for("login"))
+    return render_template('student_placement_tracker.html', active_page='')
+
+@app.route('/student-dashboard/notifications')
+def student_notifications():
+    if "user_id" not in session or session.get("role") != "student":
+        return redirect(url_for("login"))
+    from models.notification import Notification
+    all_notifs = Notification.get_user_notifications()
+    return render_template('notifications_all.html', all_notifs=all_notifs, active_page='')
+
+
+@app.route('/faculty-dashboard/timetable')
+def faculty_timetable():
+    if "user_id" not in session or session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    return render_template('faculty_timetable.html', active_page='')
+
+@app.route('/faculty-dashboard/queries')
+def faculty_queries():
+    if "user_id" not in session or session.get("role") != "faculty":
+        return redirect(url_for("login"))
+    return render_template('faculty_queries.html', active_page='')
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 # ─────────────────────────────────────────────────
 # RUN

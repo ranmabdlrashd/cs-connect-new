@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Contact & Support - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+
+  <!-- THE HERO -->
+  <section class="contact-hero fade-up">
+    <h1 class="ch-title">Get in Touch</h1>
+    <p class="ch-sub">Reach out to the Department of Computer Science & Engineering for academic advising, placement inquiries, and admissions info.</p>
+  </section>
+
+  <div class="contact-container fade-up" style="animation-delay: 0.1s;">
+    
+    <!-- LEFT: MULTI-CHANNEL SUPPORT -->
+    <div class="support-channels">
+      
+      <!-- Admissions -->
+      <div class="channel-card">
+        <div class="cc-icon">🎓</div>
+        <h3 class="cc-title">Admissions Helpdesk</h3>
+        <p class="cc-desc">Seek guidance regarding B.Tech eligibility, transfer paths, and the new curriculum.</p>
+        <a href="#" class="cc-action">CSE Admissions 2024-25 &rarr;</a>
+      </div>
+
+      <!-- Placements -->
+      <div class="channel-card" style="border-left-color: #F5E6BE;">
+        <div class="cc-icon">💼</div>
+        <h3 class="cc-title">Placement Inquiries</h3>
+        <p class="cc-desc">Corporate partners and talent acquisition teams can directly connect with our dedicated placement cell.</p>
+        <a href="/placement" class="cc-action" style="background: rgba(245,230,190,0.1); color: #F5E6BE; border-color: rgba(245,230,190,0.3);">Recruiter Connect &rarr;</a>
+      </div>
+
+      <!-- Office Map -->
+      <div class="channel-card map-card">
+        <!-- Google Map embed for AISAT Kalamassery using simple CSS filter to keep it dark themed -->
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.618037130985!2d76.32170661479446!3d10.048325992817882!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080c3a268e33eb%3A0x6b4fb835e5d3fa96!2sAlbertian%20Institute%20of%20Science%20and%20Technology%20(AISAT)!5e0!3m2!1sen!2sin!4v1700000000000" 
+          allowfullscreen="" loading="lazy">
+        </iframe>
+        <div class="map-info">
+          <h3 class="cc-title" style="font-size:18px;">Visit the Office</h3>
+          <p class="cc-desc">Archbishop Angel Mary Nagar, Cochin University P. O., Kalamassery, Kochi - 682022</p>
+          <div class="dept-hours">
+            <strong>Department Hours</strong>
+            Mon-Fri, 9:00 AM - 4:30 PM
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: THE SMART FORM -->
+    <div class="smart-form-container">
+      <h2 class="sf-title">Send a Message</h2>
+      <p class="sf-sub">Fill out the smart form below. Our response team aims to reply within 24 hours.</p>
+
+      <form id="contactForm" onsubmit="handleContactSubmit(event)" novalidate>
+        
+        <div class="form-group" id="fg-name">
+          <label>Full Name</label>
+          <input type="text" class="form-control" id="cf_name" placeholder="John Doe">
+          <span class="error-msg">Required</span>
+        </div>
+
+        <div class="form-group" id="fg-email">
+          <label>Email Address</label>
+          <input type="email" class="form-control" id="cf_email" placeholder="john@example.com">
+          <span class="error-msg">Valid Email Required</span>
+        </div>
+
+        <div class="form-group">
+          <label>Select Category</label>
+          <select class="form-control" style="appearance: none;">
+            <option>Placement Inquiry</option>
+            <option>Academic Advising</option>
+            <option>General Support</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="fg-msg">
+          <label>Message</label>
+          <textarea class="form-control" id="cf_msg" placeholder="How can we help you?"></textarea>
+          <span class="error-msg">Message cannot be empty</span>
+        </div>
+
+        <button type="submit" class="submit-btn" id="cf_submit">
+          <span class="spinner"></span>
+          <span class="btn-text">Send Message</span>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Simple validation & interaction logic
+  function handleContactSubmit(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('cf_name');
+    const email = document.getElementById('cf_email');
+    const msg = document.getElementById('cf_msg');
+    
+    let isValid = true;
+    
+    // Reset errors
+    document.querySelectorAll('.form-group').forEach(el => el.classList.remove('has-error'));
+    document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+
+    if(!name.value.trim()) {
+      document.getElementById('fg-name').classList.add('has-error');
+      name.classList.add('error');
+      isValid = false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(email.value)) {
+      document.getElementById('fg-email').classList.add('has-error');
+      email.classList.add('error');
+      isValid = false;
+    }
+    
+    if(!msg.value.trim()) {
+      document.getElementById('fg-msg').classList.add('has-error');
+      msg.classList.add('error');
+      isValid = false;
+    }
+
+    if(isValid) {
+      const btn = document.getElementById('cf_submit');
+      const btnText = btn.querySelector('.btn-text');
+      
+      // Sending Animation
+      btn.classList.add('loading');
+      btn.disabled = true;
+      btnText.innerText = 'Sending...';
+      
+      // Simulate API Call
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        btn.style.background = '#2ecc71';
+        btn.style.color = '#fff';
+        btnText.innerText = 'Message Sent ✓';
+        
+        // Reset form
+        document.getElementById('contactForm').reset();
+        
+        // Restore button after 3s
+        setTimeout(() => {
+          btn.style.background = '';
+          btn.disabled = false;
+          btnText.innerText = 'Send Message';
+        }, 3000);
+      }, 1500);
+    }
+  }
+
+  // Fade Up
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.fade-up').forEach(el => {
+      setTimeout(() => {
+        el.style.opacity = 1;
+        el.style.transform = 'translateY(0)';
+      }, 50);
+    });
+  });
+</script>
+{% endblock %}

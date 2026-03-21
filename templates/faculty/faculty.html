@@ -1,96 +1,257 @@
 {% extends "base.html" %}
 
-{% block title %}Faculty | CS Connect{% endblock %}
+{% block title %}Faculty | CS Connect · AISAT{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty.css') }}" />
 {% endblock %}
 
 {% block content %}
+<div class="faculty-page">
 
-<!-- Page Header -->
-<section class="page-header">
-  <div class="header-overlay">
-    <h1>Faculty &amp; Staff</h1>
-    <p>Meet our distinguished team of educators and researchers</p>
+  {# --- 2.1 BREADCRUMB --- #}
+  <div class="faculty-breadcrumb">
+    <a href="/">Home</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-active">Faculty</span>
   </div>
-</section>
 
-<!-- Filter Section -->
-<section class="filter-section">
-  <div class="container">
-    <div class="filter-bar">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search by name..." />
-      </div>
-      <div class="filter-buttons">
-        <button class="filter-btn active" data-filter="all">All Faculty</button>
-        <button class="filter-btn" data-filter="hod">Head of Department</button>
-        <button class="filter-btn" data-filter="assistant">Assistant Professors</button>
-      </div>
+  {# --- 2.2 PAGE HERO --- #}
+  <section class="faculty-hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING</div>
+      <h1 class="hero-title">Our Faculty</h1>
+      <p class="hero-subtitle">
+        A team of dedicated educators, researchers, and industry experts committed to shaping
+        the next generation of engineers through academic excellence and innovation.
+      </p>
+    </div>
+  </section>
+
+  {# --- 2.2 FILTER & SEARCH --- #}
+  <div class="filter-sticky">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="tab-btn active" data-filter="all">All</button>
+      <button class="tab-btn" data-filter="hod">Leadership</button>
+      <button class="tab-btn" data-filter="prof">Professors</button>
+      <button class="tab-btn" data-filter="asst">Assistant Professors</button>
+      <button class="tab-btn" data-filter="staff">Lab Staff</button>
+    </div>
+    <div class="search-wrapper">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="facultySearch" placeholder="Search by name or specialization...">
     </div>
   </div>
-</section>
 
-<!-- Faculty Grid -->
-<section class="faculty-section">
-  <div class="container">
-    <div class="section-header">
-      <h2>Our Faculty</h2>
-      <div class="header-line"></div>
-    </div>
+  {# --- 2.3 HOD FEATURE --- #}
+  <section class="faculty-spotlight" id="hodSection" style="display: none;">
+    <!-- Rendered by JS -->
+  </section>
+
+  {# --- 2.4 FACULTY GRID --- #}
+  <main class="faculty-container">
     <div class="faculty-grid" id="facultyGrid">
-      {% for member in faculty %}
-      <div class="faculty-card reveal" data-designation="{{ member.designation_key }}">
-        <div class="faculty-photo">
-          <img src="{{ member.photo }}" alt="{{ member.name }}" />
-          <div class="photo-overlay">
-            <button class="view-profile-btn">View Profile</button>
-          </div>
-        </div>
-        <div class="faculty-info">
-          <h3>{{ member.name }}</h3>
-          <span class="designation">{{ member.designation }}</span>
-          <div class="qualification">{{ member.qualification }}</div>
-          <div class="experience"><i class="fas fa-briefcase"></i> Joined: {{ member.joined }}</div>
-          <div class="research-interests"><strong>Research:</strong> {{ member.research }}</div>
-          <div class="contact-info">
-            <div class="contact-item"><i class="fas fa-envelope"></i> {{ member.email }}</div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+      <!-- Rendered by JS -->
     </div>
-    <div class="no-results" id="noResults" style="display: none">
-      <i class="fas fa-search"></i>
-      <h3>No faculty members found</h3>
-      <p>Try adjusting your search or filter criteria</p>
-    </div>
-  </div>
-</section>
 
-<!-- Instructors / Staff -->
-<section class="staff-section">
-  <div class="container">
-    <div class="section-header">
-      <h2>Instructors</h2>
-      <div class="header-line"></div>
+    {# No Results State #}
+    <div class="no-results" id="noResults">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <p>No faculty members match your criteria.</p>
     </div>
-    <div class="staff-grid">
-      {% for staff in staff_members %}
-      <div class="staff-card reveal">
-        <div class="staff-icon"><i class="{{ staff.icon }}"></i></div>
-        <h3>{{ staff.name }}</h3>
-        <span class="role">{{ staff.role }}</span>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+  </main>
 
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/faculty.js') }}"></script>
+<script>
+/**
+ * FACULTY LISTING ENGINE
+ * Handles API fetching, real data fallbacks, and multi-criteria filtering.
+ */
+
+const FALLBACK_DATA = [
+  {
+    id: 101,
+    name: "Dr. Jeswin Roy Dcouth",
+    designation: "HoD & Associate Professor",
+    designation_key: "hod",
+    qualification: "Ph.D. CSE, PGDCL",
+    research: "Cyber Security, Digital Forensics",
+    email: "jeswinroy@aisat.ac.in",
+    photo: null
+  },
+  {
+    id: 102,
+    name: "Prof. Divya Mohan",
+    designation: "Associate Professor",
+    designation_key: "prof",
+    qualification: "M.Tech, Ph.D Researcher",
+    research: "Data Science, Machine Learning",
+    email: "divyamohan@aisat.ac.in",
+    photo: null
+  },
+  {
+    id: 103,
+    name: "Prof. Chinnu Edwin A",
+    designation: "Assistant Professor",
+    designation_key: "asst",
+    qualification: "M.Tech",
+    research: "Cloud Computing, Networking",
+    email: "chinnu.edwin@aisat.ac.in",
+    photo: null
+  },
+  {
+    id: 104,
+    name: "Ms. Nisy John Panicker",
+    designation: "Assistant Professor (Sr.S)",
+    designation_key: "asst",
+    qualification: "M.Tech",
+    research: "Image Processing",
+    email: "nisyjohn@aisat.ac.in",
+    photo: null
+  },
+  {
+    id: 105,
+    name: "Ms. Lima Sebastian",
+    designation: "Assistant Professor",
+    designation_key: "asst",
+    qualification: "M.Tech",
+    research: "Compiler Design",
+    email: "limaseb@aisat.ac.in",
+    photo: null
+  },
+  {
+    id: 106,
+    name: "Ms. Teenu Jose",
+    designation: "Assistant Professor",
+    designation_key: "asst",
+    qualification: "M.Tech",
+    research: "Software Engineering",
+    email: "teenu.jose@aisat.ac.in",
+    photo: null
+  }
+];
+
+let allFaculty = [];
+let activeFilter = 'all';
+let searchQuery = '';
+
+async function initFaculty() {
+  const grid = document.getElementById('facultyGrid');
+  const hodSection = document.getElementById('hodSection');
+
+  try {
+    const res = await fetch('/api/faculty');
+    const data = await res.json();
+    allFaculty = (data && data.length > 0) ? data : FALLBACK_DATA;
+  } catch (err) {
+    console.warn("Using fallback faculty data:", err);
+    allFaculty = FALLBACK_DATA;
+  }
+
+  renderFaculty();
+  setupEventListeners();
+}
+
+function renderFaculty() {
+  const grid = document.getElementById('facultyGrid');
+  const hodSection = document.getElementById('hodSection');
+  const noResults = document.getElementById('noResults');
+
+  // 1. Filter data
+  const filtered = allFaculty.filter(f => {
+    const matchesTab = activeFilter === 'all' || f.designation_key === activeFilter;
+    const matchesSearch = !searchQuery || 
+                         f.name.toLowerCase().includes(searchQuery) || 
+                         (f.research && f.research.toLowerCase().includes(searchQuery));
+    return matchesTab && matchesSearch;
+  });
+
+  // 2. Handle HOD (Priority Spotlight)
+  const hod = allFaculty.find(f => f.designation_key === 'hod');
+  if (hod && activeFilter === 'all' && !searchQuery) {
+    hodSection.style.display = 'block';
+    hodSection.innerHTML = `
+      <div class="hod-card">
+        ${hod.photo ? `<img src="${hod.photo}" class="hod-avatar" alt="${hod.name}">` : `<div class="hod-avatar-initials">${getInitials(hod.name)}</div>`}
+        <div class="hod-content">
+          <div class="hod-tag">Head of Department</div>
+          <h2 class="hod-name">${hod.name}</h2>
+          <div class="hod-qual">${hod.qualification}<br>${hod.research || ''}</div>
+          <a href="/faculty/${hod.id || ''}" class="hod-btn">View Full Profile →</a>
+        </div>
+      </div>
+    `;
+  } else {
+    hodSection.style.display = 'none';
+  }
+
+  // 3. Render Grid
+  grid.innerHTML = '';
+  // Skip the HOD if we are in 'all' view and it's already shown in spotlight
+  const gridItems = (activeFilter === 'all' && !searchQuery) 
+                   ? filtered.filter(f => f.designation_key !== 'hod')
+                   : filtered;
+
+  if (gridItems.length === 0) {
+    noResults.style.display = 'block';
+  } else {
+    noResults.style.display = 'none';
+    gridItems.forEach(f => {
+      const card = document.createElement('a');
+      card.href = `/faculty/${f.id}`;
+      card.className = 'faculty-card';
+      card.innerHTML = `
+        <div class="card-avatar-box">
+          ${f.photo ? `<img src="${f.photo}" class="card-img" alt="${f.name}">` : `<div class="card-initials">${getInitials(f.name)}</div>`}
+        </div>
+        <div class="card-name">${f.name}</div>
+        <div class="card-designation">${f.designation}</div>
+        <div class="card-qual">${f.qualification}</div>
+        <div class="card-tags">
+          ${(f.research || '').split(',').map(tag => tag.trim() ? `<span class="tag">${tag.trim()}</span>` : '').join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+}
+
+function setupEventListeners() {
+  const searchInput = document.getElementById('facultySearch');
+  const tabs = document.querySelectorAll('.tab-btn');
+
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase();
+    renderFaculty();
+  });
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeFilter = tab.dataset.filter;
+      renderFaculty();
+    });
+  });
+}
+
+function getInitials(name) {
+  return name.split(' ')
+             .filter(n => !n.includes('.')) // skip Dr., Prof.
+             .map(n => n[0])
+             .slice(0, 2)
+             .join('')
+             .toUpperCase() || name[0];
+}
+
+initFaculty();
+</script>
 {% endblock %}

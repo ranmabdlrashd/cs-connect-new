@@ -1,304 +1,286 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Faculty Dashboard — CS Connect{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty_dashboard.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="dash-wrapper">
 
-{% block title %}Faculty Dashboard - CS Connect{% endblock %}
-
-{% block content %}
-<div style="max-width:900px; margin: 60px auto; padding: 20px;">
-
-    <h1 style="color: var(--primary-red); margin-bottom: 10px; display: none;">
-        🎓 Faculty Dashboard
-    </h1>
-    <p>Welcome, <strong>{{ session.get('name') }}</strong>! You are logged in as <strong>Faculty</strong>.</p>
-
-    <hr style="margin: 20px 0;">
-
-    <!-- Quick Links (Tiles) -->
-    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
-        <div onclick="togglePanel('courses-panel')"
-            style="background:#3498db; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
-            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <h2>📚</h2>
-            <p>Manage Courses</p>
-        </div>
-        <div onclick="togglePanel('announcements-panel')"
-            style="background:#9b59b6; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s;"
-            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <h2>💬</h2>
-            <p>Announcements</p>
-        </div>
-        <a href="{{ url_for('timetable') }}"
-            style="background:#e67e22; color:#fff; border-radius:10px; padding:25px; flex:1; text-align:center; cursor:pointer; min-width:150px; transition: transform 0.2s; text-decoration:none;"
-            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <h2>📅</h2>
-            <p>Timetable</p>
-        </a>
+  <!-- ═══════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
     </div>
 
-    <!-- Timetable Quick Access -->
-    <div
-        style="background:#fff; border-radius:10px; padding:25px; margin-bottom:30px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border-top:4px solid #e67e22;">
-        <h2 style="color:#e67e22; margin-top:0;">📅 Class Timetables</h2>
-        <p style="color:#666; font-size:14px; margin-bottom:16px;">Quick access to all batch timetables</p>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px;">
-            {% for batch in all_batches %}
-            <a href="{{ url_for('timetable', batch=batch) }}"
-                style="display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#e67e22,#d35400); color:#fff; padding:14px 16px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.9rem; transition:transform .15s;"
-                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                📋 {{ batch }}
-            </a>
+    <nav class="nav-items">
+      <!-- Dashboard (Active) -->
+      <div class="nav-item active" data-tip="Dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <!-- My Classes -->
+      <div class="nav-item" data-tip="My Classes" onclick="location.href='/timetable'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <!-- Attendance Entry -->
+      <div class="nav-item" data-tip="Attendance Entry" onclick="location.href='/attendance-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <!-- Mark Entry -->
+      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <!-- Department Files -->
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <!-- Settings -->
+      <div class="nav-item" data-tip="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <!-- Avatar -->
+      <div class="user-avatar" title="{{ faculty.name if faculty else 'Faculty' }}">
+        {% if faculty and faculty.name %}
+          {{ faculty.name.split()[0][0] }}{{ faculty.name.split()[-1][0] if faculty.name.split()|length > 1 else '' }}
+        {% else %}
+          AR
+        {% endif %}
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════ -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect &middot; <b>Faculty Portal</b></span>
+      <div class="search-bar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" placeholder="Search..." />
+      </div>
+      <div class="notif-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="notif-dot"></span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      {% block faculty_content %}
+      <!-- Welcome Row -->
+      <div class="section-header">
+        <div>
+          <h1>Good Morning, {{ faculty.name if faculty else 'Dr. Anitha R.' }}</h1>
+          <div class="welcome-meta">
+            {{ faculty.designation if faculty else 'Associate Professor' }}
+            &middot; {{ faculty.dept if faculty else 'Computer Science & Engineering' }}
+            <span class="dept-badge">{{ faculty.dept_code if faculty else 'CSE' }}</span>
+          </div>
+        </div>
+        <div class="time-chip" id="live-time">—</div>
+      </div>
+
+      <!-- ══════════ BENTO GRID ══════════ -->
+      <div class="bento-grid">
+
+        <!-- 1. Total Students -->
+        <div class="card">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Total Students
+          </div>
+          <div class="card-value">{{ faculty.total_students if faculty else '124' }}</div>
+          <div class="card-sub" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Across all assigned batches</span>
+            <a href="/faculty/my-students" style="color:var(--accent-crimson); text-decoration:none; font-weight:600; font-size:11px;">View All &rarr;</a>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width: 72%;"></div></div>
+        </div>
+
+        <!-- 2. Average Attendance -->
+        <div class="card">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Avg Attendance
+          </div>
+          <div class="card-value">
+            {{ faculty.avg_attendance if faculty else '84.2' }}%
+            <span class="trend-up">&uarr; 1.4</span>
+          </div>
+          <div class="card-sub">vs last month average</div>
+          <div class="prog-bar"><div class="prog-fill" style="width: {{ faculty.avg_attendance if faculty else 84 }}%;"></div></div>
+        </div>
+
+        <!-- 3. Pending Evaluations -->
+        <div class="card warn-tint">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Pending Evaluations
+          </div>
+          <div class="card-value">{{ faculty.pending_evals if faculty else '12' }}</div>
+          <div class="card-sub">Mid-sem & assignment marks</div>
+        </div>
+
+        <!-- 4. Research / Active Labs -->
+        <div class="card">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"></path></svg>
+            Research / Labs
+          </div>
+          <div class="card-value">{{ faculty.active_projects if faculty else '3' }}</div>
+          <div class="card-sub">Active projects &amp; lab sessions</div>
+        </div>
+
+        <!-- 5. Active Courses (2-col wide) -->
+        <div class="card card-wide">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            Active Courses
+          </div>
+          <div class="course-list">
+            {% set courses = faculty.courses if faculty and faculty.courses else [
+              {'name': 'Data Structures', 'code': 'CS302', 'students': 62, 'coverage': 72},
+              {'name': 'Computer Networks', 'code': 'CS401', 'students': 58, 'coverage': 55},
+              {'name': 'Design & Analysis of Algorithms', 'code': 'CS303', 'students': 60, 'coverage': 68}
+            ] %}
+            {% for c in courses %}
+            <div class="course-item">
+              <div class="course-row">
+                <span class="course-name">{{ c.name }} <small style="color:#666;">({{ c.code }})</small></span>
+                <a href="/timetable" class="course-link">Manage &rarr;</a>
+              </div>
+              <div class="course-row">
+                <span class="course-meta">{{ c.students }} students &middot; {{ c.coverage }}% coverage</span>
+              </div>
+              <div class="coverage-bar"><div class="coverage-fill" style="width: {{ c.coverage }}%;"></div></div>
+            </div>
             {% endfor %}
+          </div>
         </div>
-    </div>
 
-    <!-- Hidden Action Panels -->
-    <!-- Manage Courses Panel -->
-    <div id="courses-panel"
-        style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #3498db;">
-        <h2 style="color:#3498db; display:flex; align-items:center; gap:10px; margin-top:0;">📚 Manage Courses</h2>
-        <p style="color:#666; font-size:14px;">Upload Study Materials, PYQs & Syllabus Update</p>
-
-        <form action="{{ url_for('faculty_upload') }}" method="POST" enctype="multipart/form-data"
-            style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
-            <div>
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Select Course *</label>
-                <select name="course" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;"
-                    required>
-                    <option value="">-- Choose Course --</option>
-                    <option value="cs101">Data Structures (CS101)</option>
-                    <option value="cs102">Operating Systems (CS102)</option>
-                    <option value="cs103">Database Systems (CS103)</option>
-                    <option value="cs104">Computer Networks (CS104)</option>
-                </select>
+        <!-- 6. Upcoming Sessions (tall card) -->
+        <div class="card card-tall">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Today's Sessions
+          </div>
+          <div class="session-list">
+            {% set sessions = faculty.sessions if faculty and faculty.sessions else [
+              {'time': '8:30 AM', 'subject': 'Data Structures', 'room': 'CS-101', 'status': 'done'},
+              {'time': '10:30 AM', 'subject': 'Computer Networks', 'room': 'CS-102', 'status': 'next'},
+              {'time': '12:30 PM', 'subject': 'DAA Lab', 'room': 'Lab-3', 'status': 'upcoming'},
+              {'time': '2:30 PM', 'subject': 'Research Group', 'room': 'Seminar Hall', 'status': 'upcoming'}
+            ] %}
+            {% for s in sessions %}
+            <div class="session-item">
+              <span class="sched-dot {{ s.status }}"></span>
+              <div class="session-body">
+                <div class="session-sub">{{ s.subject }}</div>
+                <div class="session-meta">{{ s.time }} &middot; Room {{ s.room }}</div>
+              </div>
+              {% if s.status == 'next' or s.status == 'upcoming' %}
+              <a href="/attendance-entry" class="attend-link">Mark</a>
+              {% endif %}
             </div>
-
-            <div>
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Material Type *</label>
-                <select name="material_type" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd;"
-                    required>
-                    <option value="">-- Choose Type --</option>
-                    <option value="notes">Class Notes</option>
-                    <option value="pyq">Previous Year Questions (PYQ)</option>
-                    <option value="syllabus">Update Syllabus</option>
-                </select>
-            </div>
-
-            <div>
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">File Upload *</label>
-                <input type="file" name="file"
-                    style="width:100%; padding:8px; border:1px dashed #ccc; border-radius:5px;" required>
-            </div>
-
-            <button type="submit"
-                style="background:#3498db; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer;">
-                Upload Material
-            </button>
-        </form>
-    </div>
-
-    <!-- Announcements Panel -->
-    <div id="announcements-panel"
-        style="display:none; background:#fff; border-radius:10px; padding:25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-top: 4px solid #9b59b6;">
-        <h2 style="color:#9b59b6; display:flex; align-items:center; gap:10px; margin-top:0;">💬 Announcements</h2>
-        <p style="color:#666; font-size:14px;">Add or Edit CSE Notices</p>
-
-        <form action="#" method="POST" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
-            <div>
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Announcement Title *</label>
-                <input type="text" name="title" placeholder="e.g. Rescheduled Lab Exam"
-                    style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box;"
-                    required>
-            </div>
-
-            <div>
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Details *</label>
-                <textarea name="description" rows="4" placeholder="Enter full details here..."
-                    style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd; box-sizing: border-box; resize: vertical;"
-                    required></textarea>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <button type="submit"
-                    style="background:#9b59b6; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; flex:1;">
-                    Post Announcement
-                </button>
-                <!-- Simulated "Edit" option link -->
-                <a href="#"
-                    style="background:#f1c40f; color:#fff; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; text-decoration:none; text-align:center; flex:1;">
-                    Manage Existing
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Active Notices (Preview) -->
-    <div style="background:#fff; border-radius:10px; padding:25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h2 style="margin-top:0;">Recent Notices (Preview)</h2>
-        <ul style="list-style:none; padding:0; margin:0;">
-            <li
-                style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <strong>Faculty meeting scheduled for 10th March at 10AM.</strong>
-                    <div style="font-size:12px; color:#888;">Posted 2 days ago</div>
-                </div>
-                <div>
-                    <a href="#" style="color:#3498db; text-decoration:none; margin-right:10px;">Edit</a>
-                    <a href="#" style="color:#e74c3c; text-decoration:none;">Delete</a>
-                </div>
-            </li>
-            <li
-                style="background:#f9f9f9; margin-bottom:10px; padding:15px; border-left:4px solid #9b59b6; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <strong>Submit internal assessment marks by 15th March.</strong>
-                    <div style="font-size:12px; color:#888;">Posted 5 days ago</div>
-                </div>
-                <div>
-                    <a href="#" style="color:#3498db; text-decoration:none; margin-right:10px;">Edit</a>
-                    <a href="#" style="color:#e74c3c; text-decoration:none;">Delete</a>
-                </div>
-            </li>
-        </ul>
-    </div>
-
-    <!-- MOU Management Panel -->
-    <div
-        style="background:#fff; border-radius:10px; padding:25px; margin-top:30px; box-shadow:0 4px 6px rgba(0,0,0,0.1); border-top:4px solid #1abc9c;">
-        <h2 style="color:#1abc9c; margin-top:0;">🤝 MOU Management</h2>
-        <p style="color:#666; font-size:14px; margin-bottom:16px;">Add, edit, or delete Memorandums of Understanding</p>
-
-        <!-- Add MOU Form -->
-        <form action="{{ url_for('faculty_mou_add') }}" method="POST"
-            style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:20px; padding:16px; background:#f8f9fa; border-radius:8px;">
-            <div style="flex:2; min-width:200px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Organization Name
-                    *</label>
-                <input type="text" name="organization" required placeholder="e.g. ICT Academy of Kerala"
-                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
-            </div>
-            <div style="flex:1; min-width:140px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Date of
-                    Signing</label>
-                <input type="text" name="date_of_signing" placeholder="DD-MM-YYYY"
-                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem; box-sizing:border-box;">
-            </div>
-            <div style="flex:0.5; min-width:100px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px; font-size:13px;">Status</label>
-                <select name="status"
-                    style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.9rem;">
-                    <option value="Active">Active</option>
-                    <option value="Expired">Expired</option>
-                </select>
-            </div>
-            <button type="submit"
-                style="background:#1abc9c; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer; white-space:nowrap;">
-                + Add MOU
-            </button>
-        </form>
-
-        <!-- MOU Table -->
-        <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
-                <thead>
-                    <tr style="background:#2c3e50; color:#fff;">
-                        <th style="padding:10px 12px; text-align:center; width:40px;">#</th>
-                        <th style="padding:10px 12px; text-align:left;">Organization</th>
-                        <th style="padding:10px 12px; text-align:center; width:120px;">Date</th>
-                        <th style="padding:10px 12px; text-align:center; width:80px;">Status</th>
-                        <th style="padding:10px 12px; text-align:center; width:120px;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for mou in mous %}
-                    <tr style="border-bottom:1px solid #eee;">
-                        <td style="padding:9px 12px; text-align:center; color:#888;">{{ loop.index }}</td>
-                        <td style="padding:9px 12px; font-weight:500;">{{ mou.organization }}</td>
-                        <td style="padding:9px 12px; text-align:center; color:#666;">{{ mou.date_of_signing }}</td>
-                        <td style="padding:9px 12px; text-align:center;">
-                            <span
-                                style="padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;
-                                {% if mou.status == 'Active' %}background:#d5f5e3; color:#27ae60;{% else %}background:#fadbd8; color:#e74c3c;{% endif %}">
-                                {{ mou.status }}
-                            </span>
-                        </td>
-                        <td style="padding:9px 12px; text-align:center; display:flex; gap:6px; justify-content:center;">
-                            <button
-                                onclick="openMouEdit({{ mou.id }}, '{{ mou.organization|e }}', '{{ mou.date_of_signing|e }}', '{{ mou.status }}')"
-                                style="background:#3498db; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">Edit</button>
-                            <form method="POST" action="{{ url_for('faculty_mou_delete', mid=mou.id) }}"
-                                onsubmit="return confirm('Delete this MOU?');" style="display:inline; margin:0;">
-                                <button type="submit"
-                                    style="background:#e74c3c; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" style="padding:20px; text-align:center; color:#999;">No MOUs added yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% endfor %}
+          </div>
         </div>
-    </div>
 
-</div>
+        <!-- 7. Administrative Tasks (2-col wide) -->
+        <div class="card card-wide">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            Administrative Tasks
+          </div>
+          <div class="task-list">
+            {% set tasks = faculty.tasks if faculty and faculty.tasks else [
+              {'name': 'Mid Sem Marks Entry (CS302)',   'status': 'overdue'},
+              {'name': 'Project Viva Schedule Upload',  'status': 'pending'},
+              {'name': 'Lab Report Verification (S4)',  'status': 'progress'},
+              {'name': 'Course Outcome Mapping (CO5)',  'status': 'pending'},
+              {'name': 'Student Feedback Review',       'status': 'progress'}
+            ] %}
+            {% for t in tasks %}
+            <div class="task-item">
+              <span class="task-name">{{ t.name }}</span>
+              {% if t.status == 'overdue' %}
+                <span class="badge badge-overdue">Overdue</span>
+              {% elif t.status == 'progress' %}
+                <span class="badge badge-progress">In Progress</span>
+              {% else %}
+                <span class="badge badge-pending">Pending</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
 
-<!-- MOU Edit Modal -->
-<div id="mou-edit-modal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:14px; padding:28px; width:min(500px, 94vw);">
-        <button onclick="closeMouEdit()"
-            style="float:right; background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
-        <h3 style="margin:0 0 18px; color:#1abc9c;">Edit MOU</h3>
-        <form id="mou-edit-form" method="POST">
-            <div style="margin-bottom:12px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px;">Organization *</label>
-                <input id="mou-edit-org" name="organization" required
-                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box;">
-            </div>
-            <div style="margin-bottom:12px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px;">Date of Signing</label>
-                <input id="mou-edit-date" name="date_of_signing" placeholder="DD-MM-YYYY"
-                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box;">
-            </div>
-            <div style="margin-bottom:16px;">
-                <label style="font-weight:bold; display:block; margin-bottom:4px;">Status</label>
-                <select id="mou-edit-status" name="status"
-                    style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
-                    <option value="Active">Active</option>
-                    <option value="Expired">Expired</option>
-                </select>
-            </div>
-            <button type="submit"
-                style="background:#1abc9c; color:#fff; border:none; padding:11px 24px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">
-                Save Changes
-            </button>
-        </form>
-    </div>
-</div>
+        <!-- 8. Quick Action Hub (2-col wide) -->
+        <div class="card card-wide">
+          <div class="card-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Quick Action Hub
+          </div>
+          <div class="action-grid">
+            <a href="/attendance-entry" class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+              Mark Attendance
+            </a>
+            <a href="/marks-entry" class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+              Enter Marks
+            </a>
+            <a href="/faculty/upload-material" class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg>
+              Upload Material
+            </a>
+            <a href="/faculty/my-students" class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              My Students
+            </a>
+          </div>
+        </div>
+
+      </div><!-- end .bento-grid -->
+      {% endblock %}
+    </div><!-- end .page-content -->
+  </div><!-- end .main-content -->
+</div><!-- end .dash-wrapper -->
 
 <script>
-    function togglePanel(panelId) {
-        var panel = document.getElementById(panelId);
-        if (panel.style.display === "none") {
-            document.getElementById('courses-panel').style.display = 'none';
-            document.getElementById('announcements-panel').style.display = 'none';
-            panel.style.display = 'block';
-            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            panel.style.display = "none";
-        }
-    }
-
-    function openMouEdit(id, org, date, status) {
-        document.getElementById('mou-edit-form').action = '/faculty/mou/edit/' + id;
-        document.getElementById('mou-edit-org').value = org;
-        document.getElementById('mou-edit-date').value = date;
-        document.getElementById('mou-edit-status').value = status;
-        document.getElementById('mou-edit-modal').style.display = 'flex';
-    }
-
-    function closeMouEdit() {
-        document.getElementById('mou-edit-modal').style.display = 'none';
-    }
+  // Live time chip
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('live-time').textContent =
+      now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+  updateTime();
+  setInterval(updateTime, 30000);
 </script>
-{% endblock %}
+</body>
+</html>

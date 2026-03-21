@@ -1,43 +1,178 @@
-<footer>
-    <div>
-        <h4>AISAT CSE</h4>
-        <p style="font-size: 0.9rem; color: var(--neutral-gray)">
-            Albertian Institute of Science and Technology<br />
-            AISAT Technical Campus, Kalamassery<br />
-            Archbishop Angel Mary Nagar,<br />
-            Cochin University P. O., Kochi<br />
-            Ernakulam, Kerala, India, 6820 22
-        </p>
+<style>
+.custom-footer {
+    background: #080808;
+    color: var(--text-secondary);
+    border-top: 1px solid rgba(245, 230, 190, 0.06);
+    padding: 4rem 5% 1rem 5%;
+    font-family: var(--font-body);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.footer-col h4 {
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.footer-brand {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.footer-col p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-col ul li a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s ease;
+}
+
+.footer-col ul li a:hover {
+    color: var(--accent-crimson);
+}
+
+.social-circles {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.social-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(245, 230, 190, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-circle:hover {
+    background: var(--accent-crimson);
+    border-color: var(--accent-crimson);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+}
+
+.newsletter-form input {
+    background: var(--surface);
+    border: 1px solid rgba(245, 230, 190, 0.1);
+    padding: 10px 14px;
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 12px;
+    width: 100%;
+}
+
+.newsletter-form button {
+    background: var(--accent-crimson);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    padding: 0 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bottom-bar {
+    text-align: center;
+    border-top: 1px solid rgba(245, 230, 190, 0.04);
+    padding-top: 1.5rem;
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 1px;
+}
+</style>
+
+<footer class="custom-footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <span class="footer-brand">CS Connect &middot; AISAT</span>
+            <p>Albertian Institute of Science and Technology, Kalamassery, Ernakulam, Kerala &mdash; 683 104</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
+                <li><a href="{{ url_for('academics') }}">Academics</a></li>
+                <li><a href="{{ url_for('faculty') }}">Faculty</a></li>
+                <li><a href="{{ url_for('placements') }}">Placement</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Resources</h4>
+            <ul>
+                <li><a href="{{ url_for('academics') }}">Syllabus</a></li>
+                <li><a href="{{ url_for('academics') }}">Lab Manuals</a></li>
+                <li><a href="#">Research</a></li>
+                <li><a href="#">Results</a></li>
+                <li><a href="{{ url_for('timetable') }}">Timetable</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Connect With Us</h4>
+            <div class="social-circles">
+                <a href="#" class="social-circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" class="icon-stroke" stroke="currentColor">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/aisat_official/" target="_blank" class="social-circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" class="icon-stroke" stroke="currentColor">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/school/aisat-kochi/" target="_blank" class="social-circle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" class="icon-stroke" stroke="currentColor">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </a>
+            </div>
+            <form class="newsletter-form" onsubmit="event.preventDefault();">
+                <input type="email" placeholder="Newsletter email..." required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
     </div>
-    <div>
-        <h4>Quick Links</h4>
-        <ul>
-            <li><a href="{{ url_for('about_cse') }}">About CSE</a></li>
-            <li><a href="{{ url_for('placements') }}">Placements</a></li>
-            {% if session.get('user_id') %}
-            <li><a href="{{ url_for('library_bp.library') }}">Library</a></li>
-            {% endif %}
-            <li><a href="{{ url_for('login') }}">Student Portal</a></li>
-        </ul>
-    </div>
-    <div>
-        <h4>Connect</h4>
-        <ul>
-            <li><a href="https://www.linkedin.com/school/aisat-kochi/" target="_blank">LinkedIn</a></li>
-            <li><a href="https://www.instagram.com/aisat_official/" target="_blank">Instagram</a></li>
-            <li><a href="https://aisat.ac.in" target="_blank">Official Website</a></li>
-        </ul>
-    </div>
-    <div>
-        <h4>Contact</h4>
-        <ul>
-            <li>📧 <a href="mailto:cse@aisat.ac.in">cse@aisat.ac.in</a></li>
-            <li>📞 0484-2532120</li>
-            <li>📍 <a href="https://maps.app.goo.gl/KjtzU1ck9Bxfxynn6" target="_blank" style="color: var(--neutral-gray); text-decoration: none;">Kalamassery, Kochi (Google Maps)</a></li>
-        </ul>
-    </div>
-    <div
-        style="grid-column: 1 / -1; border-top: 1px solid #3a3a3a; padding-top: 1.5rem; text-align: center; color: var(--neutral-gray); font-size: 0.85rem; margin-top: 1rem;">
-        &copy; 2025 AISAT CSE Department — CS Connect. All rights reserved.
+    <div class="bottom-bar">
+        &copy; 2025 CS Connect &middot; AISAT &middot; Department of Computer Science and Engineering &middot; All Rights Reserved
     </div>
 </footer>

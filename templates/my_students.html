@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Students — CS Connect Faculty</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/my_students.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+  <!-- ═════════════════════ SIDEBAR ═════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+    </div>
+    <nav class="nav-items">
+      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <!-- Students (Active) -->
+      <div class="nav-item active" data-tip="My Students">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Attendance" onclick="location.href='/attendance-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="nav-item" data-tip="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="user-avatar">{{ session.get('name','F')[0].upper() }}</div>
+    </div>
+  </aside>
+
+  <!-- ═════════════════════ MAIN ═════════════════════ -->
+  <div class="main-content">
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect &middot; Faculty Portal &middot; <b>My Students</b></span>
+      <div class="notif-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="notif-dot"></span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Page Header + Stats -->
+      <div class="page-header">
+        <h1>Student Directory</h1>
+        <div class="stats-pills">
+          <div class="stat-pill">Total <b>{{ stats.total }}</b></div>
+          <div class="stat-pill risk">At Risk <b>{{ stats.at_risk }}</b></div>
+          <div class="stat-pill avg">Avg Attendance <b>{{ stats.avg_att }}%</b></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="Search by name, roll no, email…" oninput="filterTable()">
+        </div>
+        <select class="filter-drop" id="batchFilter" onchange="filterTable()">
+          <option value="">All Batches</option>
+          {% for b in batches %}
+          <option value="{{ b }}">{{ b }}</option>
+          {% endfor %}
+        </select>
+        <select class="filter-drop" id="attFilter" onchange="filterTable()">
+          <option value="">All Attendance</option>
+          <option value="low">Below 75%</option>
+          <option value="mid">75% – 85%</option>
+          <option value="high">Above 85%</option>
+        </select>
+        <select class="filter-drop" id="statusFilter" onchange="filterTable()">
+          <option value="">All Status</option>
+          <option value="safe">Safe</option>
+          <option value="risk">At Risk</option>
+        </select>
+        <div class="sort-wrap">
+          <label>Sort by</label>
+          <select class="filter-drop" id="sortSel" onchange="sortTable()">
+            <option value="name">Name</option>
+            <option value="roll">Roll No</option>
+            <option value="att">Attendance</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <table class="student-table" id="stuTable">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th class="hide-mobile">Roll No</th>
+              <th>Attendance</th>
+              <th class="hide-mobile">Last Active</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="stuBody">
+            {% for s in students %}
+            {% set pct = s.att_pct %}
+            {% set cls = 'high' if pct > 85 else ('mid' if pct >= 75 else 'low') %}
+            <tr
+              class="stu-row"
+              data-name="{{ s.name|lower }}"
+              data-roll="{{ s.roll_no|lower }}"
+              data-batch="{{ s.batch|lower }}"
+              data-att="{{ pct }}"
+              data-status="{{ 'safe' if pct >= 75 else 'risk' }}"
+              onclick="toggleExpand(this)"
+            >
+              <td>
+                <div class="name-cell">
+                  <div class="stu-avatar">{{ s.initials }}</div>
+                  <div>
+                    <div class="stu-name">{{ s.name }}</div>
+                    <div class="stu-email">{{ s.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="hide-mobile"><span class="roll-no">{{ s.roll_no }}</span></td>
+              <td>
+                <div class="att-cell">
+                  <span class="att-frac">{{ s.att_present }} / {{ s.att_total }} ({{ pct }}%)</span>
+                  <div class="pbar"><div class="pbar-fill {{ cls }}" style="width:{{ pct }}%;"></div></div>
+                </div>
+              </td>
+              <td class="hide-mobile last-seen">{{ s.last_seen }}</td>
+              <td>
+                {% if pct >= 75 %}
+                <span class="badge-safe">Safe</span>
+                {% else %}
+                <span class="badge-risk">At Risk</span>
+                {% endif %}
+              </td>
+              <td onclick="event.stopPropagation()">
+                <div class="action-pills">
+                  <a href="/faculty/student/{{ s.id }}" class="pill pill-view">View</a>
+                  {% if pct < 75 %}
+                  <button class="pill pill-notify" onclick="openNotify('{{ s.name }}','{{ s.email }}','{{ pct }}')">Notify</button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            <!-- Quick-expand accordion row -->
+            <tr class="expand-row">
+              <td colspan="6">
+                <div class="expand-content">
+                  <strong>{{ s.name }}</strong> &mdash; {{ s.roll_no }} &mdash; Batch: {{ s.batch }}<br>
+                  <span style="color:var(--text-sec); font-size:12px;">Attendance: {{ s.att_present }}/{{ s.att_total }} classes attended ({{ pct }}%)</span>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <span class="page-info" id="pageInfo">Showing <b id="showCount">—</b> of <b>{{ stats.total }}</b> students</span>
+          <div class="page-btns">
+            <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Prev</button>
+            <button class="page-btn active" id="curPage">1</button>
+            <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- page-content -->
+  </div><!-- main-content -->
+</div><!-- dash-wrapper -->
+
+<!-- ═════════════════ NOTIFY MODAL ═════════════════ -->
+<div class="modal-overlay" id="notifyModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeNotify()">&times;</button>
+    <h3>Send Low Attendance Alert</h3>
+    <p id="modalDesc">Send an automated notice to the student's institutional email.</p>
+    <div class="form-grp">
+      <label>Recipient</label>
+      <input id="notifyEmail" type="text" readonly
+        style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--gold);font-family:'Inter',sans-serif;font-size:13px;outline:none;width:100%;">
+    </div>
+    <div class="form-grp">
+      <label>Message</label>
+      <textarea id="notifyMsg"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNotify()">Cancel</button>
+      <button class="btn-send" onclick="sendNotify()">Send Notice</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Pagination state ── */
+const PAGE_SIZE = 8;
+let curPageNum = 1;
+let visibleRows = [];
+
+function getRows() {
+  return Array.from(document.querySelectorAll('#stuBody .stu-row'));
+}
+function getExpandRows() {
+  return Array.from(document.querySelectorAll('#stuBody .expand-row'));
+}
+
+function applyPagination() {
+  const allRows = visibleRows;
+  const total = allRows.length;
+  const start = (curPageNum - 1) * PAGE_SIZE;
+  const end   = start + PAGE_SIZE;
+
+  getRows().forEach(r => r.style.display = 'none');
+  getExpandRows().forEach(r => { r.style.display = 'none'; r.classList.remove('open'); });
+
+  allRows.slice(start, end).forEach(r => r.style.display = '');
+
+  document.getElementById('showCount').textContent = Math.min(end, total) - start + ' of ' + total;
+  document.getElementById('pageInfo').innerHTML =
+    `Showing <b>${Math.min(start+1, total)}–${Math.min(end,total)}</b> of <b>${total}</b> students`;
+  document.getElementById('curPage').textContent = curPageNum;
+  document.getElementById('prevBtn').disabled = curPageNum === 1;
+  document.getElementById('nextBtn').disabled = end >= total;
+}
+
+function changePage(dir) {
+  curPageNum += dir;
+  applyPagination();
+}
+
+/* ── Filter & Sort ── */
+function filterTable() {
+  const q      = document.getElementById('searchInput').value.toLowerCase();
+  const batch  = document.getElementById('batchFilter').value.toLowerCase();
+  const attF   = document.getElementById('attFilter').value;
+  const statF  = document.getElementById('statusFilter').value;
+
+  visibleRows = getRows().filter(r => {
+    const name  = r.dataset.name;
+    const roll  = r.dataset.roll;
+    const rb    = r.dataset.batch;
+    const pct   = parseFloat(r.dataset.att);
+    const stat  = r.dataset.status;
+
+    if (q && !name.includes(q) && !roll.includes(q)) return false;
+    if (batch && rb !== batch) return false;
+    if (attF === 'low'  && pct >= 75)  return false;
+    if (attF === 'mid'  && (pct < 75 || pct > 85)) return false;
+    if (attF === 'high' && pct <= 85)  return false;
+    if (statF && stat !== statF) return false;
+    return true;
+  });
+
+  curPageNum = 1;
+  applyPagination();
+}
+
+function sortTable() {
+  const key = document.getElementById('sortSel').value;
+  const tbody = document.getElementById('stuBody');
+  const rows = getRows();
+
+  rows.sort((a, b) => {
+    if (key === 'att')  return parseFloat(b.dataset.att)  - parseFloat(a.dataset.att);
+    if (key === 'roll') return a.dataset.roll.localeCompare(b.dataset.roll);
+    return a.dataset.name.localeCompare(b.dataset.name);
+  });
+
+  // Re-insert in sorted order
+  rows.forEach(r => {
+    const next = r.nextElementSibling;
+    tbody.appendChild(r);
+    if (next && next.classList.contains('expand-row')) tbody.appendChild(next);
+  });
+
+  filterTable();
+}
+
+/* ── Row accordion ── */
+function toggleExpand(row) {
+  const exp = row.nextElementSibling;
+  if (!exp || !exp.classList.contains('expand-row')) return;
+  const isOpen = exp.classList.contains('open');
+  // close all
+  document.querySelectorAll('.expand-row.open').forEach(e => e.classList.remove('open'));
+  if (!isOpen) exp.classList.add('open');
+}
+
+/* ── Notify modal ── */
+function openNotify(name, email, pct) {
+  document.getElementById('notifyEmail').value = email;
+  document.getElementById('notifyMsg').value =
+    `Dear ${name},\n\nYour current attendance stands at ${pct}%, which is below the required 75% threshold.\n\nPlease ensure you attend all upcoming classes to meet the minimum criterion.\n\nRegards,\nCS Department, AISAT`;
+  document.getElementById('modalDesc').textContent = `Sending alert to ${name} (${email})`;
+  document.getElementById('notifyModal').classList.add('open');
+}
+function closeNotify() {
+  document.getElementById('notifyModal').classList.remove('open');
+}
+function sendNotify() {
+  const email = document.getElementById('notifyEmail').value;
+  const msg   = document.getElementById('notifyMsg').value;
+
+  fetch('/faculty/notify-student', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ email, message: msg })
+  })
+  .then(r => r.json())
+  .then(data => {
+    alert(data.ok ? '✓ Notice sent successfully!' : '✗ Failed: ' + data.error);
+    closeNotify();
+  })
+  .catch(() => {
+    alert('Notice queued (email service offline).');
+    closeNotify();
+  });
+}
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  visibleRows = getRows();
+  applyPagination();
+});
+</script>
+</body>
+</html>

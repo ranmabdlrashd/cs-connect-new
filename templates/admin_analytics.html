@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics & Reports - CS Connect Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .aa-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .aa-header { margin-bottom: 30px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .aa-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0; font-size: 28px; }
+    .aa-header p { color: #A0A0A0; margin: 8px 0 0; font-size: 14px; }
+    .aa-export { background: #1A1A1A; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .aa-export:hover { background: #222; }
+
+    .aa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
+    .aa-card { background: #121212; border: 1px solid rgba(245,230,190,0.05); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; }
+    
+    .aa-card h3 { color: #A0A0A0; margin: 0 0 16px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .aa-card-val { font-family: 'Playfair Display', serif; color: #fff; font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+    .aa-card-trend { font-size: 13px; font-weight: 600; }
+    .trend-up { color: #4ade80; }
+    .trend-down { color: #f87171; }
+    
+    /* Mock Chart Areas */
+    .aa-chart-placeholder { width: 100%; height: 200px; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 10px, transparent 10px, transparent 20px); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #666; font-size: 12px; margin-top: 16px; }
+
+    .aa-full-width { grid-column: span 2; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="aa-page">
+    <div class="aa-header">
+        <div>
+            <h2>Data Analytics & Reports</h2>
+            <p>Platform usage, placement success rates, and academic performance trends.</p>
+        </div>
+        <button class="aa-export" onclick="alert('Exporting CSV Report Data...')"><i class="fas fa-download" style="margin-right:8px;"></i> Export Report</button>
+    </div>
+
+    <div class="aa-grid">
+        <!-- Metric 1: Placements -->
+        <div class="aa-card">
+            <h3>Placement Success Rate (2025)</h3>
+            <div class="aa-card-val">82.4%</div>
+            <div class="aa-card-trend trend-up">↑ 4.2% vs Last Year</div>
+            <div class="aa-chart-placeholder">[ Placement Trend Chart Visualization ]</div>
+        </div>
+        
+        <!-- Metric 2: Engagement -->
+        <div class="aa-card">
+            <h3>Student Portal Engagement</h3>
+            <div class="aa-card-val">940 <span style="font-size: 16px; color: #888; font-family: 'Inter', sans-serif;">Daily Active Base</span></div>
+            <div class="aa-card-trend trend-up">↑ 12% This Semester</div>
+            <div class="aa-chart-placeholder">[ Daily Logins Line Chart ]</div>
+        </div>
+
+        <!-- Metric 3: Academic -->
+        <div class="aa-card aa-full-width">
+            <h3>Semester Performance Analysis (Average CGPA)</h3>
+            <div style="display: flex; gap: 40px; margin-bottom: 20px;">
+                <div>
+                    <div style="color: #A0A0A0; font-size: 12px; text-transform: uppercase;">Batch 10 (S6)</div>
+                    <div style="color: #fff; font-size: 24px; font-weight: 700;">7.84</div>
+                </div>
+                <div>
+                    <div style="color: #A0A0A0; font-size: 12px; text-transform: uppercase;">Batch 11 (S4)</div>
+                    <div style="color: #fff; font-size: 24px; font-weight: 700;">8.02</div>
+                </div>
+                <div>
+                    <div style="color: #A0A0A0; font-size: 12px; text-transform: uppercase;">Batch 12 (S2)</div>
+                    <div style="color: #fff; font-size: 24px; font-weight: 700;">8.30</div>
+                </div>
+            </div>
+            <div class="aa-chart-placeholder" style="height: 150px;">[ Cohort Performance Bar Chart ]</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Study Material — Faculty Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty_upload_material.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 12 12 17 22 12"></polyline>
+        <polyline points="2 17 12 22 22 17"></polyline>
+      </svg>
+    </div>
+    <nav class="nav-items">
+      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <div class="nav-item" data-tip="My Students" onclick="location.href='/faculty/my-students'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Attendance" onclick="location.href='/faculty/mark-attendance'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item active" data-tip="Upload Material">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="nav-item" data-tip="Settings" onclick="location.href='/faculty/settings'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="user-avatar" onclick="location.href='/faculty/profile'">{{ initials }}</div>
+    </div>
+  </aside>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div class="main-content">
+    
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect · Faculty Portal · <b>Study Materials</b></span>
+    </header>
+
+    <div class="page-header">
+      <h1 class="page-title">Upload Study Material</h1>
+      <p class="page-subtitle">Distribute lecture notes, lab manuals, and assignments directly to student portals.</p>
+    </div>
+
+    <div class="page-content">
+
+      <!-- LEFT COLUMN: Material Details Form -->
+      <section class="um-card">
+        <div class="card-header">
+          <svg class="ch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <h2 class="ch-title">Material Configuration</h2>
+        </div>
+        
+        <form id="materialForm" onsubmit="uploadFiles(event)">
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="fg-label">Subject</label>
+            <select class="fg-sel" id="matSubject" required>
+              <option value="" disabled selected>Select from assigned subjects...</option>
+              <option value="CS304 · Software Engineering">CS304 · Software Engineering</option>
+              <option value="CS401 · Machine Learning">CS401 · Machine Learning</option>
+              <option value="CS202 · Data Structures">CS202 · Data Structures</option>
+              <option value="CS331 · OS Lab">CS331 · OS Lab</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="fg-label">Batch Visibility</label>
+              <select class="fg-sel" id="matBatch" required>
+                <option value="All Batches">All Enrolled</option>
+                <option value="S6 CSE A">S6 CSE A</option>
+                <option value="S6 CSE B">S6 CSE B</option>
+                <option value="S4 CSE A">S4 CSE A</option>
+                <option value="S8 CSE Alpha">S8 CSE Alpha</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="fg-label">Material Type</label>
+              <select class="fg-sel" id="matType" required>
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Lab Manual">Lab Manual</option>
+                <option value="Question Bank">Question Bank</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Reference Book">Reference Book</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label class="fg-label">Special Instructions (Optional)</label>
+            <textarea class="fg-inp fg-textarea" id="matDetails" placeholder="e.g. Please review module 2 before the internal assessment..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            Upload &amp; Distribute
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          </button>
+        </form>
+      </section>
+
+
+      <!-- RIGHT COLUMN: Dropzone & History -->
+      <section style="display:flex; flex-direction: column; gap: 24px;">
+        
+        <div class="um-card">
+          <div class="card-header">
+            <svg class="ch-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+            <h2 class="ch-title">File Attachments</h2>
+          </div>
+
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInp').click()">
+            <input type="file" id="fileInp" class="dz-file-inp" accept=".pdf,.zip,.doc,.docx,.ppt,.pptx" multiple onchange="handleFiles(this.files)">
+            <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <div class="dz-title">Drag &amp; drop files here</div>
+            <div class="dz-sub">or click to browse local storage</div>
+          </div>
+
+          <!-- Pending Files UI -->
+          <div class="pending-list" id="pendingList"></div>
+        </div>
+
+        <div class="um-card" style="flex: 1;">
+          <h2 class="history-title">Previously Uploaded Materials</h2>
+          
+          <div class="history-list">
+            <!-- Mock items based on requirements -->
+            <div class="hist-item">
+              <div class="hi-left">
+                <div class="hi-title">CS304_Module_3_Notes.pdf</div>
+                <div class="hi-meta">
+                  <span class="hi-batch">S6 CSE A</span>
+                  <span>Mar 18, 2026</span>
+                  <span>•</span>
+                  <span>2.4 MB</span>
+                </div>
+              </div>
+              <button class="btn-download">Download</button>
+            </div>
+            
+            <div class="hist-item">
+              <div class="hi-left">
+                <div class="hi-title">ML_Lab_Experiment_04.docx</div>
+                <div class="hi-meta">
+                  <span class="hi-batch">S8 CSE Alpha</span>
+                  <span>Mar 15, 2026</span>
+                  <span>•</span>
+                  <span>1.1 MB</span>
+                </div>
+              </div>
+              <button class="btn-download">Download</button>
+            </div>
+
+            <div class="hist-item">
+              <div class="hi-left">
+                <div class="hi-title">DataStructures_QBank.zip</div>
+                <div class="hi-meta">
+                  <span class="hi-batch">All Enrolled</span>
+                  <span>Mar 10, 2026</span>
+                  <span>•</span>
+                  <span>14.5 MB</span>
+                </div>
+              </div>
+              <button class="btn-download">Download</button>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+    </div><!-- page-content -->
+  </div><!-- main-content -->
+</div>
+
+<!-- Scripts for UI Logic -->
+<script>
+  // Drag and Drop Logic
+  const dz = document.getElementById('dropzone');
+  let pendingFiles = [];
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, pr, false));
+  function pr(e) { e.preventDefault(); e.stopPropagation(); }
+  
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, () => dz.classList.add('dragover'), false));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('dragover'), false));
+
+  dz.addEventListener('drop', (e) => {
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
+  function handleFiles(files) {
+    for(let f of files) {
+      // Avoid exact duplicates
+      if(!pendingFiles.find(existing => existing.name === f.name)) {
+        pendingFiles.push(f);
+      }
+    }
+    renderPendingList();
+  }
+
+  function removeFile(idx) {
+    pendingFiles.splice(idx, 1);
+    renderPendingList();
+  }
+
+  function renderPendingList() {
+    const list = document.getElementById('pendingList');
+    list.innerHTML = '';
+    pendingFiles.forEach((file, idx) => {
+      let size = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+      if(file.size < 1024*1024) size = (file.size / 1024).toFixed(0) + ' KB';
+      
+      list.innerHTML += `
+        <div class="pending-item">
+          <div class="pi-info">
+            <svg class="pi-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span class="pi-name" title="${file.name}">${file.name}</span>
+            <span class="pi-size">${size}</span>
+          </div>
+          <button type="button" class="btn-remove" onclick="removeFile(${idx})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  // Final Form Submission
+  async function uploadFiles(e) {
+    e.preventDefault();
+    if(pendingFiles.length === 0) {
+      alert("Please attach at least one file to upload.");
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Uploading...';
+    btn.style.opacity = '0.5';
+
+    const formData = new FormData();
+    formData.append('subject', document.getElementById('matSubject').value);
+    formData.append('batch', document.getElementById('matBatch').value);
+    formData.append('type', document.getElementById('matType').value);
+    formData.append('details', document.getElementById('matDetails').value);
+    for(let f of pendingFiles) {
+      formData.append('files', f);
+    }
+
+    try {
+      const resp = await fetch('/api/faculty/study-material/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await resp.json();
+      if(data.ok) {
+        // Success Mock behavior
+        alert("Study materials securely uploaded and distributed!");
+        document.getElementById('materialForm').reset();
+        pendingFiles = [];
+        renderPendingList();
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch(err) {
+      alert("Error contacting the server.");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Upload &amp; Distribute <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>';
+      btn.style.opacity = '1';
+    }
+  }
+</script>
+</body>
+</html>

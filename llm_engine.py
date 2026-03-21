@@ -1,20 +1,19 @@
 import os
 import json
-import re
-from typing import List, Any
+from typing import List
 from groq import Groq
 from database import get_db_connection
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize Groq client
+# Initialize Groq client (Llama 3.3 70B)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+MODEL = "llama-3.3-70b-versatile"
 
 def analyze_intent(user_query: str, chat_history: List[dict]) -> dict:
     """
-    Uses Llama-3.3 to determine the subject of the query and extract keywords,
-    taking conversation history into account.
+    Uses Claude to determine the subject of the query and extract keywords.
     """
     history_str = ""
     for msg in chat_history[-3:]: # Only look at last 3 for intent
@@ -23,13 +22,13 @@ def analyze_intent(user_query: str, chat_history: List[dict]) -> dict:
 
     system_prompt = (
         "You are a Search Intent Analyzer for a college department portal.\n"
-        "Your goal is to determine EXACTLY what the user wants to search for, even if they use pronouns like 'him', 'them', or 'those'.\n"
+        "Your goal is to determine EXACTLY what the user wants to search for, considering conversation history.\n"
         "Available Categories: ['faculty', 'library', 'academics', 'placements', 'events', 'general']\n\n"
-        "Return ONLY a JSON object with this structure:\n"
+        "Return ONLY a JSON object with this structure (no Markdown wrap):\n"
         "{\n"
         "  \"intent\": \"faculty|library|academics|placements|events|general\",\n"
-        "  \"subject\": \"the actual noun they are talking about (e.g. 'Dr. Jeswin', 'OSI model notes')\",\n"
-        "  \"keywords\": [\"list\", \"of\", \"keywords\", \"to\", \"search\"]\n"
+        "  \"subject\": \"the actual noun they are talking about\",\n"
+        "  \"keywords\": [\"list\", \"of\", \"keywords\"]\n"
         "}"
     )
 
@@ -39,10 +38,10 @@ def analyze_intent(user_query: str, chat_history: List[dict]) -> dict:
         completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
+                {"role": "user",   "content": user_prompt},
             ],
-            model="llama-3.3-70b-versatile",
-            temperature=0.1, # Low temperature for consistent JSON
+            model=MODEL,
+            temperature=0.1,
             response_format={"type": "json_object"}
         )
         return json.loads(completion.choices[0].message.content)
@@ -58,7 +57,6 @@ def get_context_by_intent(analysis: dict) -> str:
     subject = analysis.get("subject", "")
     keywords = analysis.get("keywords", [])
     
-    # If LLM failed to give keywords, fallback to subject
     if not keywords:
         keywords = [subject]
 
@@ -70,7 +68,7 @@ def get_context_by_intent(analysis: dict) -> str:
     
     try:
         with conn.cursor() as cur:
-            for kw in keywords[:3]: # Limit keywords to avoid excessive queries
+            for kw in keywords[:3]:
                 search_term = f"%{kw}%"
                 
                 if intent == 'faculty':
@@ -83,7 +81,6 @@ def get_context_by_intent(analysis: dict) -> str:
                     for b in cur.fetchall():
                         context_parts.append(f"LIBRARY BOOK: {b[0]} by {b[1]} (Subject: {b[2]}, Status: {b[3]}, Avail: {b[4]})")
                     
-                    # Also check notes
                     cur.execute("SELECT document_name, content FROM document_chunks WHERE content ILIKE %s OR document_name ILIKE %s", (search_term, search_term))
                     for c in cur.fetchall():
                         pdf_url = f"/static/uploads/notes/{c[0]}"
@@ -99,7 +96,6 @@ def get_context_by_intent(analysis: dict) -> str:
                     for s in cur.fetchall():
                         context_parts.append(f"SUBJECT: {s[0]} ({s[1]}) - Faculty: {s[2]}")
 
-                # Always do a small broad search for "general" or as safety
                 if len(context_parts) < 3:
                     cur.execute("SELECT title, content FROM website_content WHERE title ILIKE %s OR content ILIKE %s LIMIT 2", (search_term, search_term))
                     for w in cur.fetchall():
@@ -112,60 +108,52 @@ def get_context_by_intent(analysis: dict) -> str:
 
     return "\n".join(context_parts) if context_parts else "No specific database records found."
 
-def generate_response(user_query: str, chat_history: List[dict] = None, is_logged_in: bool = False) -> str:
+def generate_response(messages: List[dict], is_logged_in: bool = False) -> str:
     """
-    Refined response generation with Intent Analysis and Conversation History.
+    Response generation via Groq/Llama. Accepts full message history from frontend.
     """
-    if chat_history is None:
-        chat_history = []
+    if not messages:
+        return "I didn't receive any message."
+        
+    user_query = messages[-1]['content']
+    chat_history = messages[:-1]
 
-    # 1. Analyze Intent (History-Aware)
+    # Analyze Intent
     analysis = analyze_intent(user_query, chat_history)
-    print(f"AI INTENT ANALYSIS: {analysis}")
 
-    # 2. Targeted Context Retrieval
+    # Targeted Context Retrieval
     context = get_context_by_intent(analysis)
 
-    # 3. Build History for Prompt
-    history_context = ""
-    for msg in chat_history[-5:]: # Use last 5 for context
-        history_context += f"{msg['role'].upper()}: {msg['content']}\n"
-
-    login_instruction = ""
-    if is_logged_in:
-        login_instruction = "The user if logged in. They can View and Download PDFs."
-    else:
-        login_instruction = "The user is NOT logged in. They can View but must be logged in to Download PDFs."
+    login_instruction = (
+        "The user is logged in. They can View and Download PDFs."
+        if is_logged_in else
+        "The user is NOT logged in. They can View but must be logged in to Download PDFs."
+    )
 
     system_prompt = (
-        "You are 'CS Connect Assistant', a professional AI for AISAT CSE.\n\n"
+        "You are 'CS Connect Assistant', a professional AI for AISAT CSE department.\n"
         "RULES:\n"
-        "1. MEMORY: Use the provided CONVERSATION HISTORY to understand context. If the user says 'him' or 'them', refer to the previous subjects.\n"
-        "2. NO JARGON: Never mention 'database', 'intent', 'records', etc.\n"
-        "3. TARGETED: Answer based ONLY on the provided DATABASE CONTEXT and CONVERSATION HISTORY.\n"
+        "1. MEMORY: Use CONVERSATION HISTORY to understand context. Resolve pronouns like 'him'/'them' from previous messages.\n"
+        "2. NO JARGON: Never mention 'database', 'intent', 'records', or how you got the data.\n"
+        "3. TARGETED: Answer ONLY based on the provided DATABASE CONTEXT and CONVERSATION HISTORY.\n"
         "4. SOURCE: Link PDFs as [Filename](/static/uploads/notes/filename.pdf).\n"
-        "5. MANAGEMENT MATTERS: If the user asks about sensitive management decisions, high-level appointments (like 'who is the next HOD'), "
-        "or policy changes not in the database, you must reply: 'These are matters handled by the Management and involve high-level decisions.'\n"
-        f"6. {login_instruction}\n"
+        "5. MANAGEMENT MATTERS: For sensitive decisions (e.g. 'who is next HOD'), reply: "
+        "'These are matters handled by the Management and involve high-level decisions.'\n"
+        f"6. {login_instruction}\n\n"
+        f"DATABASE CONTEXT:\n{context}\n"
     )
 
-    user_prompt = (
-        f"CONVERSATION HISTORY:\n{history_context}\n\n"
-        f"DATABASE CONTEXT:\n{context}\n\n"
-        f"CURRENT USER QUESTION: {user_query}"
-    )
+    # Build messages list for Groq: system + prior history + current user query
+    groq_messages = [{"role": "system", "content": system_prompt}]
+    for m in chat_history[-6:]:
+        if m.get('role') in ('user', 'assistant'):
+            groq_messages.append({"role": m['role'], "content": str(m['content'])})
+    groq_messages.append({"role": "user", "content": user_query})
 
     try:
-        messages = [{"role": "system", "content": system_prompt}]
-        # We don't need to put the whole history in 'messages' for Groq because we embedded it in the user_prompt for context control, 
-        # but structured 'messages' is better for the LLM to understand roles.
-        for msg in chat_history[-5:]:
-            messages.append(msg)
-        messages.append({"role": "user", "content": user_prompt})
-
         completion = client.chat.completions.create(
-            messages=messages,
-            model="llama-3.3-70b-versatile",
+            messages=groq_messages,
+            model=MODEL,
             temperature=0.4,
             max_tokens=800,
         )
@@ -175,15 +163,6 @@ def generate_response(user_query: str, chat_history: List[dict] = None, is_logge
         return "I'm sorry, I'm having trouble retrieving information right now."
 
 if __name__ == "__main__":
-    test_suite = [
-        ("What are the department stats?", True),
-        ("Any new announcements?", False),
-        ("Who is placed in TCS?", True),
-        ("Is the OSI model in the notes?", False),
-        ("Is there any news today?", True)
-    ]
-    
-    for q, login in test_suite:
-        print(f"\nQUERY: {q}")
-        print(f"RESPONSE:\n{generate_response(q, login)}\n")
-        print("="*40)
+    test_msgs = [{"role": "user", "content": "What are the department stats?"}]
+    print(generate_response(test_msgs, False))
+
