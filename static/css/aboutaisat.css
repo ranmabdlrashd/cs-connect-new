@@ -1,367 +1,341 @@
-:root {
-    --primary-red: #a41f13;
-    --bg-off-white: #faf5f1;
-    --neutral-gray: #e0dbd8;
-    --dark-charcoal: #292f36;
-    --taupe-brown: #8f7a6e;
-    --glass: rgba(255, 255, 255, 0.85);
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+/* =============================================================================
+   ABOUT AISAT — DARK ACADEMIC THEME
+   Shares stat-card-sm, stat-num, stat-label with aboutcse.css via identical class names.
+   ============================================================================= */
+
+/* ── Page wrapper ─────────────────────────────────────────────────── */
+.aisat-page {
+  background: #0A0A0A;
+  color: #F5E6BE;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ── Breadcrumb ───────────────────────────────────────────────────── */
+.aisat-breadcrumb {
+  padding: 10px 48px;
+  border-bottom: 1px solid rgba(245,230,190,0.04);
+  font-size: 10px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+}
+.aisat-breadcrumb a {
+  color: #444;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.aisat-breadcrumb a:hover { color: #8B1D1D; }
+.bc-sep   { color: #8B1D1D; font-size: 12px; }
+.bc-active { color: #8B1D1D; }
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.aisat-hero {
+  position: relative;
+  padding: 56px 48px 44px;
+  background: linear-gradient(180deg, #080a0d 0%, #0A0A0A 100%);
+  border-bottom: 1px solid rgba(245,230,190,0.05);
+  overflow: hidden;
+}
+.aisat-hero-glow {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(139,29,29,0.14) 0%, transparent 70%);
+  pointer-events: none;
+}
+.aisat-hero-inner { position: relative; z-index: 1; }
+.aisat-eyebrow {
+  font-size: 9px;
+  color: #8B1D1D;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 14px;
+  font-family: 'Inter', sans-serif;
+}
+.aisat-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 40px;
+  font-weight: 900;
+  color: #F5E6BE;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.aisat-crimson { color: #8B1D1D; }
+.aisat-subtitle {
+  font-size: 13px;
+  color: #666;
+  max-width: 580px;
+  line-height: 1.7;
+  font-family: 'Inter', sans-serif;
 }
 
-body {
-    background-color: var(--bg-off-white);
-    color: var(--dark-charcoal);
-    font-family: 'Inter', system-ui, sans-serif;
-    overflow-x: hidden;
+/* ── Main content padding ─────────────────────────────────────────── */
+.aisat-content {
+  padding: 40px 48px;
 }
 
-/* Page Header */
-.page-header {
-    height: 40vh;
-    background: linear-gradient(135deg, var(--primary-red), var(--dark-charcoal));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+/* ── Stats Bar (mirrors About CSE stat-card-sm exactly) ───────────── */
+.aisat-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+/* stat-card-sm, stat-num, stat-label reused from aboutcse.css — but
+   defined here too so this page is standalone if CSE css isn't loaded */
+.aisat-stats-bar .stat-card-sm {
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.06);
+  border-bottom: 2px solid #8B1D1D;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+}
+.aisat-stats-bar .stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #F5E6BE;
+}
+.aisat-stats-bar .stat-label {
+  font-size: 9px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 4px;
+  font-family: 'Inter', sans-serif;
 }
 
-.header-content {
-    text-align: center;
-    color: #fff;
-    z-index: 2;
+/* ── Two-column grid ──────────────────────────────────────────────── */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 28px;
 }
 
-.header-content h1 {
-    font-size: 4rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    letter-spacing: -1px;
+/* ── Section header ───────────────────────────────────────────────── */
+.aisat-section-hdr {
+  margin-bottom: 20px;
+}
+.aisat-sec-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5E6BE;
+  margin-bottom: 4px;
+}
+.aisat-sec-sub {
+  font-size: 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Inter', sans-serif;
 }
 
-.header-content p {
-    font-size: 1.4rem;
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    opacity: 0.9;
+/* ── Generic panel ────────────────────────────────────────────────── */
+.aisat-panel {
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 12px;
+  padding: 22px;
+  height: fit-content;
+}
+.aisat-panel-text {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.9;
+  font-family: 'Inter', sans-serif;
+}
+.aisat-panel-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(245,230,190,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.aisat-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10px;
+}
+.aisat-info-lbl { color: #555; white-space: nowrap; }
+.aisat-info-val { color: #A0A0A0; text-align: right; }
+
+/* ── Accreditations list ──────────────────────────────────────────── */
+.accred-list { display: flex; flex-direction: column; }
+.accred-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(245,230,190,0.04);
+}
+.accred-last { border-bottom: none !important; }
+.accred-badge {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(139,29,29,0.2), rgba(18,18,18,0.9));
+  border: 1px solid rgba(139,29,29,0.25);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.accred-text { flex: 1; min-width: 0; }
+.accred-name {
+  font-size: 12px;
+  color: #F5E6BE;
+  font-weight: 500;
+  margin-bottom: 2px;
+  font-family: 'Inter', sans-serif;
+}
+.accred-detail {
+  font-size: 10px;
+  color: #555;
+  font-family: 'Inter', sans-serif;
+}
+.accred-grade {
+  font-size: 11px;
+  font-weight: 700;
+  color: #3a8a6e;
+  margin-left: auto;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Container */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 5%;
+/* ── Timeline ─────────────────────────────────────────────────────── */
+.tl-list {
+  display: flex;
+  flex-direction: column;
+}
+.tl-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  padding-bottom: 20px;
+}
+.tl-last { padding-bottom: 0; }
+
+.tl-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 42px;
+}
+.tl-year {
+  font-size: 10px;
+  color: #8B1D1D;
+  font-weight: 600;
+  margin-top: -2px;
+  font-family: 'Inter', sans-serif;
+  min-width: 32px;
+  text-align: center;
+}
+.tl-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #8B1D1D;
+  border: 2px solid rgba(139,29,29,0.4);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.tl-line {
+  flex: 1;
+  width: 1px;
+  background: rgba(139,29,29,0.2);
+  margin-top: 4px;
+  min-height: 16px;
 }
 
-/* Section Titles */
-.section-title {
-    text-align: center;
-    margin-bottom: 4rem;
+.tl-body {
+  padding-left: 12px;
+  flex: 1;
+}
+.tl-title {
+  font-size: 12px;
+  color: #C0A88A;
+  font-weight: 500;
+  margin-bottom: 2px;
+  font-family: 'Inter', sans-serif;
+}
+.tl-desc {
+  font-size: 10px;
+  color: #555;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
 }
 
-.section-title h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: var(--dark-charcoal);
+/* ── Campus Facilities grid ───────────────────────────────────────── */
+.pnl-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(245,230,190,0.05);
+}
+.pnl-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: #F5E6BE;
+  font-weight: 600;
+}
+.campus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.campus-card {
+  background: #0e0e0e;
+  border: 1px solid rgba(245,230,190,0.05);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s;
+}
+.campus-card:hover { border-color: rgba(139,29,29,0.3); }
+.campus-img {
+  height: 70px;
+  background: linear-gradient(135deg, rgba(139,29,29,0.12), rgba(18,18,18,0.9));
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.campus-name {
+  font-size: 12px;
+  color: #F5E6BE;
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
+}
+.campus-desc {
+  font-size: 10px;
+  color: #555;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
 }
 
-.section-title-line {
-    width: 60px;
-    height: 4px;
-    background: var(--primary-red);
-    margin: 0 auto 1.5rem;
-    border-radius: 2px;
-}
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .aisat-breadcrumb,
+  .aisat-hero,
+  .aisat-content { padding-left: 20px; padding-right: 20px; }
 
-.section-title p {
-    color: var(--taupe-brown);
-    font-size: 1.1rem;
-}
-
-/* History Section */
-.history-section {
-    padding: 6rem 0;
-    background: #fff;
-}
-
-.history-content {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 4rem;
-    align-items: center;
-}
-
-.history-image {
-    background: var(--bg-off-white);
-    height: 400px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 8rem;
-    color: var(--primary-red);
-    box-shadow: var(--shadow);
-}
-
-.history-text h3 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: var(--dark-charcoal);
-}
-
-.establishment-year {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--primary-red);
-    color: #fff;
-    padding: 0.5rem 1.2rem;
-    border-radius: 50px;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-}
-
-.history-text p {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--taupe-brown);
-    margin-bottom: 1.5rem;
-}
-
-.management-info {
-    background: var(--bg-off-white);
-    padding: 2rem;
-    border-radius: 20px;
-    border-left: 5px solid var(--primary-red);
-}
-
-.management-info h4 {
-    margin-bottom: 1rem;
-    color: var(--dark-charcoal);
-}
-
-.management-info ul {
-    list-style: none;
-}
-
-.management-info ul li {
-    margin-bottom: 0.8rem;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.management-info ul li::before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: var(--primary-red);
-    font-weight: bold;
-}
-
-/* Vision & Mission */
-.vision-mission-section {
-    padding: 6rem 0;
-    background: var(--bg-off-white);
-}
-
-.vm-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-}
-
-.vm-card {
-    background: white;
-    padding: 3rem;
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    transition: 0.3s;
-}
-
-.vm-card:hover {
-    transform: translateY(-10px);
-}
-
-.vm-icon {
-    width: 80px;
-    height: 80px;
-    background: var(--primary-red);
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-}
-
-.vm-card h3 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-}
-
-.vm-card p,
-.vm-card ul li {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: #555;
-}
-
-.vm-card ul {
-    list-style: none;
-}
-
-.vm-card ul li {
-    margin-bottom: 1rem;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.vm-card ul li::before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: var(--primary-red);
-    font-weight: bold;
-}
-
-/* Accreditation Section */
-.accreditation-section {
-    padding: 6rem 0;
-    background: #fff;
-}
-
-.accreditation-badges {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-}
-
-.badge-card {
-    background: var(--bg-off-white);
-    padding: 3rem 2rem;
-    border-radius: 24px;
-    text-align: center;
-    transition: 0.3s;
-}
-
-.badge-card:hover {
-    background: #fff;
-    box-shadow: var(--shadow);
-    transform: translateY(-5px);
-}
-
-.badge-icon {
-    font-size: 3.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.badge-card h4 {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
-}
-
-.badge-grade {
-    display: inline-block;
-    margin-top: 1rem;
-    background: var(--primary-red);
-    color: #fff;
-    padding: 0.4rem 1.2rem;
-    border-radius: 50px;
-    font-weight: 700;
-}
-
-/* Infrastructure */
-.infrastructure-section {
-    padding: 6rem 0;
-    background: var(--bg-off-white);
-}
-
-.infrastructure-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-}
-
-.infra-card {
-    background: #fff;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: 0.3s;
-}
-
-.infra-card:hover {
-    transform: translateY(-10px);
-}
-
-.infra-image {
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    color: #fff;
-}
-
-.infra-content {
-    padding: 2.5rem;
-}
-
-.infra-content h4 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.infra-content p {
-    color: #666;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.infra-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-}
-
-.feature-tag {
-    background: var(--bg-off-white);
-    color: var(--primary-red);
-    padding: 0.3rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-/* Scroll Reveal */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: 1s all ease;
-}
-
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Responsive */
-@media (max-width: 968px) {
-    .header-content h1 {
-        font-size: 3rem;
-    }
-
-    .history-content {
-        grid-template-columns: 1fr;
-    }
-
-    .vm-grid {
-        grid-template-columns: 1fr;
-    }
+  .aisat-stats-bar { grid-template-columns: 1fr 1fr; }
+  .two-col-grid { grid-template-columns: 1fr; }
+  .campus-grid { grid-template-columns: 1fr; }
+  .aisat-title { font-size: 30px; }
 }

@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Results & CGPA - CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+/* CSS Reset and Global Hide */
+.custom-nav { display: none !important; }
+.news-ticker { display: none !important; }
+body { margin: 0; padding: 0; overflow: hidden; background: #0A0A0A; }
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg-primary:       #0A0A0A;
+  --bg-secondary:     #121212;
+  --bg-card:          #0e0e0e;
+  --bg-hover:         #160808;
+  --accent:           #8B1D1D;
+  --accent-hover:     #a82222;
+  --accent-dark:      #6B1010;
+  --cream:            #F5E6BE;
+  --text-primary:     #e0d6c8;
+  --text-muted:       #A0A0A0;
+  --text-dim:         #666666;
+  --text-ghost:       #555555;
+  --text-dead:        #444444;
+  --border:           rgba(245,230,190,0.06);
+  --border-accent:    rgba(139,29,29,0.3);
+  --border-focus:     rgba(139,29,29,0.4);
+  --green:            #3a8834;
+  --amber:            #b85a00;
+  --red:              #8B1D1D;
+}
+
+body .results-page {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+}
+
+.results-page h1, .results-page h2, .results-page h3, .playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Sidebar item logic */
+.dash-sidebar-item {
+  width: 40px; height: 40px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: all 0.2s ease; margin-bottom: 8px;
+}
+.dash-sidebar-item.active { background: rgba(139,29,29,0.2); }
+.dash-sidebar-item:hover { background: rgba(139,29,29,0.1); }
+
+/* BENTO GRID */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+
+.bento-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Specifics */
+.cgpa-label {
+  font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px;
+}
+.cgpa-value {
+  font-size: 56px; color: var(--cream); font-weight: 900; margin: 4px 0; line-height: 1.1;
+}
+.cgpa-trend { font-size: 13px; color: var(--green); margin-bottom: 4px; }
+.cgpa-rank { font-size: 11px; color: var(--text-dim); margin-bottom: 24px; }
+.progress-track { background: rgba(255,255,255,0.06); border-radius: 3px; height: 6px; width: 100%; margin-top: 8px; }
+.progress-fill { background: var(--green); height: 100%; border-radius: 3px; }
+
+.sgpa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; height: 100%; }
+.sgpa-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; position: relative; }
+.sgpa-card.current { border-color: rgba(139,29,29,0.35); background: linear-gradient(180deg, rgba(139,29,29,0.08) 0%, var(--bg-card) 100%); }
+.current-badge { position: absolute; top: 12px; right: 12px; font-size: 9px; background: rgba(139,29,29,0.15); color: var(--accent); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+
+/* Table */
+.marks-table { width: 100%; border-collapse: collapse; text-align: left; }
+.marks-table th { font-size: 11px; color: var(--text-ghost); padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
+.marks-table td { font-size: 13px; color: var(--text-primary); padding: 14px 16px; border-bottom: 1px solid rgba(245,230,190,0.03); }
+.inline-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+.inline-bar-fill { height: 100%; background: var(--cream); border-radius: 2px; }
+
+.status-pill { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; border: 1px solid transparent; display: inline-block; }
+.status-safe { background: rgba(60,180,100,0.1); color: var(--green); border-color: rgba(60,180,100,0.2); }
+.status-warn { background: rgba(180,130,40,0.1); color: var(--amber); border-color: rgba(180,130,40,0.2); }
+.status-danger { background: rgba(139,29,29,0.1); color: var(--red); border-color: rgba(139,29,29,0.2); }
+
+/* Grades list */
+.internal-item { display: flex; align-items: center; gap: 16px; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; }
+.grade-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: var(--bg-primary); }
+.grade-A-plus, .grade-A { background: var(--green); }
+.grade-B-plus, .grade-B { background: var(--amber); }
+.grade-C { background: var(--red); color: var(--cream); }
+
+.dist-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.dist-label { width: 24px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.dist-track { flex: 1; height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; }
+.dist-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block content %}
+<div class="results-page" style="display:flex; height:100vh; background:#0A0A0A; overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid rgba(245,230,190,0.06); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 10;">
+    <div style="width:36px; height:36px; background:linear-gradient(135deg,#8B1D1D,#6B1010); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#F5E6BE">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    
+    <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
+      <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Attendance" onclick="location.href='/dashboard/attendance'">
+      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item active" title="Results" onclick="location.href='/dashboard/results'">
+      <i data-lucide="award" style="stroke: #8B1D1D; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Assignments">
+      <i data-lucide="file-text" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Library" onclick="location.href='/dashboard/library'">
+      <i data-lucide="book-open" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Lab Bookings">
+      <i data-lucide="flask-conical" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
+      <i data-lucide="calendar" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Placements" onclick="location.href='/dashboard/placements'">
+      <i data-lucide="briefcase" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+
+    <!-- Bottom section -->
+    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
+      <div class="dash-sidebar-item" title="Settings" onclick="location.href='/dashboard/settings'">
+        <i data-lucide="settings" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+      </div>
+      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#8B1D1D,#6B1010); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#F5E6BE;">
+        {% set sname = session.get('name', 'Student') %}
+        {% set parts = sname.split() %}
+        {% if parts|length > 1 %}
+          {{ parts[0][0]|upper }}{{ parts[-1][0]|upper }}
+        {% else %}
+          {{ sname[:2]|upper }}
+        {% endif %}
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+    
+    <!-- Topbar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:1px solid rgba(245,230,190,0.06); background:#0A0A0A; flex-shrink:0;">
+      <div style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase;">
+        CS Connect · <span style="color:#A0A0A0">Results & CGPA</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <input placeholder="Search portal..." style="background:#121212; border:1px solid rgba(245,230,190,0.06); border-radius:8px; padding:7px 14px; font-size:11px; color:#888; outline:none; width:180px;" />
+        <div style="width:32px; height:32px; background:rgba(139,29,29,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(139,29,29,0.2); position:relative; cursor:pointer;">
+          <i data-lucide="bell" style="stroke: #8B1D1D; width: 15px; height: 15px; stroke-width: 1.5;"></i>
+          <span style="position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: #8B1D1D;"></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1; overflow-y:auto; padding:32px 28px; padding-bottom: 80px;">
+      
+      <!-- Page Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div>
+          <h1 class="playfair" style="font-size:28px; color:var(--cream); margin:0;">Results & CGPA</h1>
+          <div style="font-size:12px; color:var(--text-ghost); margin-top:4px;">
+            B.Tech CSE · KTU 2019 Scheme · All Semesters
+          </div>
+        </div>
+        <a href="#" style="color:var(--accent); font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;">
+          Download Transcript <i data-lucide="arrow-right" style="width:14px; height:14px;"></i>
+        </a>
+      </div>
+
+      <!-- Grid -->
+      <div class="bento-grid">
+        
+        <!-- Left: CGPA Feature Card -->
+        <div class="bento-card col-span-1" style="justify-content:space-between;">
+          <div>
+            <div class="cgpa-label">Cumulative GPA</div>
+            <div class="cgpa-value playfair">{{ data.overall_cgpa }} <span style="font-size:24px; color:var(--text-dim); font-family:'Inter',sans-serif">/ 10</span></div>
+            <div class="cgpa-trend"><i data-lucide="trending-up" style="width:12px; height:12px; display:inline;"></i> {{ data.cgpa_improvement }} from Semester {{ data.prev_sem }}</div>
+            <div class="cgpa-rank">Top {{ data.rank_percentile }}% of batch</div>
+          </div>
+          
+          <div style="border-top: 1px solid var(--border); padding-top:16px; margin-top:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+              <span>Credits Earned</span>
+              <span>{{ data.earned_credits }} / {{ data.total_credits }}</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width: {{ (data.earned_credits / data.total_credits)*100 }}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Semester SGPA Grid -->
+        <div class="col-span-2">
+          <div class="sgpa-grid">
+            {% for sem in data.semester_results %}
+            <div class="sgpa-card {% if sem.isCurrent %}current{% endif %}">
+              {% if sem.isCurrent %}<div class="current-badge">Current</div>{% endif %}
+              <div style="font-size:11px; color:var(--text-ghost); margin-bottom:8px;">Semester {{ sem.semester }}</div>
+              <div class="playfair" style="font-size:24px; color:var(--cream); margin-bottom:auto;">
+                {% if sem.sgpa > 0 %}{{ sem.sgpa }}{% else %}--{% endif %}
+              </div>
+              <div style="font-size:10px; color:var(--text-dim); margin-top:12px;">Credits: {{ sem.credits }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Detailed Marks Table -->
+        <div class="bento-card col-span-3" style="padding:0; overflow:hidden;">
+          <div style="padding:24px 24px 16px 24px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 class="playfair" style="margin:0; font-size:18px; color:var(--cream);">Semester 6 — Detailed Marks</h3>
+            <span style="font-size:12px; color:var(--text-muted); cursor:pointer;">View All Semesters <i data-lucide="arrow-right" style="width:12px;height:12px;display:inline;"></i></span>
+          </div>
+          
+          <div style="overflow-x:auto;">
+            <table class="marks-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Code</th>
+                  <th>Internal (/50)</th>
+                  <th>External (/100)</th>
+                  <th>Total (/150)</th>
+                  <th>Grade</th>
+                  <th>Points</th>
+                  <th>Credits</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for mark in data.current_semester_marks %}
+                <tr>
+                  <td style="color:var(--cream); font-weight:500;">{{ mark.subject_name }}</td>
+                  <td style="color:var(--text-dim); font-size:11px;">{{ mark.subject_code }}</td>
+                  <td style="color:var(--text-muted)">{{ mark.internal }}</td>
+                  <td>
+                    <span style="display:inline-block; width:20px;">{% if mark.external > 0 %}{{ mark.external }}{% else %}--{% endif %}</span>
+                    <div class="inline-bar">
+                      <div class="inline-bar-fill" style="width: {{ mark.external }}%; background: {% if mark.external > 0 %}var(--cream){% else %}transparent{% endif %};"></div>
+                    </div>
+                  </td>
+                  <td style="font-weight:600; color:var(--text-primary);">{{ mark.total }}</td>
+                  <td>
+                    {% set grade_class = 'status-safe' if mark.grade.startswith('A') else ('status-warn' if mark.grade.startswith('B') else 'status-danger') %}
+                    <span class="status-pill {{ grade_class }}">{{ mark.grade }}</span>
+                  </td>
+                  <td style="color:var(--cream);">{{ mark.points }}</td>
+                  <td style="color:var(--text-dim);">{{ mark.credits }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border);">
+                <tr>
+                  <td colspan="5"></td>
+                  <td colspan="3" style="text-align:right; padding:16px;">
+                    <span style="color:var(--text-muted); font-size:12px; margin-right:12px;">Semester 6 SGPA:</span>
+                    <span style="color:var(--cream); font-weight:600; font-size:14px;">Pending Finals</span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bottom Row (2 cols) out of 3 total cols -> let's make them span 1.5 each or 1 and 2 -->
+        <!-- Internal Grades -->
+        <div class="bento-card col-span-2">
+          <h3 class="playfair" style="font-size:16px; color:var(--cream); margin-bottom:4px; margin-top:0;">Internal Assessments</h3>
+          <div style="font-size:11px; color:var(--text-dim); margin-bottom:16px;">Internals only · Finals pending</div>
+          
+          <div>
+            {% for item in data.current_semester_marks %}
+              {% set circle_class = 'grade-C' %}
+              {% if item.grade.startswith('A') %}
+                {% set circle_class = 'grade-A' %}
+              {% elif item.grade.startswith('B') %}
+                {% set circle_class = 'grade-B' %}
+              {% endif %}
+              <div class="internal-item">
+                <div class="grade-circle {{ circle_class }} playfair">{{ item.grade }}</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px; color:var(--cream); font-weight:500; margin-bottom:2px;">{{ item.subject_name }}</div>
+                  <div style="font-size:11px; color:var(--text-ghost);">{{ item.internal }} / 50 marks · {{ item.credits }} Credits</div>
+                </div>
+                <div style="font-weight:600; color:var(--text-muted); border-left:1px solid var(--border); padding-left:16px;">
+                  {{ item.points }} pt
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Grade Distribution Chart -->
+        <div class="bento-card col-span-1">
+          <h3 class="playfair" style="font-size:16px; color:var(--cream); margin-top:0; margin-bottom:24px;">Grade Distribution</h3>
+          
+          <div style="display:flex; flex-direction:column; gap:12px; flex:1;">
+            {% set grades = ['A+', 'A', 'B+', 'B', 'C'] %}
+            {% set total_grades = 0 %}
+            {% set max_count = 15 %} <!-- Hardcoded for mock data mapping -->
+            
+            {% for g in grades %}
+              {% set count = data.grade_distribution.get(g, 0) %}
+              <div class="dist-bar-row">
+                <div class="dist-label">{{ g }}</div>
+                <div class="dist-track">
+                  <div class="dist-fill" style="width: {{ (count / max_count) * 100 }}%;"></div>
+                </div>
+                <div style="width:20px; font-size:12px; color:var(--text-primary); text-align:right;">{{ count }}</div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <div style="margin-top:auto; padding-top:16px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim);">
+            <span>Total: 40 Subjects</span>
+            <span style="color:var(--green);">0 Backlogs</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
+{% endblock %}

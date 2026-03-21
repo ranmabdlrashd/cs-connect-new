@@ -2,12 +2,22 @@
    GLOBAL DESIGN SYSTEM
 =================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap');
+
 :root {
-  --primary-red: #a41f13;
-  --bg-off-white: #faf5f1;
-  --neutral-gray: #e0dbd8;
-  --dark-charcoal: #292f36;
-  --taupe-brown: #8f7a6e;
+  --bg-color: #0A0A0A;
+  --surface: #121212;
+  --deep-surface: #0d0d0d;
+  --accent-crimson: #8B1D1D;
+  --accent-dark: #6B1010;
+  --text-primary: #F5E6BE;
+  --text-secondary: #A0A0A0;
+  --text-muted: #555;
+  --border-subtle: rgba(245,230,190,0.06);
+  --border-accent: rgba(139,29,29,0.3);
+  
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 /* Reset */
@@ -15,13 +25,32 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-  background: var(--bg-off-white);
-  color: var(--dark-charcoal);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .playfair {
+  font-family: var(--font-heading);
+}
+
+/* Global SVG Rules */
+svg.icon-stroke {
+  fill: none;
+  stroke: var(--accent-crimson);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+svg.icon-fill {
+  fill: var(--text-primary);
+  stroke: none;
 }
 
 /* ===================================

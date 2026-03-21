@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - CS Connect Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .um-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .um-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 20px; }
+    .um-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0; font-size: 28px; }
+    .um-header p { color: #A0A0A0; margin: 8px 0 0; font-size: 14px; }
+    
+    .um-toolbar { display: flex; gap: 16px; margin-bottom: 24px; }
+    .um-search { flex: 1; background: #121212; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 16px; border-radius: 8px; outline: none; }
+    .um-filter { background: #121212; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 16px; border-radius: 8px; outline: none; }
+    .um-btn { background: #8B1D1D; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .um-btn:hover { background: #a32222; }
+
+    .um-table-wrapper { background: #121212; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); overflow: hidden; }
+    .um-table { width: 100%; border-collapse: collapse; }
+    .um-table th { background: #1A1A1A; color: #A0A0A0; padding: 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .um-table td { padding: 16px; color: #D0D0D0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .um-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .role-student { background: rgba(23,162,184,0.15); color: #38bdf8; border: 1px solid rgba(23,162,184,0.3); }
+    .role-faculty { background: rgba(255,193,7,0.15); color: #facc15; border: 1px solid rgba(255,193,7,0.3); }
+    .role-admin { background: rgba(220,53,69,0.15); color: #f87171; border: 1px solid rgba(220,53,69,0.3); }
+
+    .action-link { color: #F5E6BE; text-decoration: none; font-size: 13px; font-weight: 500; margin-right: 12px; transition: 0.2s; }
+    .action-link:hover { color: #fff; text-decoration: underline; }
+    .action-del { color: #f87171; }
+    .action-del:hover { color: #ef4444; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="um-page">
+    <div class="um-header">
+        <div>
+            <h2>User Management</h2>
+            <p>Add, edit, or suspend user accounts across the platform.</p>
+        </div>
+        <button class="um-btn" onclick="alert('Open Add User Modal')"><i class="fas fa-plus"></i> New User</button>
+    </div>
+
+    <div class="um-toolbar">
+        <input type="text" class="um-search" placeholder="Search by name, ID, or email...">
+        <select class="um-filter">
+            <option value="all">All Roles</option>
+            <option value="student">Students</option>
+            <option value="faculty">Faculty</option>
+            <option value="admin">Admins</option>
+        </select>
+    </div>
+
+    <div class="um-table-wrapper">
+        <table class="um-table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Mock Data -->
+                <tr>
+                    <td>AIS-CS-042</td>
+                    <td><strong style="color:#fff;">Arjun Kumar</strong></td>
+                    <td>arjun@aisat.ac.in</td>
+                    <td><span class="role-badge role-student">Student</span></td>
+                    <td><span style="color:#4ade80;">Active</span></td>
+                    <td>
+                        <a href="#" class="action-link">Edit</a>
+                        <a href="#" class="action-link action-del">Suspend</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>FAC-CS-012</td>
+                    <td><strong style="color:#fff;">Dr. Thomas Kurian</strong></td>
+                    <td>thomas.k@aisat.ac.in</td>
+                    <td><span class="role-badge role-faculty">Faculty</span></td>
+                    <td><span style="color:#4ade80;">Active</span></td>
+                    <td>
+                        <a href="#" class="action-link">Edit</a>
+                        <a href="#" class="action-link action-del">Suspend</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ADM-SYS-01</td>
+                    <td><strong style="color:#fff;">System Admin</strong></td>
+                    <td>admin@aisat.ac.in</td>
+                    <td><span class="role-badge role-admin">Admin</span></td>
+                    <td><span style="color:#4ade80;">Active</span></td>
+                    <td>
+                        <a href="#" class="action-link" style="opacity:0.5; cursor:not-allowed;">Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

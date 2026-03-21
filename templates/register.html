@@ -1,67 +1,196 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - CS Connect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}" />
+</head>
+<body>
 
-{% block title %}Register - CS Connect{% endblock %}
+  <div class="register-split">
+    
+    <!-- LEFT PANEL: BRANDING -->
+    <div class="register-left">
+      <div class="register-left-content">
+        <div class="register-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 12 12 17 22 12"></polyline>
+              <polyline points="2 17 12 22 22 17"></polyline>
+            </svg>
+          </div>
+          <h1 class="register-title">Join the <span>CS Connect</span> Community</h1>
+        </div>
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}" />
-{% endblock %}
-
-{% block content %}
-
-<div class="login-wrapper">
-    <div class="login-left">
-        <h1>Create Account</h1>
-        <p>Register to access CS Connect services and resources.</p>
+        <ul class="features-list">
+          <li class="feature-item">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <span class="f-label">Instant Access to Academic Vault</span>
+          </li>
+          <li class="feature-item">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <span class="f-label">Secure & Private Data Encryption</span>
+          </li>
+          <li class="feature-item">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <span class="f-label">Verified by AISAT Administration</span>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <div class="login-right">
-        <h2>Register</h2>
+    <!-- RIGHT PANEL: FORM -->
+    <div class="register-right">
+      <div class="register-card">
+        
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step done">
+            <div class="step-circle">✓</div>
+            <span class="step-label">Account</span>
+          </div>
+          <div class="step active">
+            <div class="step-circle">2</div>
+            <span class="step-label">Verify</span>
+          </div>
+          <div class="step">
+            <div class="step-circle">3</div>
+            <span class="step-label">Profile</span>
+          </div>
+        </div>
+
+        <h2 style="font-family:'Playfair Display'; font-size: 28px; margin: 0 0 8px; color: #F5E6BE; text-align: center;">Register Profile</h2>
+        <p style="font-size: 13px; color: #666; text-align: center; margin-bottom: 32px;">Create your identity within the CSE portal.</p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="flash {{ category }}">{{ message }}</div>
+        <div style="background: rgba(139,29,29,0.1); border: 1px solid #8B1D1D; color: #8B1D1D; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px;">{{ message }}</div>
         {% endfor %}
         {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('register') }}">
-            <div class="input-box">
-                <input type="text" name="name" placeholder="Full Name" required>
+        <form method="POST" action="{{ url_for('register') }}" onsubmit="return combineName()">
+          <input type="hidden" name="role" id="roleInput" value="student">
+          <!-- Combined name field for backend mapping -->
+          <input type="hidden" name="name" id="nameInput">
+          
+          {% if next_url %}
+          <input type="hidden" name="next_url" value="{{ next_url }}">
+          {% endif %}
+
+          <!-- Role Selector -->
+          <div class="role-tabs">
+            <button type="button" class="role-btn active" onclick="setRole('student', this)">Student</button>
+            <button type="button" class="role-btn" onclick="setRole('faculty', this)">Faculty</button>
+            <button type="button" class="role-btn" onclick="setRole('admin', this)">Admin</button>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="firstName" class="form-control" placeholder="John" required>
             </div>
-            <div class="input-box">
-                <input type="email" name="email" placeholder="Email" required>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
             </div>
-            <div class="input-box">
-                <input type="password" name="password" placeholder="Password" required>
+
+            <div class="form-group span-2">
+              <label>Roll Number / ID</label>
+              <input type="text" name="user_id" class="form-control" placeholder="AIS-CS-XXXX" required>
             </div>
-            <div class="input-box">
-                <input type="text" name="user_id" placeholder="College ID / Roll Number" required>
+
+            <div class="form-group span-2">
+              <label>Institutional Email</label>
+              <input type="email" name="email" class="form-control" placeholder="john.doe@aisat.ac.in" required>
             </div>
-            <div class="input-box">
-                <select name="role" required>
-                    <option value="">Select Role</option>
-                    <option value="student">Student</option>
-                    <option value="faculty">Faculty</option>
-                    <option value="admin">Admin</option>
+
+            <div class="form-group">
+              <label>Batch / Semester</label>
+              <div class="select-wrapper">
+                <select name="batch" class="form-control">
+                  <option value="S1">Semester 1 (2024)</option>
+                  <option value="S2">Semester 2 (2024)</option>
+                  <option value="S3">Semester 3 (2023)</option>
+                  <option value="S4">Semester 4 (2023)</option>
+                  <option value="S5">Semester 5 (2022)</option>
+                  <option value="S6" selected>Semester 6 (2022)</option>
+                  <option value="S7">Semester 7 (2021)</option>
+                  <option value="S8">Semester 8 (2021)</option>
                 </select>
+              </div>
             </div>
-            <button type="submit" class="login-btn">Create Account</button>
-            <p style="margin-top: 15px;">
-                Already have an account? <a href="{{ url_for('login') }}">Login</a>
-            </p>
+
+            <div class="form-group">
+              <label>Section</label>
+              <div class="select-wrapper">
+                <select name="section" class="form-control">
+                  <option value="A">Section A</option>
+                  <option value="B">Section B</option>
+                  <option value="C">Section C</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group span-2">
+              <label>Password</label>
+              <input type="password" name="password" id="passInput" class="form-control" placeholder="••••••••" required oninput="checkStrength(this.value)">
+              <div class="strength-meter">
+                <div id="strengthBar" class="strength-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Continue to Verification</button>
+
+          <p class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Sign In</a>
+          </p>
         </form>
+      </div>
     </div>
-</div>
+  </div>
 
-{% endblock %}
+  <script>
+    function setRole(role, btn) {
+      document.getElementById('roleInput').value = role;
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
 
-{% block extra_js %}
-<script>
-    setTimeout(function () {
-        document.querySelectorAll('.flash').forEach(function (alert) {
-            alert.style.display = 'none';
-        });
-    }, 3000);
-</script>
-{% endblock %}
+    function combineName() {
+      const fn = document.getElementById('firstName').value;
+      const ln = document.getElementById('lastName').value;
+      document.getElementById('nameInput').value = fn + " " + ln;
+      return true;
+    }
+
+    function checkStrength(pass) {
+      let strength = 0;
+      if (pass.length > 5) strength += 20;
+      if (pass.length > 8) strength += 20;
+      if (/[A-Z]/.test(pass)) strength += 20;
+      if (/[0-9]/.test(pass)) strength += 20;
+      if (/[^A-Za-z0-9]/.test(pass)) strength += 20;
+
+      const bar = document.getElementById('strengthBar');
+      bar.style.width = strength + '%';
+      
+      if (strength <= 40) bar.style.background = '#8B1D1D';
+      else if (strength <= 60) bar.style.background = '#b85';
+      else bar.style.background = '#50C878';
+    }
+  </script>
+
+</body>
+</html>

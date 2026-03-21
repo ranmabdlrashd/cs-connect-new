@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mark Attendance — CS Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mark_attendance.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+    </div>
+    <nav class="nav-items">
+      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <div class="nav-item" data-tip="My Students" onclick="location.href='/faculty/my-students'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <!-- Attendance (Active) -->
+      <div class="nav-item active" data-tip="Mark Attendance">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="nav-item" data-tip="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="user-avatar">{{ session.get('name', 'F')[0].upper() }}</div>
+    </div>
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main-content">
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect · Faculty Portal · <b>Mark Attendance</b></span>
+      <div class="notif-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="notif-dot"></span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Title Row -->
+      <div class="page-title-row">
+        <div>
+          <h1>Mark Attendance</h1>
+          <p style="font-size:13px; color:var(--muted); margin-top:4px;">Record student presence for today's session</p>
+        </div>
+        <div class="date-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span id="currentDate">—</span>
+        </div>
+      </div>
+
+      <!-- Session Config Bar -->
+      <div class="config-bar">
+        <div class="config-field">
+          <label>Subject</label>
+          <select class="config-select" id="subjectSel" onchange="reloadStudents()">
+            {% for s in subjects %}
+            <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
+            {% endfor %}
+            {% if not subjects %}
+            <option value="CS302">CS302 · Data Structures</option>
+            <option value="CS401">CS401 · Computer Networks</option>
+            <option value="CS303">CS303 · DAA</option>
+            {% endif %}
+          </select>
+        </div>
+        <div class="config-field">
+          <label>Batch</label>
+          <select class="config-select" id="batchSel" onchange="reloadStudents()">
+            {% for b in batches %}
+            <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+            {% if not batches %}
+            <option value="S6 CSE">S6 CSE - Alpha</option>
+            <option value="S4 CSE">S4 CSE - Beta</option>
+            <option value="S2 CSE">S2 CSE - Gamma</option>
+            {% endif %}
+          </select>
+        </div>
+        <div class="config-field">
+          <label>Hour / Slot</label>
+          <select class="config-select" id="hourSel">
+            <option value="1">1st Hour · 8:30 AM</option>
+            <option value="2">2nd Hour · 10:30 AM</option>
+            <option value="3">3rd Hour · 12:30 PM</option>
+            <option value="4">4th Hour · 2:30 PM</option>
+            <option value="5">5th Hour · 3:30 PM</option>
+            <option value="lab1">Lab Session 1</option>
+            <option value="lab2">Lab Session 2</option>
+          </select>
+        </div>
+        <button class="submit-btn" onclick="openSubmit()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          Submit Attendance
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </div>
+
+      <!-- Register Header -->
+      <div class="register-header">
+        <h3>DIGITAL REGISTER</h3>
+        <div class="reg-summary">
+          Present: <b id="cnt-p">0</b> &nbsp;|&nbsp;
+          Absent: <b class="cnt-absent" id="cnt-a">0</b> &nbsp;|&nbsp;
+          Total: <b id="cnt-t">0</b>
+        </div>
+      </div>
+
+      <!-- Bulk Actions -->
+      <div class="bulk-bar">
+        <button class="bulk-btn all-p" onclick="markAll('P')">✓ Mark All Present</button>
+        <button class="bulk-btn" onclick="markAll('A')">✗ Mark All Absent</button>
+        <button class="bulk-btn" onclick="markAll('reset')">↺ Reset</button>
+      </div>
+
+      <!-- Register List -->
+      <div class="register-list" id="registerList">
+        {% for i, s in students %}
+        <div class="reg-row" id="row-{{ s.id }}" data-id="{{ s.id }}" data-name="{{ s.name }}" data-roll="{{ s.roll_no }}">
+          <span class="reg-idx">{{ i + 1 }}</span>
+          <div class="reg-avatar">{{ s.initials }}</div>
+          <div class="reg-info">
+            <div class="reg-name">{{ s.name }}</div>
+            <div class="reg-roll">{{ s.roll_no }}</div>
+          </div>
+          <span class="late-badge" id="late-{{ s.id }}" onclick="toggleLate('{{ s.id }}')">Late</span>
+          <div class="pa-toggle">
+            <button class="pa-btn p-btn active" id="p-{{ s.id }}" onclick="mark('{{ s.id }}','P')">P</button>
+            <button class="pa-btn a-btn"         id="a-{{ s.id }}" onclick="mark('{{ s.id }}','A')">A</button>
+          </div>
+        </div>
+        {% endfor %}
+        {% if not students %}
+        <!-- Fallback dummy register (shown if no DB data) -->
+        {% set dummy = [
+          ('101','Arjun Kumar','AIS22CS001','AK'),
+          ('102','Sneha Krishnan','AIS22CS002','SK'),
+          ('103','Rahul Menon','AIS22CS003','RM'),
+          ('104','Divya Nair','AIS22CS004','DN'),
+          ('105','Priya Suresh','AIS22CS005','PS'),
+          ('106','Arun Babu','AIS22CS006','AB'),
+          ('107','Meera Thomas','AIS22CS007','MT'),
+          ('108','Kiran Raj','AIS22CS008','KR')
+        ] %}
+        {% for id, name, roll, init in dummy %}
+        <div class="reg-row" id="row-{{ id }}" data-id="{{ id }}" data-name="{{ name }}" data-roll="{{ roll }}">
+          <span class="reg-idx">{{ loop.index }}</span>
+          <div class="reg-avatar">{{ init }}</div>
+          <div class="reg-info">
+            <div class="reg-name">{{ name }}</div>
+            <div class="reg-roll">{{ roll }}</div>
+          </div>
+          <span class="late-badge" id="late-{{ id }}" onclick="toggleLate('{{ id }}')">Late</span>
+          <div class="pa-toggle">
+            <button class="pa-btn p-btn active" id="p-{{ id }}" onclick="mark('{{ id }}','P')">P</button>
+            <button class="pa-btn a-btn"        id="a-{{ id }}" onclick="mark('{{ id }}','A')">A</button>
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+
+    </div><!-- page-content -->
+  </div><!-- main-content -->
+</div><!-- dash-wrapper -->
+
+<!-- ══════════ SUBMIT CONFIRMATION MODAL ══════════ -->
+<div class="submit-overlay" id="submitOverlay">
+  <div class="submit-card" id="submitCard">
+    <h3>Confirm Submission</h3>
+    <p id="submitDesc">Review before sending to the server.</p>
+    <div class="submit-summary">
+      <div class="ssum-item p">
+        <span class="ssum-val" id="modal-p">0</span>
+        <span class="ssum-lbl">Present</span>
+      </div>
+      <div class="ssum-item a">
+        <span class="ssum-val" id="modal-a">0</span>
+        <span class="ssum-lbl">Absent</span>
+      </div>
+      <div class="ssum-item">
+        <span class="ssum-val" id="modal-t">0</span>
+        <span class="ssum-lbl">Total</span>
+      </div>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn-cancel-modal" onclick="closeSubmit()">Review Again</button>
+      <button class="btn-confirm" onclick="submitAttendance()">Confirm &amp; Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═════════════════════════════════════════
+   ATTENDANCE STATE
+═════════════════════════════════════════ */
+const state = {};   // { studentId: 'P' | 'A' }
+const lateSet = new Set();
+
+// Init all to Present
+document.querySelectorAll('.reg-row').forEach(row => {
+  state[row.dataset.id] = 'P';
+});
+updateSummary();
+
+/* ── Toggle P/A ── */
+function mark(id, val) {
+  state[id] = val;
+  const row  = document.getElementById('row-' + id);
+  const pBtn = document.getElementById('p-' + id);
+  const aBtn = document.getElementById('a-' + id);
+  const late = document.getElementById('late-' + id);
+
+  if (val === 'P') {
+    pBtn.classList.add('active');
+    aBtn.classList.remove('active');
+    row.classList.remove('absent');
+  } else {
+    aBtn.classList.add('active');
+    pBtn.classList.remove('active');
+    row.classList.add('absent');
+    // Hide late badge when absent
+    late.classList.remove('visible');
+    row.classList.remove('late');
+    lateSet.delete(id);
+  }
+  updateSummary();
+}
+
+/* ── Late Toggle ── */
+function toggleLate(id) {
+  if (state[id] !== 'P') return;  // only present students can be late
+  const row  = document.getElementById('row-' + id);
+  const late = document.getElementById('late-' + id);
+  if (lateSet.has(id)) {
+    lateSet.delete(id);
+    late.classList.remove('visible');
+    row.classList.remove('late');
+  } else {
+    lateSet.add(id);
+    late.classList.add('visible');
+    row.classList.add('late');
+  }
+}
+
+/* ── Bulk Mark ── */
+function markAll(val) {
+  Object.keys(state).forEach(id => {
+    if (val === 'reset') mark(id, 'P');
+    else mark(id, val);
+  });
+}
+
+/* ── Summary Counter ── */
+function updateSummary() {
+  const vals  = Object.values(state);
+  const pCnt  = vals.filter(v => v === 'P').length;
+  const aCnt  = vals.filter(v => v === 'A').length;
+  document.getElementById('cnt-p').textContent = pCnt;
+  document.getElementById('cnt-a').textContent = aCnt;
+  document.getElementById('cnt-t').textContent = vals.length;
+
+  // Late badge visibility for present students
+  Object.keys(state).forEach(id => {
+    const late = document.getElementById('late-' + id);
+    if (late) late.classList.toggle('visible', state[id] === 'P' && lateSet.has(id));
+  });
+}
+
+/* ── Date chip ── */
+function setDate() {
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('currentDate').textContent =
+    new Date().toLocaleDateString('en-IN', opts);
+}
+setDate();
+
+/* ════════════════════════════════════════
+   SUBMIT FLOW
+════════════════════════════════════════ */
+function openSubmit() {
+  const vals = Object.values(state);
+  document.getElementById('modal-p').textContent = vals.filter(v => v==='P').length;
+  document.getElementById('modal-a').textContent = vals.filter(v => v==='A').length;
+  document.getElementById('modal-t').textContent = vals.length;
+  const sub = document.getElementById('subjectSel');
+  const bat = document.getElementById('batchSel');
+  document.getElementById('submitDesc').textContent =
+    `${sub.options[sub.selectedIndex]?.text || 'Subject'} — ${bat.options[bat.selectedIndex]?.text || 'Batch'}`;
+  document.getElementById('submitOverlay').classList.add('open');
+}
+function closeSubmit() {
+  document.getElementById('submitOverlay').classList.remove('open');
+}
+
+function submitAttendance() {
+  const subject = document.getElementById('subjectSel').value;
+  const batch   = document.getElementById('batchSel').value;
+  const hour    = document.getElementById('hourSel').value;
+
+  const payload = Object.entries(state).map(([id, status]) => ({
+    student_id: id,
+    status:     status,
+    late:       lateSet.has(id),
+    subject:    subject,
+    batch:      batch,
+    hour:       hour,
+    date:       new Date().toISOString().slice(0,10)
+  }));
+
+  fetch('/faculty/submit-attendance', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ records: payload })
+  })
+  .then(r => r.json())
+  .then(data => {
+    const card = document.getElementById('submitCard');
+    card.innerHTML = `
+      <div class="success-tick">✅</div>
+      <h3>Attendance Saved!</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">
+        ${data.saved || payload.filter(p=>p.status==='P').length} Present, 
+        ${data.absent || payload.filter(p=>p.status==='A').length} Absent recorded.
+      </p>
+      <button class="btn-confirm" onclick="location.href='/faculty-dashboard'">Back to Dashboard</button>
+    `;
+  })
+  .catch(() => {
+    alert('Attendance saved locally (server offline). Please reconnect and re-submit.');
+    closeSubmit();
+  });
+}
+
+/* ════════════════════════════════════════
+   DYNAMIC RELOAD (batch/subject change)
+════════════════════════════════════════ */
+function reloadStudents() {
+  const batch = document.getElementById('batchSel').value;
+  fetch(`/faculty/students-by-batch?batch=${encodeURIComponent(batch)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.students || !data.students.length) return;
+      const list = document.getElementById('registerList');
+      list.innerHTML = '';
+      // Reset state
+      Object.keys(state).forEach(k => delete state[k]);
+      lateSet.clear();
+
+      data.students.forEach((s, i) => {
+        state[s.id] = 'P';
+        const div = document.createElement('div');
+        div.className = 'reg-row';
+        div.id = 'row-' + s.id;
+        div.dataset.id   = s.id;
+        div.dataset.name = s.name;
+        div.dataset.roll = s.roll_no;
+        div.innerHTML = `
+          <span class="reg-idx">${i+1}</span>
+          <div class="reg-avatar">${s.initials}</div>
+          <div class="reg-info">
+            <div class="reg-name">${s.name}</div>
+            <div class="reg-roll">${s.roll_no}</div>
+          </div>
+          <span class="late-badge" id="late-${s.id}" onclick="toggleLate('${s.id}')">Late</span>
+          <div class="pa-toggle">
+            <button class="pa-btn p-btn active" id="p-${s.id}" onclick="mark('${s.id}','P')">P</button>
+            <button class="pa-btn a-btn"         id="a-${s.id}" onclick="mark('${s.id}','A')">A</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+      updateSummary();
+    })
+    .catch(() => { /* keep existing list on error */ });
+}
+</script>
+</body>
+</html>

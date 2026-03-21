@@ -1,0 +1,152 @@
+{% extends "faculty_dashboard.html" %}
+
+{% block title %}Student Queries - CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .fq-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: flex; gap: 24px; height: 75vh; }
+    .fq-sidebar { width: 350px; background: #121212; border: 1px solid rgba(245,230,190,0.05); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+    .fq-header { padding: 20px; border-bottom: 1px solid rgba(245,230,190,0.05); }
+    .fq-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0 0 12px; font-size: 20px; }
+    .fq-search { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 14px; border-radius: 6px; outline: none; transition: 0.2s; }
+    .fq-search:focus { border-color: #8B1D1D; }
+    
+    .fq-list { flex: 1; overflow-y: auto; }
+    .fq-item { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer; transition: 0.2s; display: flex; gap: 12px; align-items: center; }
+    .fq-item:hover { background: #1A1A1A; }
+    .fq-item.active { background: rgba(139,29,29,0.1); border-left: 3px solid #8B1D1D; }
+    
+    .fq-avatar { width: 44px; height: 44px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #F5E6BE; font-weight: 600; font-size: 14px; position: relative; }
+    .fq-badge { position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: #8B1D1D; border-radius: 50%; border: 2px solid #121212; display: none; }
+    .fq-item.unread .fq-badge { display: block; }
+    .fq-item.unread .fq-name { font-weight: 700; color: #fff; }
+    
+    .fq-info { flex: 1; min-width: 0; }
+    .fq-name { margin: 0 0 4px; font-size: 14px; color: #D0D0D0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fq-preview { margin: 0; font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    /* Main Chat Area */
+    .fq-chat { flex: 1; background: #121212; border: 1px solid rgba(245,230,190,0.05); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+    .fq-chat-head { padding: 20px; border-bottom: 1px solid rgba(245,230,190,0.05); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+    .fq-chat-head h3 { margin: 0; color: #F5E6BE; font-size: 18px; }
+    .fq-chat-head p { margin: 4px 0 0; color: #888; font-size: 12px; }
+    .fq-chat-actions button { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #D0D0D0; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 12px; }
+    .fq-chat-actions button:hover { background: #1A1A1A; color: #fff; }
+    
+    .fq-messages { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #0A0A0A; }
+    
+    .msg-wrap { display: flex; gap: 12px; max-width: 80%; }
+    .msg-wrap.received { align-self: flex-start; }
+    .msg-wrap.sent { align-self: flex-end; flex-direction: row-reverse; }
+    
+    .msg-av { width: 32px; height: 32px; border-radius: 50%; background: #222; display: flex; justify-content: center; align-items: center; color: #888; font-size: 12px; flex-shrink: 0; }
+    .msg-bubble { padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; position: relative; }
+    .received .msg-bubble { background: #1A1A1A; color: #D0D0D0; border: 1px solid rgba(255,255,255,0.05); border-top-left-radius: 2px; }
+    .sent .msg-bubble { background: rgba(139,29,29,0.15); color: #F5E6BE; border: 1px solid rgba(139,29,29,0.3); border-top-right-radius: 2px; }
+    
+    .msg-time { font-size: 10px; color: #666; margin-top: 6px; display: block; text-align: right; }
+    .sent .msg-time { color: rgba(245,230,190,0.5); }
+    
+    .fq-input-area { padding: 20px; border-top: 1px solid rgba(245,230,190,0.05); background: rgba(0,0,0,0.2); display: flex; gap: 12px; align-items: center; }
+    .fq-input-area input { flex: 1; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 16px; border-radius: 30px; outline: none; font-size: 14px; transition: 0.2s; }
+    .fq-input-area input:focus { border-color: #8B1D1D; }
+    .fq-send { background: #8B1D1D; color: #fff; border: none; width: 46px; height: 46px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+    .fq-send:hover { background: #a32222; transform: scale(1.05); }
+
+    .back-btn { display: inline-block; color: #888; text-decoration: none; margin-bottom: 24px; font-weight: 500; font-size: 14px; transition: 0.2s; position: absolute; top: 80px;}
+    .back-btn:hover { color: #F5E6BE; transform: translateX(-4px); }
+</style>
+{% endblock %}
+
+{% block faculty_content %}
+<a href="/faculty-dashboard" class="back-btn" style="margin-left: 20px; display: none;">&larr; Back to Faculty Dashboard</a>
+
+<div class="fq-page">
+    
+    <!-- Sidebar / Inbox List -->
+    <div class="fq-sidebar">
+        <div class="fq-header">
+            <h2>Student Queries</h2>
+            <input type="text" class="fq-search" placeholder="Search by name or roll no...">
+        </div>
+        <div class="fq-list">
+            
+            <div class="fq-item unread active">
+                <div class="fq-avatar">AK<div class="fq-badge"></div></div>
+                <div class="fq-info">
+                    <h4 class="fq-name">Arjun Kumar (S6 CSE)</h4>
+                    <p class="fq-preview">Sir, I had a doubt regarding the lab assignment on ML...</p>
+                </div>
+            </div>
+            
+            <div class="fq-item">
+                <div class="fq-avatar">MP</div>
+                <div class="fq-info">
+                    <h4 class="fq-name">Meera Prasad (S4 CSE)</h4>
+                    <p class="fq-preview">Thank you for extending the deadline.</p>
+                </div>
+            </div>
+            
+            <div class="fq-item">
+                <div class="fq-avatar">VJ</div>
+                <div class="fq-info">
+                    <h4 class="fq-name">Varun Joseph (S8 CSE)</h4>
+                    <p class="fq-preview">Could you please review my project synopsis?</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Main Chat Window -->
+    <div class="fq-chat">
+        
+        <div class="fq-chat-head">
+            <div>
+                <h3>Arjun Kumar</h3>
+                <p>Roll No: AIS-CS-042 | Semester 6</p>
+            </div>
+            <div class="fq-chat-actions">
+                <button><i class="fas fa-check" style="margin-right: 4px;"></i> Mark Resolved</button>
+            </div>
+        </div>
+        
+        <div class="fq-messages">
+            
+            <div class="msg-wrap received">
+                <div class="msg-av">AK</div>
+                <div class="msg-bubble">
+                    Good evening Sir, I had a doubt regarding the last Machine Learning assignment question 3. Which dataset should we use to train the SVM model?
+                    <span class="msg-time">Today, 4:30 PM</span>
+                </div>
+            </div>
+            
+            <div class="msg-wrap sent">
+                <div class="msg-av" style="background: rgba(139,29,29,0.3); color: #F5E6BE;">You</div>
+                <div class="msg-bubble">
+                    Good evening Arjun. You should use the Iris dataset provided in the Resource Vault under '/academics'.
+                    <span class="msg-time">Today, 5:10 PM</span>
+                </div>
+            </div>
+            
+            <div class="msg-wrap received">
+                <div class="msg-av">AK</div>
+                <div class="msg-bubble">
+                    Got it sir, thank you! I will upload the repository link by tomorrow.
+                    <span class="msg-time">Today, 5:15 PM</span>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="fq-input-area">
+            <input type="text" placeholder="Type your reply here...">
+            <button class="fq-send" onclick="alert('Message sent to student dashboard successfully.')">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        
+    </div>
+
+</div>
+{% endblock %}

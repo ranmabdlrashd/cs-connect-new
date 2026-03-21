@@ -24,6 +24,21 @@ def library():
     return render_template("library.html", active_page="library")
 
 
+@library_bp.route("/library/scan/<book_uuid>")
+def scan_book(book_uuid):
+    if "user_id" not in session:
+        flash("Welcome! Please register or log in to interact with library books.", "info")
+        return redirect(url_for("register", next=f"/library/scan/{book_uuid}"))
+    
+    try:
+        book_id = int(book_uuid)
+    except ValueError:
+        flash("Invalid book QR code.", "danger")
+        return redirect(url_for("library_bp.library"))
+        
+    return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+
 @library_bp.route("/search_books")
 def search_books():
     if "user_id" not in session:

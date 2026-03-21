@@ -8,90 +8,216 @@
 
 {% block content %}
 
-<!-- Hero Section -->
-<section class="hero" id="home">
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <h2 class="reveal">Albertian Institute of Science and Technology</h2>
-    <h1 class="reveal">CS CONNECT</h1>
-    <p class="reveal" style="margin-bottom: 2rem; font-size: 1.2rem; opacity: 0.9">
-      Department of Computer Science &amp; Engineering. <br />
-      Innovate. Create. Lead the Future.
-    </p>
-    <div class="hero-btns reveal">
-      <a href="{{ url_for('about_cse') }}" class="btn-main btn-primary">Explore CSE</a>
-      <a href="{{ url_for('about_aisat') }}" class="btn-main btn-outline">About AISAT</a>
+<!-- 2.2 Hero Section -->
+<section class="hero">
+    <div class="hero-content reveal">
+        <div class="hero-eyebrow">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</div>
+        <div class="hero-sub-eyebrow">ALBERTIAN INSTITUTE OF SCIENCE AND TECHNOLOGY</div>
+        <h1 class="hero-title">CS CONNECT</h1>
+        <p class="hero-tagline">
+            <span>Innovate.</span> Create. <span>Lead the Future.</span>
+        </p>
+        <div class="hero-btns">
+            <a href="#" class="hero-btn btn-filled">Explore Portal &rarr;</a>
+            <a href="{{ url_for('academics') }}" class="hero-btn btn-transparent">View Academics</a>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- Stats Strip -->
-<div class="stats-strip reveal">
-  {% for stat in stats %}
-  <div class="stat-item">
-    <span class="stat-number" data-target="{{ stat.value }}">0</span>
-    <span class="stat-label">{{ stat.label }}</span>
-  </div>
-  {% endfor %}
+<!-- 2.3 Stats Bar -->
+<div class="stats-bar reveal">
+    {% if stats %}
+        {% for stat in stats %}
+        <div class="stat-item">
+            <span class="stat-number">{{ stat.value }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Students</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">50+</span>
+            <span class="stat-label">Faculty</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Placement</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">15+</span>
+            <span class="stat-label">Research Labs</span>
+        </div>
+    {% endif %}
 </div>
 
-<!-- Feature Cards -->
-<section class="features" id="academics">
-  {% for card in feature_cards %}
-  {% if card.title == 'Placements' %}
-    {% set target_url = url_for('placements') %}
-{% elif card.title == 'Syllabus & Curriculum' %}
-    {% set target_url = url_for('academics') %}
-{% else %}
-    {% set target_url = '#' %}
-{% endif %}
-  <a href="{{ target_url }}" class="card reveal" style="text-decoration: none; color: inherit; display: block;">
-    <div class="card-icon">{{ card.icon }}</div>
-    <h3>{{ card.title }}</h3>
-    <p>{{ card.description }}</p>
-  </a>
-  {% endfor %}
-</section>
-
-<!-- Faculty Parallax -->
-<section class="faculty-parallax" id="faculty">
-  <div class="faculty-text reveal">
-    <h2 style="font-size: 3rem; margin-bottom: 1rem; color: #fff">Meet Our Visionaries</h2>
-    <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--neutral-gray)">
-      Led by <strong>Dr. Jeswin Roy Dcouth</strong>, our faculty comprises
-      industry experts and seasoned researchers dedicated to shaping the
-      next generation of engineers.
-    </p>
-    <a href="{{ url_for('faculty') }}" class="btn-main btn-primary">View All Faculty</a>
-  </div>
-  <div class="faculty-image-container reveal">
-    <div class="faculty-card">
-      <img src="{{ url_for('static', filename='media/hod.jpg') }}" alt="Dr. Jeswin Roy Dcouth"
-        style="width: 100%; height: 250px; object-fit: cover; border-radius: 4px;">
-      <h3 style="margin-top: 15px">Dr. Jeswin Roy Dcouth</h3>
-      <p style="color: var(--primary-red); font-weight: bold">HOD &amp; Associate Professor</p>
+<div class="section-container">
+    <!-- 2.4 & 2.5 Title row -->
+    <div class="section-header reveal">
+        <div>
+            <h2 class="section-header-title">Department Highlights</h2>
+            <div class="section-header-subtitle">Recent achievements &amp; milestones</div>
+        </div>
+        <a href="#" class="section-link">View All &rarr;</a>
     </div>
-  </div>
-</section>
 
-<!-- Department Highlights / Events -->
-<section class="events-section">
-  <div class="section-header reveal">
-    <h2>Department Highlights</h2>
-    <p style="color: var(--taupe-brown)">Upcoming Events and Recent Activities</p>
-  </div>
-  <div class="event-slider reveal">
-    {% for event in events %}
-    <div class="event-card">
-     <div style="height: 180px; background-color: {{ event.bg_color|default('#eee') }};"></div>
-      <div class="event-info">
-        <span class="date-badge">{{ event.date }}</span>
-        <h4>{{ event.title }}</h4>
-        <p style="font-size: 0.9rem; margin-top: 5px">{{ event.description }}</p>
-      </div>
+    <!-- 2.5 Two-Column Layout -->
+    <div class="split-layout">
+        <!-- Left: Highlights Grid -->
+        <div class="highlights-container">
+            <!-- Row 1 (3 cols) -->
+            <div class="highlights-grid reveal">
+                <!-- Card 1 -->
+                <div class="highlight-card">
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M12 15l-8-4 8-4 8 4-8 4z"></path><path d="M4 11v6l8 4 8-4v-6"></path></svg>
+                    <h3 class="highlight-title">National Hackathon Victory</h3>
+                    <p class="highlight-desc">Team AlphaCode secured 1st place at CodeFest 2024, defeating 320+ teams across India</p>
+                    <span class="highlight-date">March 10, 2025</span>
+                </div>
+                <!-- Card 2 -->
+                <div class="highlight-card">
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <h3 class="highlight-title">IEEE Research Publication</h3>
+                    <p class="highlight-desc">Faculty &amp; students published 3 papers in IEEE Transactions on Neural Networks &amp; Learning Systems</p>
+                    <span class="highlight-date">February 28, 2025</span>
+                </div>
+                <!-- Card 3 -->
+                <div class="highlight-card">
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+                    <h3 class="highlight-title">AI Lab Inauguration</h3>
+                    <p class="highlight-desc">New AI &amp; ML research lab inaugurated with GPU cluster, open for final year project students</p>
+                    <span class="highlight-date">February 14, 2025</span>
+                </div>
+            </div>
+            
+            <!-- Row 2 (2 cols) -->
+            <div class="highlights-grid row-2 reveal">
+                <!-- Card 4 -->
+                <div class="highlight-card">
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <h3 class="highlight-title">Industry MoU Signed</h3>
+                    <p class="highlight-desc">New partnership with TCS &amp; Infosys for campus recruitment and internship programs</p>
+                    <span class="highlight-date">January 20, 2025</span>
+                </div>
+                <!-- Card 5 -->
+                <div class="highlight-card">
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                    <h3 class="highlight-title">NAAC A++ Accreditation</h3>
+                    <p class="highlight-desc">CSE dept awarded highest grade in institutional quality assessment for academic excellence</p>
+                    <span class="highlight-date">January 05, 2025</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Notice Board -->
+        <div class="notice-panel reveal">
+            <h3 class="notice-title">Notice Board</h3>
+            <div class="notice-list">
+                <!-- Dummy notices matching prompt -->
+                <div class="notice-item">
+                    <div class="notice-item-header">
+                        <div class="notice-dot"></div>
+                        <div class="notice-item-title">End Semester Exam Schedule</div>
+                    </div>
+                    <div class="notice-item-desc">Exams commence April 5. Hall tickets available from HOD office</div>
+                    <div class="notice-item-date">Mar 15, 2025</div>
+                </div>
+                <div class="notice-item">
+                    <div class="notice-item-header">
+                        <div class="notice-dot"></div>
+                        <div class="notice-item-title">Project Expo Registration</div>
+                    </div>
+                    <div class="notice-item-desc">Final year project expo registrations open. Deadline: March 30</div>
+                    <div class="notice-item-date">Mar 12, 2025</div>
+                </div>
+                <div class="notice-item">
+                    <div class="notice-item-header">
+                        <div class="notice-dot"></div>
+                        <div class="notice-item-title">Guest Lecture: Deep Learning</div>
+                    </div>
+                    <div class="notice-item-desc">Industry expert from Google DeepMind on March 22, 2025 at 2 PM</div>
+                    <div class="notice-item-date">Mar 10, 2025</div>
+                </div>
+                <div class="notice-item">
+                    <div class="notice-item-header">
+                        <div class="notice-dot"></div>
+                        <div class="notice-item-title">Scholarship Notifications</div>
+                    </div>
+                    <div class="notice-item-desc">Merit scholarship applications for 2025 batch now open via online portal</div>
+                    <div class="notice-item-date">Mar 05, 2025</div>
+                </div>
+            </div>
+            <a href="/notice-archive" class="btn-notice-all">View All Notices &rarr;</a>
+        </div>
     </div>
-    {% endfor %}
-  </div>
-</section>
+    
+    <!-- 2.6 Faculty Spotlight -->
+    <div class="faculty-spotlight reveal">
+        <div class="faculty-left">
+            <span class="spotlight-label">Faculty Spotlight &mdash; HOD's Message</span>
+            <div class="spotlight-quote-mark">&ldquo;</div>
+            <p class="spotlight-quote">
+                Our department is not just a place of learning &mdash; it is a crucible where ideas are forged into innovations. We equip our students with both the technical mastery and the ethical foundation to shape the digital future.
+            </p>
+            <div class="spotlight-name">Dr. Mathew Joseph</div>
+            <div class="spotlight-credentials">HOD &middot; Dept. of Computer Science &amp; Engineering &middot; Ph.D. (IIT Bombay)</div>
+        </div>
+        <div class="faculty-right">
+            <div class="portrait-circle">
+                <svg viewBox="0 0 24 24" class="icon-stroke"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <h3 class="spotlight-name">Dr. Mathew Joseph</h3>
+            <div class="portrait-badge">Head of Dept.</div>
+        </div>
+    </div>
+    
+    <!-- 2.7 Academic Excellence Grid -->
+    <div class="section-header reveal" style="margin-top: 80px;">
+        <div>
+            <h2 class="section-header-title">Academic Excellence</h2>
+            <div class="section-header-subtitle">Resources &amp; opportunities</div>
+        </div>
+    </div>
+    
+    <div class="excellence-grid reveal">
+        <div class="excellence-card">
+            <div class="excellence-icon-wrapper">
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <h3 class="excellence-title">Syllabus &amp; Curriculum</h3>
+            <p class="excellence-desc">Access semester-wise syllabi, lab manuals and reference materials</p>
+            <a href="{{ url_for('academics') }}" class="excellence-link">Explore &rarr;</a>
+        </div>
+        
+        <div class="excellence-card">
+            <div class="excellence-icon-wrapper">
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
+            <h3 class="excellence-title">Research Labs</h3>
+            <p class="excellence-desc">AI/ML, Cybersecurity, IoT and Cloud Computing research facilities</p>
+            <a href="#" class="excellence-link">Explore &rarr;</a>
+        </div>
+        
+        <div class="excellence-card">
+            <div class="excellence-icon-wrapper">
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <h3 class="excellence-title">Placements</h3>
+            <p class="excellence-desc">Industry partnerships, placement records and career guidance resources</p>
+            <a href="{{ url_for('placements') }}" class="excellence-link">Explore &rarr;</a>
+        </div>
+        
+        <div class="excellence-card">
+            <div class="excellence-icon-wrapper">
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            </div>
+            <h3 class="excellence-title">Achievements</h3>
+            <p class="excellence-desc">Awards, publications, patents and national-level competition wins</p>
+            <a href="#" class="excellence-link">Explore &rarr;</a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

@@ -3,80 +3,104 @@
    Loaded on every page via base.html
    ========================================= #}
 
-<!-- Floating Chatbot Button -->
-<div class="chatbot-float" id="chatbotFloat" onclick="toggleFloatingChat()">
-    💬
+<div class="chatbot-container">
+    <!-- Quick Pills (Visible when closed) -->
+    <div class="chatbot-quick-pills" id="chatbotQuickPills">
+        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('Check my attendance')"><span class="pill-dot"></span>Check my attendance</div>
+        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('View today\'s schedule')"><span class="pill-dot"></span>View today's schedule</div>
+        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('Library due dates')"><span class="pill-dot"></span>Library due dates</div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="chatbot-tooltip" id="chatbotTooltip">Ask CS Connect AI anything</div>
+
+    <!-- Chatbot Window -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="bot-avatar gradient-avatar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="icon-fill"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg>
+                </div>
+                <div class="bot-info">
+                    <div class="bot-name">CS Connect AI</div>
+                    <div class="bot-status"><span class="status-dot"></span>Online &middot; Powered by Claude</div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <button class="chat-action-btn" title="Clear History" onclick="clearChat()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" class="icon-stroke"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <button class="chat-action-btn" title="Close" onclick="toggleChatWindow()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" class="icon-stroke"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Context Bar -->
+        {% if session.get('user_id') %}
+        <div class="chat-context-bar">
+            <span>Logged in as {{ session.get('name') }}</span>
+        </div>
+        {% else %}
+        <div class="chat-context-bar-login">
+            Login to get personalised answers
+        </div>
+        {% endif %}
+
+        <!-- Messages Area -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-typing-indicator" id="chatTypingIndicator">
+                <div class="bot-bubble typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div class="chat-suggestion-chips" id="suggestionChips">
+            <button class="suggestion-chip" onclick="sendChatbotQuick('All subject attendance')">All subject attendance</button>
+            <button class="suggestion-chip" onclick="sendChatbotQuick('Next ML class')">Next ML class</button>
+            <button class="suggestion-chip" onclick="sendChatbotQuick('My CGPA')">My CGPA</button>
+            <button class="suggestion-chip" onclick="sendChatbotQuick('Library dues')">Library dues</button>
+            <button class="suggestion-chip" onclick="sendChatbotQuick('Placement drives')">Placement drives</button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+                <button class="chat-attach-btn" title="Attach file (Coming soon)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" class="icon-stroke"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                </button>
+                <input type="text" id="chatInput" placeholder="Ask about attendance, results, library..." autocomplete="off">
+                <button class="chat-send-btn" onclick="sendChat()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-fill"><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor"/></svg>
+                </button>
+            </div>
+            <div class="chat-input-hints">
+                <span>Powered by Claude API &middot; Context-aware</span>
+                <span>Press Enter to send</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB Button -->
+    <div class="chatbot-fab-wrapper">
+        <div class="chatbot-pulse-ring"></div>
+        <button class="chatbot-fab default-fab" id="chatbotFab" onclick="toggleChatWindow()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="icon-fill"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg>
+            <span class="chatbot-badge"></span>
+        </button>
+    </div>
 </div>
 
-<!-- Floating Chat Window -->
-<div class="floating-chat-window" id="floatingChatWindow">
-    <!-- Header -->
-    <div class="floating-chat-header">
-        <div class="floating-chat-header-info">
-            <div class="floating-bot-avatar">🤖</div>
-            <div class="floating-header-text">
-                <h3>CS CONNECT</h3>
-                <p>Online now</p>
-            </div>
-        </div>
-        <div class="floating-chat-controls">
-            <button class="floating-control-btn" onclick="clearFloatingChat()" title="Clear Conversation">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-            <button class="floating-control-btn" onclick="toggleFloatingChat()" title="Minimize">
-                <i class="fas fa-minus"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Messages Area -->
-    <div class="floating-chat-messages" id="floatingChatMessages">
-        <!-- Welcome Message -->
-        <div class="floating-welcome" id="floatingWelcome">
-            <div class="floating-welcome-icon">👋</div>
-            <h4>
-                {% if session.get('name') %}
-                    Hi, {{ session.get('name') }}!
-                {% else %}
-                    Hi there!
-                {% endif %}
-            </h4>
-            <p>I'm your **CS Connect Assistant**. How can I help you explore CSE AISAT today?</p>
-            
-            <div class="floating-welcome-options">
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Who is the HOD?')">
-                    <i class="fas fa-user-tie"></i><span>HOD Info</span>
-                </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Tell me about placements')">
-                    <i class="fas fa-briefcase"></i><span>Placements</span>
-                </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Where is the CSE office?')">
-                    <i class="fas fa-map-marker-alt"></i><span>Location</span>
-                </div>
-                <div class="floating-welcome-option" onclick="sendFloatingQuick('Search for Python notes')">
-                    <i class="fas fa-file-pdf"></i><span>Notes</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Typing Indicator (Template) -->
-        <div class="floating-typing" id="floatingTyping">
-            <div class="floating-typing-dots">
-                <div class="floating-typing-dot"></div>
-                <div class="floating-typing-dot"></div>
-                <div class="floating-typing-dot"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Input Area -->
-    <div class="floating-chat-input">
-        <div class="floating-input-wrapper">
-            <input type="text" id="floatingInput" placeholder="Ask me anything..."
-                onkeypress="handleFloatingEnter(event)" autocomplete="off">
-            <button class="floating-send-btn" onclick="sendFloatingMessage()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-</div>
+<script>
+    // Embed python variables for JS use
+    window.chatConfig = {
+        isLoggedIn: {{ 'true' if session.get('user_id') else 'false' }},
+        userName: "{{ session.get('name', '') }}",
+        userInitials: "{{ session.get('name', 'User')[:1].capitalize() }}"
+    };
+</script>

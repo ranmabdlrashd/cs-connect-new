@@ -1,129 +1,214 @@
 /**
- * CS Connect Chatbot - Professional Frontend Logic
- * Connects to the Flask/Groq backend and handles premium UI interactions.
+ * CS Connect Chatbot - Premium UI Logic
+ * Connects to the Flask/Anthropic backend (/api/chat).
  */
 
-// ── Globals ───────────────────────────────────────────────────────────
 let isChatOpen = false;
+let conversationHistory = []; // Stores {role: 'user'|'assistant', content: string}
 
 // ── Toggle Logic ──────────────────────────────────────────────────────
-function toggleFloatingChat() {
-    const windowEl = document.getElementById("floatingChatWindow");
-    const floatBtn = document.getElementById("chatbotFloat");
+function toggleChatWindow() {
+    const windowEl = document.getElementById("chatbotWindow");
+    const fabEl = document.getElementById("chatbotFab");
+    const tooltipEl = document.getElementById("chatbotTooltip");
+    const pillsEl = document.getElementById("chatbotQuickPills");
     
     isChatOpen = !isChatOpen;
     
     if (isChatOpen) {
         windowEl.classList.add("active");
-        floatBtn.classList.add("chat-open");
-        floatBtn.innerHTML = '<i class="fas fa-times"></i>';
+        fabEl.classList.add("mini-fab");
+        if(tooltipEl) tooltipEl.style.display = "none";
+        if(pillsEl) pillsEl.style.display = "none";
+        
+        // Add welcome message if empty
+        const messages = document.querySelectorAll('.message-row:not(.chat-typing-indicator)');
+        if (messages.length === 0) {
+            showInitialWelcome();
+        }
+        
         scrollChatToBottom();
+        document.getElementById("chatInput").focus();
     } else {
         windowEl.classList.remove("active");
-        floatBtn.classList.remove("chat-open");
-        floatBtn.innerHTML = "💬";
+        fabEl.classList.remove("mini-fab");
+        if(pillsEl) pillsEl.style.display = "flex";
+        // Hide tooltip permanently after first click usually, but keeping it simple
     }
+}
+
+// ── Initialization ────────────────────────────────────────────────────
+function showInitialWelcome() {
+    const name = window.chatConfig.userName;
+    const msg = name ? `Hello ${name}! I'm the CS Connect assistant. How can I help you today?` : `Hello! I'm the CS Connect assistant. Login to get personalised answers, or ask me anything about the department!`;
+    
+    conversationHistory.push({ role: 'assistant', content: msg });
+    addMessageToDOM(msg, 'bot');
 }
 
 // ── Message Handling ──────────────────────────────────────────────────
-async function sendFloatingMessage() {
-    const input = document.getElementById("floatingInput");
+async function sendChat() {
+    const input = document.getElementById("chatInput");
     const text = input.value.trim();
     if (!text) return;
 
-    // Hide welcome if it's there
-    const welcome = document.getElementById("floatingWelcome");
-    if (welcome) welcome.style.display = "none";
-
-    // Add User Message
-    addMessage(text, 'user');
     input.value = "";
+    input.style.height = "36px"; // Reset height if it was auto-expanded
     
-    // Show Typing
+    // Add user message locally
+    conversationHistory.push({ role: 'user', content: text });
+    if(conversationHistory.length > 20) {
+        conversationHistory.shift(); // keep it bounded
+    }
+    
+    addMessageToDOM(text, 'user');
     showTyping();
 
     try {
-        const response = await fetch('/chat', {
+        const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
+            body: JSON.stringify({ messages: conversationHistory })
         });
-        const data = await response.json();
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
         hideTyping();
-        addMessage(data.response, 'bot');
+        
+        const replyText = data.response || "Sorry, I didn't get any response.";
+        conversationHistory.push({ role: 'assistant', content: replyText });
+        if(conversationHistory.length > 20) {
+            conversationHistory.shift();
+        }
+        
+        addMessageToDOM(replyText, 'bot');
+        
     } catch (error) {
         console.error("Chat Error:", error);
         hideTyping();
-        addMessage("Sorry, I'm having trouble connecting to the server. Please try again later.", 'bot');
+        addMessageToDOM("Sorry, I'm having trouble connecting to the server. Please try again later.", 'bot', true);
     }
 }
 
-function handleFloatingEnter(event) {
-    if (event.key === "Enter") {
-        sendFloatingMessage();
+// Handle inputs (Enter vs Shift+Enter)
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("chatInput");
+    if(input) {
+        input.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendChat();
+            }
+        });
+        
+        // Optional quick pills close logic
+        setTimeout(() => {
+            const tooltip = document.getElementById("chatbotTooltip");
+            if(tooltip && !isChatOpen) {
+                tooltip.style.opacity = '1';
+                setTimeout(() => tooltip.style.opacity = '0', 5000); // fade out after 5s
+            }
+        }, 2000);
     }
-}
+});
 
-function sendFloatingQuick(text) {
-    const input = document.getElementById("floatingInput");
+function sendChatbotQuick(text) {
+    const input = document.getElementById("chatInput");
     input.value = text;
-    sendFloatingMessage();
+    if(!isChatOpen) toggleChatWindow();
+    sendChat();
 }
 
 // ── DOM Helpers ───────────────────────────────────────────────────────
-function addMessage(text, sender) {
-    const container = document.getElementById("floatingChatMessages");
-    const msgDiv = document.createElement("div");
-    msgDiv.className = `floating-message ${sender}`;
+function addMessageToDOM(text, sender, isError=false) {
+    const container = document.getElementById("chatMessages");
+    const typingIndicator = document.getElementById("chatTypingIndicator");
+    
+    const rowEl = document.createElement("div");
+    rowEl.className = `message-row ${sender}`;
     
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
-    // Simple Markdown-to-HTML (Bold and Links)
-    let formattedText = text
+    // Basic Markdown parser for bold and line breaks
+    let formattedText = escapeHtml(text)
         .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-    msgDiv.innerHTML = `
-        <div class="floating-message-avatar">${sender === 'bot' ? '🤖' : '👤'}</div>
-        <div class="msg-content-wrapper">
-            <div class="floating-message-bubble">${formattedText}</div>
-            <div class="floating-message-time">${time}</div>
-        </div>
-    `;
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+    if (sender === 'bot') {
+        const avatarSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="icon-fill"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="#F5E6BE"/></svg>`;
+        rowEl.innerHTML = `
+            <div class="bot-avatar gradient-avatar mini-bot-avatar">
+                ${avatarSvg}
+            </div>
+            <div class="msg-content">
+                <div class="bubble bot-bubble ${isError ? 'error-text' : ''}">${formattedText}</div>
+                <div class="message-time">${time}</div>
+            </div>
+        `;
+    } else {
+        const initials = window.chatConfig.userInitials || "U";
+        rowEl.innerHTML = `
+            <div class="user-avatar-initials">${initials}</div>
+            <div class="msg-content">
+                <div class="bubble user-bubble">${formattedText}</div>
+                <div class="message-time">${time}</div>
+            </div>
+        `;
+    }
     
-    container.appendChild(msgDiv);
+    // Insert before typing indicator
+    if (typingIndicator) {
+        container.insertBefore(rowEl, typingIndicator);
+    } else {
+        container.appendChild(rowEl);
+    }
+    
     scrollChatToBottom();
 }
 
 function showTyping() {
-    const typing = document.getElementById("floatingTyping");
+    const typing = document.getElementById("chatTypingIndicator");
     if (typing) {
-        typing.classList.add("active");
+        typing.style.display = "flex";
         scrollChatToBottom();
     }
 }
 
 function hideTyping() {
-    const typing = document.getElementById("floatingTyping");
-    if (typing) typing.classList.remove("active");
+    const typing = document.getElementById("chatTypingIndicator");
+    if (typing) typing.style.display = "none";
 }
 
 function scrollChatToBottom() {
-    const container = document.getElementById("floatingChatMessages");
+    const container = document.getElementById("chatMessages");
     if (container) container.scrollTop = container.scrollHeight;
 }
 
-function clearFloatingChat() {
+function clearChat() {
     if (!confirm("Clear this conversation?")) return;
-    const container = document.getElementById("floatingChatMessages");
     
-    // Clear everything except Typing indicator
-    const typing = document.getElementById("floatingTyping");
+    conversationHistory = [];
+    
+    const container = document.getElementById("chatMessages");
+    const typing = document.getElementById("chatTypingIndicator");
+    
     container.innerHTML = "";
-    container.appendChild(typing);
+    if (typing) {
+        typing.style.display = "none"; // Reset typing state
+        container.appendChild(typing);
+    }
     
-    // Bring back welcome
-    addMessage("Hello! I'm your **CS Connect Assistant**. How can I help you today?", 'bot');
+    showInitialWelcome();
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
 }

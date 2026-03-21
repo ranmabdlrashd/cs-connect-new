@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Notice Detail - CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .notice-header { padding: 40px; background: #121212; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .notice-meta { font-size: 13px; color: #8B1D1D; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: inline-block; padding: 4px 10px; background: rgba(139,29,29,0.1); border-radius: 20px; border: 1px solid rgba(139,29,29,0.3); }
+  .notice-h1 { font-family: 'Playfair Display', serif; font-size: 36px; color: #F5E6BE; margin: 0 0 16px; line-height: 1.2; }
+  .notice-date { color: #A0A0A0; font-size: 14px; font-weight: 500; }
+  .notice-body { padding: 40px; background: #0A0A0A; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); color: #D0D0D0; line-height: 1.8; font-size: 16px; box-shadow: inset 0 2px 15px rgba(0,0,0,0.2); }
+  
+  .back-btn { display: inline-block; color: #888; text-decoration: none; margin-bottom: 24px; font-weight: 500; font-size: 14px; transition: 0.2s;}
+  .back-btn:hover { color: #F5E6BE; transform: translateX(-4px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 60px auto;">
+   <a href="/notice-archive" class="back-btn">&larr; Back to Notice Board</a>
+   
+   <div class="notice-header">
+      <span class="notice-meta">{{ notice.category | default('General Update') }}</span>
+      <h1 class="notice-h1">{{ notice.title | default('Department Notification Detailed View') }}</h1>
+      <div class="notice-date"><i class="fas fa-calendar-alt" style="margin-right: 6px;"></i> Published: {{ notice.date | default('Recent') }}</div>
+   </div>
+   
+   <div class="notice-body">
+      <p>{{ notice.content | default('This is the full detailed view of the notice. Official memorandums, attached documents, and expanded paragraphs will be displayed here for students and faculty members to read thoroughly.') }}</p>
+      
+      <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; display: flex; align-items: center; gap: 16px;">
+         <div style="width: 48px; height: 48px; border-radius: 50%; background: #121212; border: 1px solid #8B1D1D; display: flex; align-items: center; justify-content: center; color: #F5E6BE;">
+            <i class="fas fa-user-tie"></i>
+         </div>
+         <div>
+             <h4 style="color: #F5E6BE; font-family: 'Playfair Display', serif; margin: 0 0 4px; font-size: 18px;">Head of Department</h4>
+             <p style="color: #A0A0A0; font-size: 13px; margin: 0;">Computer Science & Engineering</p>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

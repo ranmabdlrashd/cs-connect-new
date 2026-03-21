@@ -1,0 +1,219 @@
+/* =============================================================================
+   FACULTY PROFILE DETAIL — DARK ACADEMIC THEME
+   ============================================================================= */
+
+.faculty-detail-page {
+  background: #0A0A0A;
+  color: #F5E6BE;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 40px 48px;
+}
+
+/* --- 1. SKELETON LOADER --- */
+.pulse-skeleton {
+  animation: pulse-bg 1.5s infinite ease-in-out;
+  background: rgba(245, 230, 190, 0.03);
+  border-radius: 8px;
+}
+@keyframes pulse-bg {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+#skeletonLoader {
+  display: flex;
+  gap: 40px;
+}
+
+/* --- 2. BACK LINK --- */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-size: 10px;
+  margin-bottom: 32px;
+  transition: 0.2s;
+}
+.back-link:hover { color: #8B1D1D; }
+
+/* --- 3. TWO-COLUMN LAYOUT --- */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* --- 4. LEFT COLUMN (STIKCY) --- */
+.profile-card-sticky {
+  position: sticky;
+  top: 100px;
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.06);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+.profile-img-box {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(139,29,29,0.3);
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-img { width: 100%; height: 100%; object-fit: cover; }
+.profile-initials {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #8B1D1D, #6B1010);
+  color: #F5E6BE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 56px;
+}
+
+.profile-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.profile-designation {
+  color: #8B1D1D;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.contact-btns {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.contact-btn {
+  background: rgba(139,29,29,0.1);
+  border: 1px solid rgba(139,29,29,0.2);
+  color: #8B1D1D;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.contact-btn:hover { background: #8B1D1D; color: #fff; }
+
+.profile-bio {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.6;
+  border-top: 1px solid rgba(245,230,190,0.05);
+  padding-top: 20px;
+}
+
+/* --- 5. RIGHT COLUMN (DETAILS) --- */
+.sections-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.detail-section-hdr {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.section-dot { width: 6px; height: 6px; background: #8B1D1D; border-radius: 50%; }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #F5E6BE;
+}
+
+/* Academic Background */
+.acad-list { display: flex; flex-direction: column; gap: 20px; }
+.acad-item {
+  position: relative;
+  padding-left: 24px;
+  border-left: 1px solid rgba(139,29,29,0.2);
+}
+.acad-degree { color: #F5E6BE; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.acad-major { color: #8B1D1D; font-size: 11px; margin-bottom: 2px; }
+.acad-univ { color: #666; font-size: 11px; }
+
+/* Research & Publications */
+.pub-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.pub-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(245,230,190,0.04);
+  padding: 18px;
+  border-radius: 10px;
+}
+.pub-title { font-size: 12px; font-style: italic; color: #A0A0A0; margin-bottom: 8px; line-height: 1.5; }
+.pub-meta { color: #666; font-size: 10px; display: flex; justify-content: space-between; align-items: center; }
+.pub-link { color: #8B1D1D; text-decoration: none; font-weight: 600; }
+.pub-link:hover { text-decoration: underline; }
+
+/* Interests Tags */
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+.interest-tag {
+  background: #121212;
+  border: 1px solid rgba(139,29,29,0.2);
+  color: #F5E6BE;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+}
+
+/* Professional Activities */
+.activity-list { list-style: none; padding: 0; }
+.activity-list li {
+  position: relative;
+  padding-left: 20px;
+  color: #888;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+.activity-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #8B1D1D;
+}
+
+/* --- 6. ANIMATIONS --- */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fade-up-in 0.6s forwards;
+}
+@keyframes fade-up-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 7. RESPONSIVE --- */
+@media (max-width: 900px) {
+  .detail-layout { grid-template-columns: 1fr; gap: 40px; }
+  .profile-card-sticky { position: static; width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .faculty-detail-page { padding: 32px 24px; }
+  .profile-name { font-size: 20px; }
+}

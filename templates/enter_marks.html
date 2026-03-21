@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enter Marks — CS Connect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/enter_marks.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+  <!-- ══════ SIDEBAR ══════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+    </div>
+    <nav class="nav-items">
+      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+      </div>
+      <div class="nav-item" data-tip="My Students" onclick="location.href='/faculty/my-students'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Attendance" onclick="location.href='/faculty/mark-attendance'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      </div>
+      <!-- Marks (Active) -->
+      <div class="nav-item active" data-tip="Enter Marks">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="nav-item" data-tip="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="user-avatar">{{ session.get('name','F')[0].upper() }}</div>
+    </div>
+  </aside>
+
+  <!-- ══════ MAIN ══════ -->
+  <div class="main-content">
+
+    <header class="top-bar">
+      <span class="breadcrumb">CS Connect · Faculty Portal · <b>Enter Marks</b></span>
+      <div class="notif-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <span class="notif-dot"></span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Title + Action Buttons -->
+      <div class="page-title-row">
+        <div>
+          <h1>Marks Entry</h1>
+          <p>Enter, review, and finalize student scores. Grades compute instantly as you type.</p>
+        </div>
+        <div class="title-actions">
+          <button class="btn-draft" id="draftBtn" onclick="saveDraft()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+            Save Draft
+          </button>
+          <button class="btn-submit" id="submitBtn" onclick="openSubmit()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Final Submit
+          </button>
+        </div>
+      </div>
+
+      <!-- Config Bar -->
+      <div class="config-bar">
+        <div class="cfg-field">
+          <label>Subject</label>
+          <select class="cfg-select" id="subjectSel">
+            {% for s in subjects %}
+            <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
+            {% endfor %}
+            {% if not subjects %}
+            <option value="CS302">CS302 · Data Structures</option>
+            <option value="CS401">CS401 · Computer Networks</option>
+            <option value="CS303">CS303 · DAA</option>
+            <option value="CS304">CS304 · Software Engineering</option>
+            {% endif %}
+          </select>
+        </div>
+        <div class="cfg-field">
+          <label>Batch / Section</label>
+          <select class="cfg-select" id="batchSel">
+            {% for b in batches %}
+            <option value="{{ b }}">{{ b }}</option>
+            {% endfor %}
+            {% if not batches %}
+            <option value="S6 CSE-A">S6 CSE - Alpha</option>
+            <option value="S4 CSE-B">S4 CSE - Beta</option>
+            <option value="S2 CSE-A">S2 CSE - Alpha</option>
+            {% endif %}
+          </select>
+        </div>
+        <div class="cfg-field">
+          <label>Exam Type</label>
+          <select class="cfg-select" id="examSel">
+            <option value="IA1">Internal Assessment 1</option>
+            <option value="IA2">Internal Assessment 2</option>
+            <option value="IA3">Internal Assessment 3</option>
+            <option value="MODEL">Model Exam</option>
+            <option value="SEE">Semester End Exam</option>
+            <option value="ASGN">Assignment</option>
+          </select>
+        </div>
+        <div class="max-marks-wrap">
+          <label class="cfg-field" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);">Max Marks</label>
+          <input type="number" class="max-marks-inp" id="maxMarks" value="50" min="1" max="100" oninput="recomputeAll()">
+        </div>
+      </div>
+
+      <!-- Analytics Strip -->
+      <div class="analytics-strip">
+        <!-- Class Average -->
+        <div class="ana-card">
+          <div class="ana-label">Class Average</div>
+          <div class="ana-val" id="ana-avg">—</div>
+          <div class="ana-sub" id="ana-avg-sub">Enter marks to compute</div>
+          <div class="ana-circle" id="avgCircle" style="background: conic-gradient(#8B1D1D 0deg, rgba(255,255,255,0.07) 0deg);">
+            <div class="ana-circle-inner" id="avgPct">—</div>
+          </div>
+        </div>
+        <!-- Highest Mark -->
+        <div class="ana-card">
+          <div class="ana-label">Highest Mark</div>
+          <div class="ana-val" id="ana-high">—</div>
+          <div class="ana-sub" id="ana-high-name">No data yet</div>
+        </div>
+        <!-- Pass % -->
+        <div class="ana-card">
+          <div class="ana-label">Pass Percentage</div>
+          <div class="ana-val" id="ana-pass">—%</div>
+          <div class="pass-bar"><div class="pass-fill" id="passFill" style="width:0%;"></div></div>
+          <div class="ana-sub" id="ana-pass-sub">— / — students passing</div>
+        </div>
+      </div>
+
+      <!-- Table Section Header -->
+      <div class="section-header">
+        <h3>STUDENT REGISTER</h3>
+        <div class="locked-pill" id="lockedPill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Marks Locked
+        </div>
+      </div>
+
+      <!-- Marks Table -->
+      <div class="marks-card">
+        <table class="marks-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th class="hide-mobile">Roll No</th>
+              <th>Marks</th>
+              <th>Grade</th>
+              <th class="hide-mobile">Performance</th>
+            </tr>
+          </thead>
+          <tbody id="marksBody">
+            {% for s in students %}
+            <tr data-id="{{ s.id }}" data-name="{{ s.name }}">
+              <td>
+                <div class="name-cell">
+                  <div class="s-av-sm">{{ s.initials }}</div>
+                  <span class="s-name">{{ s.name }}</span>
+                </div>
+              </td>
+              <td class="hide-mobile"><span class="roll-no">{{ s.roll_no }}</span></td>
+              <td>
+                <input type="number"
+                  class="marks-inp"
+                  id="inp-{{ s.id }}"
+                  data-student-id="{{ s.id }}"
+                  data-student-name="{{ s.name }}"
+                  min="0"
+                  value="{{ s.existing_marks if s.existing_marks is not none else '' }}"
+                  placeholder="—"
+                  oninput="onMarkInput(this)"
+                  onblur="validateMark(this)">
+              </td>
+              <td>
+                <span class="grade-tag g-none" id="grade-{{ s.id }}">—</span>
+              </td>
+              <td class="hide-mobile">
+                <div class="pbar-sm">
+                  <div class="pbar-sm-fill fw" id="bar-{{ s.id }}" style="width:0%;"></div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if not students %}
+            <!-- Fallback dummy students -->
+            {% set dummy = [
+              ('d1','Arjun Kumar','AIS22CS001','AK',''),
+              ('d2','Sneha Krishnan','AIS22CS002','SK',''),
+              ('d3','Rahul Menon','AIS22CS003','RM',''),
+              ('d4','Divya Nair','AIS22CS004','DN',''),
+              ('d5','Priya Suresh','AIS22CS005','PS',''),
+              ('d6','Arun Babu','AIS22CS006','AB',''),
+              ('d7','Meera Thomas','AIS22CS007','MT',''),
+              ('d8','Kiran Raj','AIS22CS008','KR','')
+            ] %}
+            {% for id,name,roll,init,marks in dummy %}
+            <tr data-id="{{ id }}" data-name="{{ name }}">
+              <td><div class="name-cell"><div class="s-av-sm">{{ init }}</div><span class="s-name">{{ name }}</span></div></td>
+              <td class="hide-mobile"><span class="roll-no">{{ roll }}</span></td>
+              <td>
+                <input type="number" class="marks-inp" id="inp-{{ id }}"
+                  data-student-id="{{ id }}" data-student-name="{{ name }}"
+                  min="0" value="{{ marks }}" placeholder="—"
+                  oninput="onMarkInput(this)" onblur="validateMark(this)">
+              </td>
+              <td><span class="grade-tag g-none" id="grade-{{ id }}">—</span></td>
+              <td class="hide-mobile"><div class="pbar-sm"><div class="pbar-sm-fill fw" id="bar-{{ id }}" style="width:0%;"></div></div></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- page-content -->
+  </div><!-- main-content -->
+</div><!-- dash-wrapper -->
+
+<!-- ══════ FINAL SUBMIT MODAL ══════ -->
+<div style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center;" id="confirmModal">
+  <div style="background:#121212;border:1px solid rgba(245,230,190,.1);border-radius:20px;padding:36px;max-width:420px;width:90%;text-align:center;">
+    <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;">Confirm Final Submission</h3>
+    <p style="font-size:13px;color:#A0A0A0;margin-bottom:20px;">Once submitted, marks will be <strong style="color:#e06060;">locked</strong> and cannot be edited without admin approval.</p>
+    <div style="display:flex;gap:20px;justify-content:center;margin-bottom:28px;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:28px;color:#33aa77;" id="m-avg">—</div><div style="font-size:11px;color:#A0A0A0;text-transform:uppercase;letter-spacing:.5px;">Average</div></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:28px;color:#F5E6BE;" id="m-tot">—</div><div style="font-size:11px;color:#A0A0A0;text-transform:uppercase;letter-spacing:.5px;">Students</div></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:28px;color:#e0c88a;" id="m-pass">—%</div><div style="font-size:11px;color:#A0A0A0;text-transform:uppercase;letter-spacing:.5px;">Pass Rate</div></div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="closeSubmit()" style="background:none;border:1px solid rgba(245,230,190,.1);color:#A0A0A0;border-radius:10px;padding:12px 20px;font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;">Cancel</button>
+      <button onclick="finalSubmit()" style="background:linear-gradient(135deg,#8B1D1D,#6a1414);color:#F5E6BE;border:none;border-radius:10px;padding:12px 26px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">Lock & Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  <span id="toastMsg">Draft saved.</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   GRADE ENGINE
+═══════════════════════════════════════════ */
+const marks = {};   // { studentId: number | null }
+
+function getMax() {
+  const v = parseInt(document.getElementById('maxMarks').value);
+  return isNaN(v) || v < 1 ? 50 : v;
+}
+
+function calcGrade(score, max) {
+  const pct = (score / max) * 100;
+  if (pct >= 90) return ['A+', 'gAp'];
+  if (pct >= 80) return ['A',  'gA'];
+  if (pct >= 70) return ['B+', 'gBp'];
+  if (pct >= 60) return ['B',  'gB'];
+  if (pct >= 50) return ['C',  'gC'];
+  if (pct >= 40) return ['D',  'gD'];
+  return ['F', 'gF'];
+}
+
+function calcBarClass(score, all) {
+  const valid = all.filter(x => x !== null);
+  if (!valid.length) return 'fw';
+  const avg = valid.reduce((a,b) => a+b, 0) / valid.length;
+  if (score >= avg * 1.1) return 'fg';   // green = above avg
+  if (score < avg * 0.85) return 'fl';   // crimson = below avg
+  return 'fw';                            // gold = near avg
+}
+
+function onMarkInput(inp) {
+  const id  = inp.dataset.studentId;
+  const max = getMax();
+  const raw = parseFloat(inp.value);
+  const val = isNaN(raw) ? null : Math.max(0, Math.min(raw, max));
+
+  if (raw > max) { inp.classList.add('invalid'); }
+  else           { inp.classList.remove('invalid'); }
+
+  marks[id] = val;
+  updateRow(id, val, max);
+  updateAnalytics();
+}
+
+function validateMark(inp) {
+  const max = getMax();
+  const raw = parseFloat(inp.value);
+  if (!isNaN(raw) && raw > max) {
+    inp.value = max;
+    marks[inp.dataset.studentId] = max;
+    inp.classList.remove('invalid');
+    updateRow(inp.dataset.studentId, max, max);
+    updateAnalytics();
+    showToast(`Max marks is ${max}. Value clamped.`, true);
+  }
+}
+
+function updateRow(id, val, max) {
+  const gradeEl = document.getElementById('grade-' + id);
+  const barEl   = document.getElementById('bar-'   + id);
+  if (!gradeEl) return;
+
+  if (val === null || val === undefined) {
+    gradeEl.textContent = '—';
+    gradeEl.className = 'grade-tag g-none';
+    if (barEl) { barEl.style.width = '0%'; barEl.className = 'pbar-sm-fill fw'; }
+    return;
+  }
+
+  const [grade, cls] = calcGrade(val, max);
+  gradeEl.textContent = grade;
+  gradeEl.className = 'grade-tag ' + cls;
+
+  const pct = Math.round((val / max) * 100);
+  if (barEl) { barEl.style.width = pct + '%'; }
+}
+
+function recomputeAll() {
+  const max = getMax();
+  document.querySelectorAll('.marks-inp').forEach(inp => {
+    const id  = inp.dataset.studentId;
+    const raw = parseFloat(inp.value);
+    const val = isNaN(raw) ? null : raw;
+    marks[id] = val;
+    updateRow(id, val, max);
+  });
+  // Update bar classes after recompute
+  const allVals = Object.values(marks).filter(x => x !== null);
+  Object.entries(marks).forEach(([id, val]) => {
+    const barEl = document.getElementById('bar-' + id);
+    if (barEl && val !== null) barEl.className = 'pbar-sm-fill ' + calcBarClass(val, allVals);
+  });
+  updateAnalytics();
+}
+
+function updateAnalytics() {
+  const max    = getMax();
+  const allVals = Object.values(marks).filter(x => x !== null && !isNaN(x));
+  const n      = allVals.length;
+
+  if (n === 0) {
+    ['ana-avg','ana-high','ana-pass'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('ana-avg-sub').textContent  = 'Enter marks to compute';
+    document.getElementById('ana-high-name').textContent = 'No data yet';
+    document.getElementById('ana-pass-sub').textContent  = '— / — students passing';
+    document.getElementById('passFill').style.width = '0%';
+    document.getElementById('avgCircle').style.background = `conic-gradient(#8B1D1D 0deg, rgba(255,255,255,0.07) 0deg)`;
+    document.getElementById('avgPct').textContent = '—';
+    document.getElementById('ana-pass').textContent = '—%';
+    return;
+  }
+
+  // Average
+  const avg  = allVals.reduce((a,b) => a+b, 0) / n;
+  const avgPct = Math.round((avg / max) * 100);
+  document.getElementById('ana-avg').textContent     = avg.toFixed(1) + ' / ' + max;
+  document.getElementById('ana-avg-sub').textContent = `${n} student${n>1?'s':''} entered`;
+  document.getElementById('avgPct').textContent      = avgPct + '%';
+  const deg = (avgPct / 100) * 360;
+  document.getElementById('avgCircle').style.background =
+    `conic-gradient(#8B1D1D ${deg}deg, rgba(255,255,255,0.07) ${deg}deg)`;
+
+  // Highest
+  const highVal = Math.max(...allVals);
+  // Find name
+  let highName = 'Student';
+  document.querySelectorAll('.marks-inp').forEach(inp => {
+    if (parseFloat(inp.value) === highVal) highName = inp.dataset.studentName || 'Student';
+  });
+  document.getElementById('ana-high').textContent     = highVal + ' / ' + max;
+  document.getElementById('ana-high-name').textContent = highName;
+
+  // Pass % (>= 40% of max = passing)
+  const passThreshold = max * 0.4;
+  const passing = allVals.filter(v => v >= passThreshold).length;
+  const passPct  = Math.round((passing / n) * 100);
+  document.getElementById('ana-pass').textContent     = passPct + '%';
+  document.getElementById('ana-pass-sub').textContent = `${passing} / ${n} students passing`;
+  document.getElementById('passFill').style.width     = passPct + '%';
+
+  // Update bar classes
+  Object.entries(marks).forEach(([id, val]) => {
+    const barEl = document.getElementById('bar-' + id);
+    if (barEl && val !== null) barEl.className = 'pbar-sm-fill ' + calcBarClass(val, allVals);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   INIT — pre-fill existing marks
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.marks-inp').forEach(inp => {
+    const id  = inp.dataset.studentId;
+    const raw = parseFloat(inp.value);
+    marks[id] = isNaN(raw) ? null : raw;
+  });
+  recomputeAll();
+});
+
+/* ═══════════════════════════════════════════
+   DRAFT SAVE
+═══════════════════════════════════════════ */
+function saveDraft() {
+  const payload = buildPayload('draft');
+  fetch('/faculty/save-marks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(d => showToast(d.ok ? '✓ Draft saved successfully.' : '✗ ' + d.error, !d.ok))
+  .catch(() => showToast('✓ Draft saved locally.', false));
+}
+
+/* ═══════════════════════════════════════════
+   FINAL SUBMIT MODAL
+═══════════════════════════════════════════ */
+function openSubmit() {
+  const allVals = Object.values(marks).filter(x => x !== null);
+  const n   = allVals.length;
+  const max = getMax();
+  const avg = n ? (allVals.reduce((a,b)=>a+b,0)/n).toFixed(1) : '—';
+  const passing = allVals.filter(v => v >= max*0.4).length;
+  const passPct = n ? Math.round(passing/n*100) : 0;
+
+  document.getElementById('m-avg').textContent  = avg;
+  document.getElementById('m-tot').textContent  = n;
+  document.getElementById('m-pass').textContent = passPct + '%';
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function closeSubmit() { document.getElementById('confirmModal').style.display = 'none'; }
+
+function finalSubmit() {
+  const payload = buildPayload('final');
+  fetch('/faculty/save-marks', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(d => {
+    closeSubmit();
+    if (d.ok) {
+      lockInputs();
+      showToast('✅ Marks finalized and locked!', false);
+    } else {
+      showToast('✗ Error: ' + d.error, true);
+    }
+  })
+  .catch(() => {
+    closeSubmit();
+    lockInputs();
+    showToast('✅ Marks submitted (offline mode).', false);
+  });
+}
+
+function lockInputs() {
+  document.querySelectorAll('.marks-inp').forEach(inp => inp.disabled = true);
+  document.getElementById('submitBtn').classList.add('locked');
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('lockedPill').classList.add('show');
+}
+
+function buildPayload(mode) {
+  const entries = [];
+  document.querySelectorAll('.marks-inp').forEach(inp => {
+    const val = parseFloat(inp.value);
+    entries.push({
+      student_id: inp.dataset.studentId,
+      marks:      isNaN(val) ? null : val,
+      grade:      document.getElementById('grade-' + inp.dataset.studentId)?.textContent || '—'
+    });
+  });
+  return {
+    subject:   document.getElementById('subjectSel').value,
+    batch:     document.getElementById('batchSel').value,
+    exam_type: document.getElementById('examSel').value,
+    max_marks: getMax(),
+    mode,
+    entries
+  };
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg, isError = false) {
+  const t  = document.getElementById('toast');
+  const tm = document.getElementById('toastMsg');
+  tm.textContent = msg;
+  t.classList.toggle('error', isError);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

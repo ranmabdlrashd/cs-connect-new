@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block title %}My Library Books - CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* DESIGN SYSTEM — apply strictly to every element */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #121212;
+    --bg-card: #0e0e0e;
+    --bg-hover: #160808;
+    --accent: #8B1D1D;
+    --accent-hover: #a82222;
+    --accent-dark: #6B1010;
+    --cream: #F5E6BE;
+    --text-primary: #e0d6c8;
+    --text-muted: #A0A0A0;
+    --text-dim: #666666;
+    --text-ghost: #555555;
+    --text-dead: #444444;
+    --border: rgba(245,230,190,0.06);
+    --border-accent: rgba(139,29,29,0.3);
+    --border-focus: rgba(139,29,29,0.4);
+    --green: #3a8834;
+    --amber: #b85a00;
+    --red: #8B1D1D;
+  }
+
+  body {
+    margin: 0; padding: 0; overflow: hidden; background: var(--bg-primary);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+  }
+
+  h1, h2, h3, .font-playfair, .large-number {
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+  }
+  
+  .custom-nav, .news-ticker { display: none !important; }
+
+  a { text-decoration: none; }
+  button { font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s ease; }
+  
+  /* Sidebar styles */
+  .dash-sidebar-item {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+  }
+  .dash-sidebar-item.active {
+    background: rgba(139,29,29,0.2);
+  }
+  .dash-sidebar-item:hover {
+    background: rgba(139,29,29,0.1);
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--cream); border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  
+  .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(139,29,29,0.3);
+    color: var(--accent);
+    border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline:hover { background: rgba(139,29,29,0.05); }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(245,230,190,0.06);
+    color: #888; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 500;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+  .btn-disabled { opacity: 0.5; pointer-events: none; }
+
+  /* CARDS */
+  .panel {
+    background: #121212;
+    border: 1px solid rgba(245,230,190,0.06);
+    border-radius: 12px; padding: 24px; margin-bottom: 24px;
+  }
+
+  /* PROGRESS BARS */
+  .progress-track {
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px; height: 5px; width: 100%; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .fill-good { background: var(--green); }
+  .fill-warn { background: var(--amber); }
+  .fill-low { background: var(--red); }
+
+  /* STATUS PILLS */
+  .status-pill {
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .status-good { background: rgba(60,180,100,0.1); color: #5c5; border: 1px solid rgba(60,180,100,0.2); }
+  .status-warn { background: rgba(180,130,40,0.1); color: #b85; border: 1px solid rgba(180,130,40,0.2); }
+  .status-danger { background: rgba(139,29,29,0.1); color: var(--accent); border: 1px solid rgba(139,29,29,0.2); }
+  .status-dead { background: rgba(255,255,255,0.04); color: #555; border: 1px solid rgba(255,255,255,0.07); }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .data-table th {
+    text-align: left; padding: 12px 16px; color: var(--text-muted); font-size: 12px; font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 16px; border-bottom: 1px solid rgba(245,230,190,0.03);
+    font-size: 14px;
+  }
+  .data-table tr:hover td { background: var(--bg-hover); }
+  
+  .due-danger { color: var(--red); }
+  .due-warn { color: var(--amber); }
+  .due-normal { color: #888; }
+  
+  /* GRID */
+  .col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .col-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+  /* Search bar */
+  .search-input {
+    background: transparent; color: var(--text-primary); border: none; outline: none; padding: 0 12px; width: 100%; font-family: 'Inter', sans-serif;
+  }
+  .search-wrapper {
+    display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px; gap: 8px;
+  }
+  .search-wrapper:focus-within { border-color: var(--border-focus); }
+
+  /* BOOK CARD */
+  .book-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px; transition: all 0.2s ease; height: 100%;
+  }
+  .book-card:hover { border-color: var(--border-accent); }
+  .book-spine {
+    height: 80px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--cream);
+  }
+
+  /* UTILS */
+  .skeleton {
+    animation: shimmer 1.5s infinite linear;
+    background: linear-gradient(90deg, var(--bg-secondary) 0px, #1a1a1a 40px, var(--bg-secondary) 80px);
+    background-size: 600px; border-radius: 8px;
+  }
+  @keyframes shimmer { 0% { background-position: -100px; } 100% { background-position: 500px; } }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: #555; }
+  .error-banner {
+    background: rgba(139,29,29,0.1); border: 1px solid var(--border-accent);
+    padding: 16px; border-radius: 8px; color: var(--red); display: flex; align-items: center; justify-content: space-between;
+  }
+  
+  .fine-banner {
+    background: rgba(139,29,29,0.08); border: 1px solid rgba(139,29,29,0.25); border-radius: 8px;
+    padding: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+  }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex; height:100vh; background:var(--bg-primary); overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 10;">
+    <div style="width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--cream)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    
+    <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/dashboard'">
+      <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Attendance" onclick="location.href='/dashboard/attendance'">
+      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Results" onclick="location.href='/dashboard/results'">
+      <i data-lucide="award" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Assignments" onclick="location.href='/dashboard/assignments'">
+      <i data-lucide="file-text" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item active" title="Library Books">
+      <i data-lucide="book-open" style="stroke: var(--accent); width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Download Syllabus" onclick="location.href='/dashboard/syllabus'">
+      <i data-lucide="download" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
+      <i data-lucide="calendar" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+    <div class="dash-sidebar-item" title="Placements" onclick="location.href='/dashboard/placements'">
+      <i data-lucide="briefcase" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+    </div>
+
+    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
+      <div class="dash-sidebar-item" title="Settings" onclick="location.href='/dashboard/settings'">
+        <i data-lucide="settings" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
+      </div>
+      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--cream); font-family:'Inter',sans-serif;">
+        {% set sname = session.get('name', 'Student') %}
+        {% set parts = sname.split() %}
+        {% if parts|length > 1 %}
+          {{ parts[0][0]|upper }}{{ parts[-1][0]|upper }}
+        {% else %}
+          {{ sname[:2]|upper }}
+        {% endif %}
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+    
+    <!-- Top bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:1px solid var(--border); background:var(--bg-primary); flex-shrink:0;">
+      <div style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase; font-family:'Inter',sans-serif;">
+        CS Connect &middot; <span style="color:var(--text-muted)">Library Books</span>
+      </div>
+      <div id="topbar-fine" style="display:none;"></div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div style="flex:1; overflow-y:auto; padding:40px 60px; padding-bottom: 80px;">
+      
+      <!-- PAGE HEADER -->
+      <div style="margin-bottom: 32px">
+        <h1 class="font-playfair" style="margin: 0 0 8px 0; font-size: 32px;">My Library Books</h1>
+        <div style="color: var(--text-dim); font-size: 14px;">Borrowed books, due dates and fine status &middot; Library ID: AIS-LIB-{{ session.get('user_id', '100') }}</div>
+      </div>
+
+      <!-- FINE BANNER -->
+      <div id="fine-banner-container" style="display:none;"></div>
+
+      <div class="dashboard-grid">
+        <!-- LEFT COLUMN -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          
+          <!-- SUMMARY CARDS -->
+          <div class="col-2">
+            <div class="panel" style="margin:0; padding:20px;">
+              <div style="color:var(--text-dim); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Books Borrowed</div>
+              <div class="font-playfair" style="font-size:22px; color:var(--cream);" id="active-count"><div class="skeleton" style="width:80px; height:26px;"></div></div>
+            </div>
+            <div class="panel" style="margin:0; padding:20px;">
+              <div style="color:var(--text-dim); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Total Borrowed Ever</div>
+              <div class="font-playfair" style="font-size:22px; color:var(--text-muted);" id="total-count"><div class="skeleton" style="width:60px; height:26px;"></div></div>
+            </div>
+          </div>
+
+          <!-- BORROWED BOOKS TABLE -->
+          <div class="panel" style="margin:0;">
+            <h2 class="font-playfair" style="margin:0 0 16px 0; font-size:20px;">Return Timeline</h2>
+            <div id="loans-container">
+              <div class="skeleton" style="width:100%; height:150px;"></div>
+            </div>
+          </div>
+
+          <!-- CATALOGUE SEARCH PANEL -->
+          <div class="panel" style="margin:0;">
+            <h2 class="font-playfair" style="margin:0 0 16px 0; font-size:20px;">Search Catalogue</h2>
+            <div class="search-wrapper" style="margin-bottom: 20px;">
+              <i data-lucide="search" style="width: 18px; height: 18px; stroke: #555; stroke-width: 1.5;"></i>
+              <input type="text" id="search-input" class="search-input" placeholder="Search by title, author, or keyword...">
+              <select id="search-category" style="background:transparent; color:var(--text-muted); border:none; outline:none; font-family:'Inter'; font-size:13px;">
+                <option value="all">All Categories</option>
+                <option value="CSE">Computer Science</option>
+                <option value="ECE">Electronics</option>
+              </select>
+              <button class="btn-primary" onclick="searchCatalogue()">Search</button>
+            </div>
+            <div class="col-3" id="search-results">
+              <div class="skeleton" style="height:150px;"></div>
+              <div class="skeleton" style="height:150px;"></div>
+              <div class="skeleton" style="height:150px;"></div>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          
+          <!-- RESERVATION QUEUE -->
+          <div class="panel" style="margin:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h2 class="font-playfair" style="margin:0 0 16px 0; font-size:18px;">Reservation Queue</h2>
+            </div>
+            <div id="reservations-container">
+              <div class="skeleton" style="height:40px; margin-bottom:12px;"></div>
+              <div class="skeleton" style="height:40px;"></div>
+            </div>
+          </div>
+
+          <!-- LIBRARY NOTICES -->
+          <div class="panel" style="margin:0;">
+            <h2 class="font-playfair" style="margin:0 0 16px 0; font-size:18px;">Library Notices</h2>
+            <div id="notices-container" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="skeleton" style="height:40px;"></div>
+              <div class="skeleton" style="height:40px;"></div>
+            </div>
+          </div>
+
+          <!-- LIBRARY HOURS -->
+          <div class="panel" style="margin:0;">
+            <h2 class="font-playfair" style="margin:0 0 16px 0; font-size:18px;">Library Hours</h2>
+            <div id="hours-status" style="margin-bottom:16px;"></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+              <span style="color:var(--text-muted); font-size:14px;">Mon &ndash; Fri</span>
+              <span class="status-pill status-good" style="padding:2px 8px; font-size:10px;">8 AM &ndash; 8 PM</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+              <span style="color:var(--text-muted); font-size:14px;">Saturday</span>
+              <span class="status-pill status-good" style="padding:2px 8px; font-size:10px;">9 AM &ndash; 5 PM</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-muted); font-size:14px;">Sunday</span>
+              <span class="status-pill status-dead" style="padding:2px 8px; font-size:10px;">Closed</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    fetchData();
+    checkLibraryHours();
+  });
+
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  function formatDate(isoStr) {
+    if(!isoStr) return "---";
+    const d = new Date(isoStr);
+    return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  }
+
+  function formatMoney(amount) {
+    return "₹" + parseFloat(amount).toFixed(0);
+  }
+
+  async function fetchJSON(url, options = {}) {
+    try {
+      const resp = await fetch(url, options);
+      if(!resp.ok) throw new Error("API error");
+      return await resp.json();
+    } catch(err) {
+      console.error(err);
+      return null;
+    }
+  }
+
+  async function fetchData() {
+    loadFines();
+    loadMyBooks();
+    loadReservations();
+    loadNotices();
+    // Pre-load catalogue
+    searchCatalogue();
+  }
+
+  async function loadFines() {
+    const data = await fetchJSON('/api/library/fines');
+    if(!data) return;
+    const amount = data.outstanding_fine || 0;
+    
+    // Topbar badge
+    const topBadge = document.getElementById("topbar-fine");
+    if(amount > 0) {
+      topBadge.style.display = 'block';
+      topBadge.innerHTML = `<span class="status-pill status-danger">Fine: ${formatMoney(amount)} Pending</span>`;
+    } else {
+      topBadge.style.display = 'none';
+    }
+
+    // Banner
+    const banner = document.getElementById("fine-banner-container");
+    if(amount > 0) {
+      banner.style.display = 'flex';
+      banner.className = "fine-banner";
+      banner.innerHTML = `
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:rgba(139,29,29,0.2); display:flex; align-items:center; justify-content:center; color:var(--accent);">
+            <i data-lucide="alert-circle" style="width:20px; height:20px;"></i>
+          </div>
+          <div>
+            <div style="color:var(--accent); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Outstanding Fine</div>
+            <div class="font-playfair" style="font-size:20px; color:var(--cream);">${formatMoney(amount)}</div>
+          </div>
+        </div>
+        <button class="btn-primary">Pay Fine &rarr;</button>
+      `;
+    } else {
+      banner.style.display = 'none';
+    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  async function loadMyBooks() {
+    const container = document.getElementById("loans-container");
+    const data = await fetchJSON('/api/library/my-books');
+    if(!data) {
+      container.innerHTML = `<div class="error-banner">Failed to load loans. <button class="btn-outline" onclick="loadMyBooks()">Retry</button></div>`;
+      return;
+    }
+
+    const books = data.books || [];
+    const activeBooks = books.filter(b => b.status === 'active');
+    
+    document.getElementById("active-count").textContent = `${activeBooks.length} / 4 slots`;
+    document.getElementById("total-count").textContent = books.length;
+
+    if(books.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i data-lucide="book-x" class="empty-icon" style="width:36px; height:36px;"></i>
+          <div>No borrowing history found</div>
+        </div>
+      `;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      return;
+    }
+
+    let html = `<table class="data-table">
+      <thead>
+        <tr>
+          <th>Book Title</th>
+          <th>Author</th>
+          <th>Issued</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    books.forEach(b => {
+      let statusHtml, actionHtml, dueColor = "";
+      
+      if(b.status === 'active') {
+        if(b.days_remaining < 0) {
+          statusHtml = `<span class="status-pill status-danger">Overdue</span>`;
+          actionHtml = `<button class="btn-ghost" onclick="returnBook(${b.book_id})" style="color:var(--accent);">Return</button> <button class="btn-ghost btn-disabled">Pay Fine</button>`;
+          dueColor = "due-danger";
+        } else if(b.days_remaining <= 5) {
+          statusHtml = `<span class="status-pill status-warn">Due Soon</span>`;
+          actionHtml = `<button class="btn-outline" onclick="renewBook(${b.id})">Renew</button> <button class="btn-ghost" onclick="returnBook(${b.book_id})">Return</button>`;
+          dueColor = "due-warn";
+        } else {
+          statusHtml = `<span class="status-pill status-good">Active</span>`;
+          actionHtml = `<button class="btn-outline" onclick="renewBook(${b.id})">Renew</button> <button class="btn-ghost" onclick="returnBook(${b.book_id})">Return</button>`;
+          dueColor = "due-normal";
+        }
+      } else {
+        statusHtml = `<span class="status-pill status-dead">Returned</span>`;
+        actionHtml = `<span style="color:#444;">&mdash;</span>`;
+        dueColor = "due-normal";
+      }
+
+      html += `<tr>
+        <td style="color:var(--cream); font-weight:500;">${b.title}</td>
+        <td>${b.author || '---'}</td>
+        <td>${formatDate(b.issued_date)}</td>
+        <td class="${dueColor}">${formatDate(b.due_date)}</td>
+        <td>${statusHtml}</td>
+        <td>${actionHtml}</td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  }
+
+  async function loadReservations() {
+    const container = document.getElementById("reservations-container");
+    const data = await fetchJSON('/api/library/reservations');
+    if(!data || !data.reservations || data.reservations.length === 0) {
+      container.innerHTML = `<div style="color:var(--text-ghost); font-size:13px; text-align:center; padding:20px 0;">No active reservations.</div>`;
+      return;
+    }
+
+    let html = '';
+    data.reservations.forEach(r => {
+      const isNext = r.queue_position === 1;
+      const progressWid = isNext ? "90%" : "30%";
+      const progressCls = isNext ? "fill-good" : "fill-warn";
+      
+      html += `
+        <div style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <div style="color:var(--cream); font-size:14px; font-weight:500;">${r.title}</div>
+            <div style="font-size:12px; color: ${isNext ? 'var(--green)' : 'var(--text-muted)'}; font-weight:500;">
+              ${isNext ? 'Next in line' : `Pos: #${r.queue_position}`}
+            </div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill ${progressCls}" style="width:${progressWid}"></div>
+          </div>
+          <div style="margin-top:6px; font-size:11px; color:var(--text-dim);">
+            ${isNext ? 'Estimated available in 2-3 days' : 'Waiting for existing loans to be returned'}
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  async function loadNotices() {
+    const container = document.getElementById("notices-container");
+    const data = await fetchJSON('/api/library/notices');
+    if(!data || !data.notices || data.notices.length === 0) {
+      container.innerHTML = `<div style="color:var(--text-ghost); font-size:13px; text-align:center; padding:20px 0;">No new notices.</div>`;
+      return;
+    }
+
+    let html = '';
+    data.notices.forEach(n => {
+      html += `
+        <div style="border-left:2px solid var(--accent); padding-left:12px;">
+          <div style="color:var(--cream); font-size:14px; margin-bottom:4px;">${n.title}</div>
+          <div style="color:var(--text-muted); font-size:12px;">${n.content}</div>
+          <div style="color:var(--text-dim); font-size:11px; margin-top:6px;">${formatDate(n.created_at)}</div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  async function searchCatalogue() {
+    const container = document.getElementById("search-results");
+    const q = document.getElementById("search-input").value;
+    const cat = document.getElementById("search-category").value;
+    
+    container.innerHTML = `<div class="skeleton" style="height:150px;"></div><div class="skeleton" style="height:150px;"></div><div class="skeleton" style="height:150px;"></div>`;
+    
+    const data = await fetchJSON(`/api/library/search?q=${encodeURIComponent(q)}&category=${encodeURIComponent(cat)}`);
+    if(!data || !data.results || data.results.length === 0) {
+      container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No books found matching criteria.</div>`;
+      return;
+    }
+
+    let html = '';
+    data.results.forEach(b => {
+      const grad = b.cover_gradient || 'linear-gradient(135deg, #1f1f1f, #121212)';
+      let icon = b.cover_icon || 'book';
+      if (icon.includes('fas')) icon = 'book';
+      const avail = b.availability;
+      
+      const badge = avail 
+        ? `<span class="status-pill status-good" style="font-size:9px; padding:2px 6px;">Available</span>`
+        : `<span class="status-pill status-warn" style="font-size:9px; padding:2px 6px;">Issued out</span>`;
+        
+      const action = avail
+        ? `<button class="btn-ghost" onclick="issueBook(${b.id})">Issue</button>`
+        : `<button class="btn-ghost" style="color:var(--accent)" onclick="reserveBook(${b.id})">Reserve</button>`;
+
+      html += `
+        <div class="book-card">
+          <div class="book-spine" style="background:${grad};">
+            <i data-lucide="${icon}" style="width:24px; height:24px;"></i>
+          </div>
+          <div>
+            <div style="color:var(--cream); font-size:14px; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${b.title}">
+              <a href="/book/${b.id}" style="color:inherit;">${b.title}</a>
+            </div>
+            <div style="color:var(--text-muted); font-size:12px; margin-bottom:8px;">${b.author || 'Unknown'}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              ${badge}
+              ${action}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  async function renewBook(loanId) {
+    if(!confirm('Renew this book for 14 days?')) return;
+    const res = await fetchJSON('/api/library/renew', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({loan_id: loanId})
+    });
+    if(res && res.status === 'success') {
+      loadMyBooks();
+    } else {
+      alert("Failed to renew book");
+    }
+  }
+
+  async function reserveBook(bookId) {
+    if(!confirm('Reserve this book? You will be notified when it is returned.')) return;
+    const res = await fetchJSON('/api/library/reserve', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({book_id: bookId})
+    });
+    if(res && res.status === 'success') {
+      loadReservations();
+    } else {
+      alert("Failed to reserve book");
+    }
+  }
+
+  async function issueBook(bookId) {
+    if(!confirm('Issue this book to your account?')) return;
+    const res = await fetchJSON('/api/library/issue_json', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({book_id: bookId})
+    });
+    if(res && res.status === 'success') {
+      fetchData();
+    } else {
+      alert("Failed to issue book");
+    }
+  }
+
+  async function returnBook(bookId) {
+    if(!confirm('Return this book?')) return;
+    const res = await fetchJSON('/api/library/return_json', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({book_id: bookId})
+    });
+    if(res && res.status === 'success') {
+      fetchData();
+    } else {
+      alert("Failed to return book");
+    }
+  }
+
+  function checkLibraryHours() {
+    const statusBox = document.getElementById("hours-status");
+    const d = new Date();
+    const isSun = d.getDay() === 0;
+    const isSat = d.getDay() === 6;
+    const h = d.getHours();
+    
+    let isOpen = false;
+    if(!isSun) {
+      if(isSat && h >= 9 && h < 17) isOpen = true;
+      else if(!isSat && h >= 8 && h < 20) isOpen = true;
+    }
+    
+    if(isOpen) {
+      statusBox.innerHTML = `
+        <div style="background:rgba(60,180,100,0.1); border:1px solid rgba(60,180,100,0.2); padding:12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);"></div>
+          <span style="color:#5c5; font-size:13px; font-weight:500;">Currently Open</span>
+        </div>
+      `;
+    } else {
+      statusBox.innerHTML = `
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); padding:12px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#666;"></div>
+          <span style="color:#aaa; font-size:13px; font-weight:500;">Currently Closed</span>
+        </div>
+      `;
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Notice Board Archive - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notice_archive.css') }}">
+<style>
+  /* Dynamic Notice Feed Styles */
+  .nt-search-container {
+    margin-bottom: 24px;
+  }
+  .nt-search {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(245,230,190,0.1);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  .nt-search:focus {
+    border-color: #8B1D1D;
+    box-shadow: 0 0 0 3px rgba(139,29,29,0.1);
+  }
+  
+  .nt-filter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nt-filter {
+    width: 100%; text-align: left; padding: 12px 16px; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(245,230,190,0.05); border-radius: 8px; color: #A0A0A0;
+    font-size: 13px; cursor: pointer; transition: 0.3s;
+  }
+  .nt-filter:hover { background: rgba(139,29,29,0.05); color: #F5E6BE; border-color: rgba(139,29,29,0.3); }
+  .nt-filter.active { background: #8B1D1D; color: #fff; border-color: #8B1D1D; font-weight: 600; }
+
+  /* Feed Engine Cards */
+  .nt-card {
+    background: #121212;
+    border: 1px solid rgba(245,230,190,0.05);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    animation: fadeUp 0.4s ease forwards;
+  }
+  .nt-card:hover { border-color: rgba(139,29,29,0.4); box-shadow: 0 10px 24px rgba(0,0,0,0.2); transform: translateY(-2px); }
+  .nt-cat { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8B1D1D; margin-bottom: 8px; font-weight: 700; display: inline-block; padding: 4px 10px; background: rgba(139,29,29,0.1); border-radius: 20px; }
+  .nt-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #F5E6BE; margin: 0 0 8px; }
+  .nt-snippet { font-size: 14px; color: #A0A0A0; line-height: 1.5; margin: 0 0 12px; }
+  .nt-date { font-size: 11px; color: #666; font-weight: 600; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; display: block; }
+  
+  .nt-empty { text-align: center; padding: 40px; color: #A0A0A0; font-family: 'Inter'; border: 1px dashed rgba(139,29,29,0.3); border-radius: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notice-arch-page">
+  <!-- BREADCRUMB -->
+  <div class="archive-breadcrumb">
+    <a href="/">Home</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-active">Notice Board Archive</span>
+  </div>
+
+  <section class="archive-hero fade-up">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING</div>
+      <h1 class="hero-title">Intelligent Notice Board</h1>
+      <p class="hero-sub">Synchronized with the latest departmental records, placement statistics, and academic highlights.</p>
+    </div>
+  </section>
+
+  <section class="archive-main fade-up" style="animation-delay: 0.1s;">
+    <div class="archive-container">
+      
+      <!-- LEFT SIDEBAR: FILTERS AND QUICK LINKS -->
+      <aside class="archive-sidebar">
+        
+        <div class="sidebar-widget nt-search-container">
+          <input type="text" class="nt-search" id="noticeSearch" placeholder="Search notices, e.g. 'Batch 10' or 'Sutherland'...">
+        </div>
+
+        <div class="sidebar-widget">
+          <h3 class="widget-title">Categories</h3>
+          <ul class="nt-filter-list">
+            <li><button class="nt-filter active" data-filter="All">All Notices</button></li>
+            <li><button class="nt-filter" data-filter="Placement">Placement Alerts</button></li>
+            <li><button class="nt-filter" data-filter="Higher Studies">Academic Achievements</button></li>
+            <li><button class="nt-filter" data-filter="Academic">Academic Resources</button></li>
+            <li><button class="nt-filter" data-filter="Events">Upcoming Events</button></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-widget mt-4">
+          <h3 class="widget-title">Quick Links</h3>
+          <ul class="quick-links-list">
+            <li><a href="https://app.ktu.edu.in" target="_blank" class="ql-link">View My Results &rarr;</a></li>
+            <li><a href="/placement" class="ql-link highlight-link">Placement Analytics &rarr;</a></li>
+            <li><a href="/academics" class="ql-link">Resource Vault &rarr;</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- RIGHT CONTENT: FEED ENGINE -->
+      <main class="archive-content" id="feedEngineContainer">
+        <!-- Rendered by JS -->
+      </main>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Dynamic Feed Engine DB
+  const DEPARTMENT_RECORDS = [
+    // BATCH 2025 HIGHER STUDIES
+    { type: 'Higher Studies', student: 'M. Yazhini (ECE)', course: 'M.Tech in Nanotechnology', institute: 'NIT Suratkal', batch: 'Batch 10', date: 'Just Now' },
+    { type: 'Higher Studies', student: 'Sreelakshmi P. B. (ECE)', course: "Master's in Electrical Engineering", institute: 'Kempten University of Applied Sciences, Germany', batch: 'Batch 10', date: 'Just Now' },
+    // BATCH 2024 HIGHER STUDIES
+    { type: 'Higher Studies', student: 'Batch 2024 Alumnus', course: 'M.S. in Cyber Security', institute: 'IOWA State University', batch: 'Batch 9', date: '21 Feb 2025' },
+    { type: 'Higher Studies', student: 'Batch 2024 Alumnus', course: 'M.Tech in Data Science', institute: 'CUSAT', batch: 'Batch 9', date: '20 Feb 2025' },
+    { type: 'Higher Studies', student: 'Batch 2024 Alumnus', course: 'Advanced Program', institute: 'NID Ahmedabad', batch: 'Batch 9', date: '18 Feb 2025' },
+    
+    // BATCH 2025 PLACEMENTS
+    { type: 'Placement', company: 'Sutherland', count: 68, batch: 'Batch 10', package: '', date: 'Today' },
+    { type: 'Placement', company: 'Intrainz Innovation', count: 14, batch: 'Batch 10', package: '₹6.5 LPA', date: 'Yesterday' },
+    { type: 'Placement', company: 'Montra Electric', count: 9, batch: 'Batch 10', package: '', date: '15 Mar 2025' },
+    { type: 'Placement', company: 'K12 Technoservices', count: 5, batch: 'Batch 10', package: '', date: '12 Mar 2025' },
+    { type: 'Placement', company: 'Plastic Omnium Auto Exteriors', count: 1, batch: 'Batch 10', package: '₹6.45 LPA', date: '10 Mar 2025' },
+    { type: 'Placement', company: 'Amazon Development Center', count: 1, batch: 'Batch 10', package: '', date: '08 Mar 2025' },
+    { type: 'Placement', company: 'Terawe', count: 1, batch: 'Batch 10', package: '', date: '05 Mar 2025' },
+    { type: 'Placement', company: 'VVDN Technologies', count: 1, batch: 'Batch 10', package: '', date: '04 Mar 2025' },
+    { type: 'Placement', company: 'PayTM', count: 1, batch: 'Batch 10', package: '', date: '02 Mar 2025' },
+    { type: 'Placement', company: 'HDFC Ergo', count: 1, batch: 'Batch 10', package: '', date: '01 Mar 2025' },
+    { type: 'Placement', company: 'Apollo Tyres', count: 1, batch: 'Batch 10', package: '', date: '28 Feb 2025' },
+    { type: 'Placement', company: 'Sundaram Fasteners', count: 1, batch: 'Batch 10', package: '', date: '27 Feb 2025' },
+
+    // EVENTS
+    { type: 'Events', title: '"AI Ethics & Future" Seminar', snippet: 'Scheduled for March 24th.', batch: '', date: 'Upcoming' },
+    { type: 'Events', title: 'Inter-College Hackathon', snippet: 'Scheduled for April 10th.', batch: '', date: 'Upcoming' },
+
+    // ACADEMIC RESOURCES
+    { type: 'Academic', title: 'S6 Complete Syllabus (KTU 2019 Scheme)', snippet: 'Students can now download the S6 Complete Syllabus directly from the portal.', batch: 'S6', date: 'Recent' },
+    { type: 'Academic', title: 'Machine Learning Lab Manual (2024–25)', snippet: 'The updated Machine Learning Lab Manual is available in the Resource Vault.', batch: '', date: 'Recent' },
+  ];
+
+  const searchInput = document.getElementById('noticeSearch');
+  const feedContainer = document.getElementById('feedEngineContainer');
+  let currentActiveFilter = 'All';
+
+  function renderFeed() {
+    feedContainer.innerHTML = '';
+    const query = searchInput.value.toLowerCase();
+    let matchCount = 0;
+
+    DEPARTMENT_RECORDS.forEach(record => {
+      // 1. Map to Engine Standard
+      let engineCat = "";
+      let engineTitle = "";
+      let engineSnippet = "";
+      let dt = record.date || "Just Now";
+
+      if (record.type === 'Higher Studies') {
+        engineCat = "Academic Achievement";
+        engineTitle = `${record.student} - International/National Admission`;
+        engineSnippet = `Accepted into ${record.course} at ${record.institute}. [${record.batch}]`;
+      } 
+      else if (record.type === 'Placement') {
+        engineCat = "Placement Alert";
+        engineTitle = `Placement Success: ${record.company}`;
+        let pkgStr = record.package ? ` (${record.package})` : '';
+        engineSnippet = `${record.count} student(s) from the CSE department successfully placed${pkgStr}. [${record.batch}]`;
+      } 
+      else if (record.type === 'Events') {
+        engineCat = "Upcoming Event";
+        engineTitle = record.title;
+        engineSnippet = record.snippet;
+      } 
+      else if (record.type === 'Academic') {
+        engineCat = "Academic Update";
+        engineTitle = record.title;
+        engineSnippet = record.snippet;
+      }
+
+      // 2. Filter & Search Matcher
+      const strToMatch = (engineCat + " " + engineTitle + " " + engineSnippet + " " + (record.batch || "")).toLowerCase();
+      const searchMatches = query === "" || strToMatch.includes(query);
+      const filterMatches = currentActiveFilter === 'All' || record.type === currentActiveFilter;
+
+      if (searchMatches && filterMatches) {
+        matchCount++;
+        // Build Component
+        const card = document.createElement('div');
+        card.className = 'nt-card';
+        card.innerHTML = `
+          <span class="nt-cat">${engineCat}</span>
+          <h3 class="nt-title">${engineTitle}</h3>
+          <p class="nt-snippet">${engineSnippet}</p>
+          <span class="nt-date">${dt}</span>
+        `;
+        feedContainer.appendChild(card);
+      }
+    });
+
+    if (matchCount === 0) {
+      feedContainer.innerHTML = `<div class="nt-empty">No records found matching your current filters or search query.</div>`;
+    }
+  }
+
+  // Bind Events
+  searchInput.addEventListener('input', renderFeed);
+  
+  document.querySelectorAll('.nt-filter').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.nt-filter').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentActiveFilter = e.target.getAttribute('data-filter');
+      renderFeed();
+    });
+  });
+
+  // Init
+  document.addEventListener('DOMContentLoaded', renderFeed);
+
+  // Fade Up Animation Observer
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      document.querySelectorAll('.fade-up').forEach(el => el.style.opacity = 1);
+    }, 50);
+  });
+</script>
+{% endblock %}

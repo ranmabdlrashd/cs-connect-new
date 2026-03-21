@@ -1,0 +1,154 @@
+/* =============================================================================
+   RECOVERY & RESET PAGES — DARK ACADEMIC THEME
+   ============================================================================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0A0A0A;
+  font-family: 'Inter', sans-serif;
+  color: #F5E6BE;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recovery-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100vw;
+  min-height: 100vh;
+  background: #0A0A0A;
+}
+
+/* LEFT PANEL */
+.recovery-left {
+  position: relative;
+  background-image: 
+    linear-gradient(to right, rgba(139,29,29,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139,29,29,0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.recovery-left::before {
+  content: '';
+  position: absolute;
+  bottom: 10%; left: 10%; width: 70%; height: 70%;
+  background: radial-gradient(circle, rgba(139,29,29,0.1) 0%, transparent 60%);
+}
+
+.recovery-left-content { position: relative; z-index: 10; max-width: 480px; }
+
+/* RIGHT PANEL */
+.recovery-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0A0A0A;
+  padding: 40px;
+}
+
+.recovery-card {
+  width: 100%;
+  max-width: 460px;
+  background: #121212;
+  border: 1px solid rgba(245,230,190,0.08);
+  border-radius: 16px;
+  padding: 48px;
+}
+
+/* Form Groups */
+.form-group { margin-bottom: 24px; }
+.form-group label {
+  display: block; font-size: 11px; color: #A0A0A0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600;
+}
+.form-control {
+  width: 100%;
+  background: #0A0A0A;
+  border: 1px solid rgba(245,230,190,0.1);
+  padding: 14px;
+  color: #fff;
+  font-size: 14px;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s;
+}
+.form-control:focus { border-color: #8B1D1D; box-shadow: 0 0 0 3px rgba(139,29,29,0.1); }
+
+/* Requirements Checklist */
+.requirement-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.req-item {
+  font-size: 11px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s;
+}
+.req-item.valid { color: #50C878; }
+.req-item.valid svg { color: #50C878; }
+
+/* Strength Meter (Tier 3 Green) */
+.strength-meter {
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+.strength-bar {
+  height: 100%;
+  width: 0;
+  background: #50C878;
+  transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #8B1D1D, #6b1515);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 16px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(139,29,29,0.3); }
+
+/* Email Display Bar */
+.email-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(245,230,190,0.03);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(245,230,190,0.05);
+  margin-bottom: 32px;
+}
+.email-display svg { color: #8B1D1D; }
+.email-display span { font-size: 14px; color: #F5E6BE; font-weight: 500; }
+
+@media (max-width: 900px) {
+  .recovery-split { grid-template-columns: 1fr; }
+  .recovery-left { display: none; }
+  .recovery-right { padding: 24px; }
+  .recovery-card { border: none; padding: 0; background: transparent; box-shadow: none; }
+}

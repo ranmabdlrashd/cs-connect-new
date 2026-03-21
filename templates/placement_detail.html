@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Drive - CS Connect{% endblock %}
+
+{% block extra_css %}
+<style>
+  .pd-header { display: flex; align-items: center; gap: 30px; padding: 40px; background: linear-gradient(135deg, rgba(139,29,29,0.15) 0%, rgba(18,18,18,1) 100%); border-radius: 12px; border: 1px solid rgba(139,29,29,0.3); margin-bottom: 24px; position: relative; overflow: hidden; }
+  .pd-header::before { content: ""; position: absolute; top: -50%; left: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(139,29,29,0.4) 0%, transparent 70%); filter: blur(40px); z-index: 0; }
+  
+  .pd-header-inner { position: relative; z-index: 1; flex: 1; display: flex; justify-content: space-between; align-items: center; }
+  .pd-company { font-family: 'Playfair Display', serif; font-size: 42px; color: #fff; margin: 0 0 8px; }
+  .pd-role { font-size: 18px; color: #F5E6BE; font-weight: 500; }
+  
+  .pd-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 30px; }
+  .pd-metric-card { background: #121212; padding: 24px; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .pd-metric-val { font-size: 28px; color: #F5E6BE; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+  .pd-metric-lbl { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+  .pd-content { padding: 40px; background: #0A0A0A; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); color: #D0D0D0; line-height: 1.8; }
+  .pd-btn { display: inline-block; background: #8B1D1D; color: #fff; padding: 14px 32px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.3s; margin-top: 24px; border: 1px solid #8B1D1D; }
+  .pd-btn:hover { background: #a32222; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139,29,29,0.3); }
+  
+  .back-btn { display: inline-block; color: #888; text-decoration: none; margin-bottom: 24px; font-weight: 500; font-size: 14px; transition: 0.2s;}
+  .back-btn:hover { color: #F5E6BE; transform: translateX(-4px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px; margin: 60px auto;">
+   <a href="/placement" class="back-btn">&larr; Back to Placement Hub</a>
+   
+   <div class="pd-header">
+      <div class="pd-header-inner">
+          <div>
+              <h1 class="pd-company">{{ drive.company | default('Top Tier Tech Corp') }}</h1>
+              <div class="pd-role"><i class="fas fa-briefcase" style="margin-right:8px;"></i>{{ drive.role | default('Software Development Engineer') }}</div>
+          </div>
+          <div style="text-align: right;">
+              <span style="display: inline-block; background: rgba(40,167,69,0.15); color: #4ade80; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; border: 1px solid rgba(40,167,69,0.3); margin-bottom: 12px;">Active Pipeline</span>
+              <div style="font-size: 13px; color: #A0A0A0;">Added: {{ drive.date | default('Recent') }}</div>
+          </div>
+      </div>
+   </div>
+   
+   <div class="pd-metrics">
+       <div class="pd-metric-card">
+           <div class="pd-metric-val">{{ drive.ctc | default('8.5 LPA') }}</div>
+           <div class="pd-metric-lbl">Compensation (CTC)</div>
+       </div>
+       <div class="pd-metric-card">
+           <div class="pd-metric-val">{{ drive.eligible_batch | default('Batch 10 (2025)') }}</div>
+           <div class="pd-metric-lbl">Eligible Batch</div>
+       </div>
+       <div class="pd-metric-card">
+           <div class="pd-metric-val">{{ drive.deadline | default('25 Mar 2025') }}</div>
+           <div class="pd-metric-lbl">Application Deadline</div>
+       </div>
+   </div>
+
+   <div class="pd-content">
+      <h3 style="color: #F5E6BE; font-family: 'Playfair Display', serif; margin-bottom: 16px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 12px;">About the Opportunity</h3>
+      <p style="margin-bottom: 32px;">The organization is looking for passionate engineers who want to build high-scale distributed systems. Candidates will be responsible for end-to-end development, from ideation to deployment, while ensuring high performance, responsiveness, and scale.</p>
+      
+      <h3 style="color: #F5E6BE; font-family: 'Playfair Display', serif; margin-bottom: 16px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 12px;">Eligibility Criteria</h3>
+      <ul style="margin-bottom: 32px; padding-left: 20px; list-style-type: square; color: #A0A0A0;">
+          <li style="margin-bottom: 12px;">60% or 6.0 CGPA and above in B.Tech (Computer Science & Engineering).</li>
+          <li style="margin-bottom: 12px;">No active backlogs at the time of the hiring process.</li>
+          <li style="margin-bottom: 12px;">Strong fundamentals in Data Structures, Algorithms, and System Design.</li>
+          <li style="margin-bottom: 12px;">Proficiency in at least one object-oriented programming language (Java, C++, Python).</li>
+      </ul>
+
+      <a href="#" class="pd-btn" onclick="document.getElementById('applyOverlay').style.display='flex'; return false;"><i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Submit Application Profile</a>
+   </div>
+</div>
+
+<!-- Mock Apply Modal -->
+<div id="applyOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+    <div style="background:#121212; padding:40px; border-radius:12px; border:1px solid #8B1D1D; text-align:center; max-width:400px;">
+        <i class="fas fa-check-circle" style="font-size:48px; color:#4ade80; margin-bottom:20px;"></i>
+        <h3 style="color:#F5E6BE; font-family:'Playfair Display', serif; margin:0 0 12px;">Application Registered</h3>
+        <p style="color:#A0A0A0; font-size:14px; margin:0 0 24px; line-height:1.5;">Your student profile and academic metrics have been securely forwarded to the placement cell for shortlisting.</p>
+        <button onclick="document.getElementById('applyOverlay').style.display='none';" style="background:#222; color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px 24px; border-radius:6px; cursor:pointer;">Close</button>
+    </div>
+</div>
+{% endblock %}

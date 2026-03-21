@@ -6,24 +6,24 @@ def get_db():
 
 class Notification:
     @staticmethod
-    def notify_admin(message):
+    def notify_admin(message, title='Admin Alert', category='Academic'):
         conn = get_db()
         # Find admins (role='admin')
         admins = conn.execute("SELECT id FROM users WHERE role = 'admin'").fetchall()
         for admin in admins:
             conn.execute(
-                "INSERT INTO notifications (user_id, message) VALUES (%s, %s)",
-                (admin[0], message),
+                "INSERT INTO notifications (user_id, title, body, category) VALUES (%s, %s, %s, %s)",
+                (admin[0], title, message, category),
             )
         conn.commit()
         conn.close()
 
     @staticmethod
-    def notify_user(user_id, message):
+    def notify_user(user_id, message, title='Notice', category='Academic'):
         conn = get_db()
         conn.execute(
-            "INSERT INTO notifications (user_id, message) VALUES (%s, %s)",
-            (user_id, message),
+            "INSERT INTO notifications (user_id, title, body, category) VALUES (%s, %s, %s, %s)",
+            (user_id, title, message, category),
         )
         conn.commit()
         conn.close()
@@ -39,7 +39,7 @@ class Notification:
         conn = get_db()
         notifs = conn.execute(
             """
-            SELECT id, message, created_at, read_status 
+            SELECT id, title, body, category, created_at, is_read 
             FROM notifications 
             WHERE user_id = %s 
             ORDER BY created_at DESC
@@ -49,12 +49,21 @@ class Notification:
 
         # Mark as read
         conn.execute(
-            "UPDATE notifications SET read_status = TRUE WHERE user_id = %s",
+            "UPDATE notifications SET is_read = TRUE WHERE user_id = %s",
             (admin_id,),
         )
         conn.commit()
         conn.close()
-        return [dict(n) for n in notifs]
+        
+        # for backwards compatibility with legacy templates
+        result = []
+        for n in notifs:
+            d = dict(n)
+            d['message'] = d['body']
+            d['read_status'] = d['is_read']
+            result.append(d)
+        return result
+
     @staticmethod
     def get_user_notifications():
         from flask import session
@@ -62,18 +71,27 @@ class Notification:
         if not user_id:
             return []
         conn = get_db()
+        # API requires: id, title, body, category, is_read, created_at
         notifs = conn.execute(
             """
-            SELECT id, message, created_at, read_status 
+            SELECT id, title, body, category, is_read, created_at 
             FROM notifications 
             WHERE user_id = %s 
             ORDER BY created_at DESC
-            LIMIT 20
         """,
             (user_id,),
         ).fetchall()
         conn.close()
-        return [dict(n) for n in notifs]
+        
+        result = []
+        for n in notifs:
+            d = dict(n)
+            # Create isoformat string for JS, and inject legacy fields for old templates
+            d['created_at_iso'] = d['created_at'].isoformat() if d.get('created_at') else None
+            d['message'] = d['body']
+            d['read_status'] = d['is_read']
+            result.append(d)
+        return result
 
     @staticmethod
     def get_unread_count():
@@ -83,7 +101,7 @@ class Notification:
             return 0
         conn = get_db()
         row = conn.execute(
-            "SELECT COUNT(*) FROM notifications WHERE user_id = %s AND read_status = FALSE",
+            "SELECT COUNT(*) FROM notifications WHERE user_id = %s AND is_read = FALSE",
             (user_id,),
         ).fetchone()
         conn.close()
@@ -97,8 +115,22 @@ class Notification:
             return
         conn = get_db()
         conn.execute(
-            "UPDATE notifications SET read_status = TRUE WHERE user_id = %s",
+            "UPDATE notifications SET is_read = TRUE WHERE user_id = %s",
             (user_id,),
+        )
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def mark_read(notif_id):
+        from flask import session
+        user_id = session.get("user_id")
+        if not user_id:
+            return
+        conn = get_db()
+        conn.execute(
+            "UPDATE notifications SET is_read = TRUE WHERE id = %s AND user_id = %s",
+            (notif_id, user_id),
         )
         conn.commit()
         conn.close()
