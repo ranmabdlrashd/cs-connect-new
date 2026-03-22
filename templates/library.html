@@ -3,91 +3,321 @@
 {% block title %}Department Library | CS CONNECT{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}" />
 <style>
-    .book-card {
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
 
-    .book-card:hover {
-        transform: translateY(-5px);
-    }
+  :root {
+    --bg-primary:    #0A0A0A;
+    --bg-secondary:  #121212;
+    --bg-card:       #0e0e0e;
+    --bg-hover:      #160808;
+    --accent:        #8B1D1D;
+    --accent-hover:  #a82222;
+    --accent-dark:   #6B1010;
+    --cream:         #F5E6BE;
+    --text-primary:  #e0d6c8;
+    --text-muted:    #A0A0A0;
+    --text-dim:      #666666;
+    --text-ghost:    #555555;
+    --text-dead:     #444444;
+    --border:        rgba(245,230,190,0.06);
+    --border-accent: rgba(139,29,29,0.3);
+    --border-focus:  rgba(139,29,29,0.4);
+  }
 
-    .book-holder {
-        font-size: 0.85em;
-        color: #d03030;
-        font-weight: bold;
-        margin-top: 5px;
-    }
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+  }
 
-    .search-box-main {
-        display: flex;
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-    }
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
 
-    .search-box-main input {
-        flex: 1;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 30px 0 0 30px;
-        outline: none;
-    }
+  .page-header {
+    height: 300px;
+    background: linear-gradient(135deg, var(--bg-hover), var(--bg-primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
 
-    .search-box-main button {
-        padding: 12px 30px;
-        border: none;
-        background: #4facfe;
-        color: white;
-        border-radius: 0 30px 30px 0;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
+  .header-content {
+    text-align: center;
+    z-index: 2;
+  }
 
-    .search-box-main button:hover {
-        background: #00f2fe;
-    }
+  .header-content h1 {
+    font-size: 3.5rem;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .header-content p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+  }
+
+  .library-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .search-filter-section {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+  }
+
+  .search-box-main {
+    display: flex;
+    gap: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .search-box-main input {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(245,230,190,0.1);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box-main input:focus {
+    border-color: var(--border-focus);
+    background: var(--bg-hover);
+  }
+
+  .search-box-main button {
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: var(--cream);
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .search-box-main button:hover {
+    opacity: 0.9;
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .book-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .book-card:hover {
+    border-color: var(--border-accent);
+    background: var(--bg-hover);
+    transform: translateY(-3px);
+  }
+
+  .book-cover {
+    width: 80px;
+    height: 110px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .book-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .book-title {
+    font-size: 16px;
+    color: var(--cream);
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+  }
+
+  .book-author {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin: 0 0 10px 0;
+  }
+
+  .book-holder {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: rgba(139,29,29,0.1);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .pill {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-available {
+    background: rgba(60,180,100,0.1);
+    color: #5c5;
+    border: 1px solid rgba(60,180,100,0.2);
+  }
+
+  .status-issued {
+    background: rgba(139,29,29,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(139,29,29,0.2);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-ghost);
+  }
 </style>
+<script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<section class="page-header" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-    <div class="header-overlay" style="width: 100%; text-align: center;">
-        <div class="header-content reveal">
-            <h1>Department Library</h1>
-            <p>Your Gateway to Knowledge and Technical Resources</p>
-        </div>
+<section class="page-header">
+    <div class="header-content">
+        <h1 class="font-playfair">Department Library</h1>
+        <p>Your Gateway to Knowledge and Technical Resources</p>
     </div>
 </section>
 
-<div class="library-container" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
-
-    <div class="search-filter-section reveal"
-        style="margin-bottom: 40px; background: rgba(255,255,255,0.7); padding: 30px; border-radius: 15px; box-shadow: 0 8px 32px rgba(31,38,135,0.1); backdrop-filter: blur(4px);">
+<div class="library-container">
+    <div class="search-filter-section">
         <div class="search-box-main">
             <input type="text" id="searchInput" placeholder="Search by title, author, subject, or keyword..." />
-            <button class="search-btn" id="searchBtn">
-                <i class="fas fa-search"></i> Search
+            <button id="searchBtn">
+                <i data-lucide="search" style="width: 16px; height: 16px; margin-bottom: -3px; margin-right: 4px;"></i> Search
             </button>
         </div>
     </div>
 
-    <div class="books-grid" id="booksGrid"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+    <div class="books-grid" id="booksGrid">
         <!-- Populated via AJAX -->
     </div>
 
-    <div class="no-results" id="noResults" style="display: none; text-align: center; padding: 50px;">
-        <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-        <h3>No Books Found</h3>
-        <p style="color: #666;">Try adjusting your search criteria</p>
+    <div class="no-results" id="noResults" style="display: none;">
+        <i data-lucide="search-x" style="width: 48px; height: 48px; color: var(--text-dead); margin-bottom: 16px;"></i>
+        <h3 class="font-playfair" style="color: var(--text-dim); font-size: 20px;">No Books Found</h3>
+        <p>Try adjusting your search criteria</p>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/library.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+
+    function fetchBooks(query = '') {
+        fetch(`/search_books?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => renderBooks(data))
+            .catch(err => console.error("Error fetching books:", err));
+    }
+
+    function renderBooks(books) {
+        const grid = document.getElementById('booksGrid');
+        const noResults = document.getElementById('noResults');
+
+        grid.innerHTML = '';
+        if (books.length === 0) {
+            noResults.style.display = 'block';
+            return;
+        }
+        noResults.style.display = 'none';
+
+        books.forEach(book => {
+            const isAvail = book.availability !== false;
+            const statusClass = isAvail ? 'status-available' : 'status-issued';
+            const statusText = isAvail ? 'Available' : 'Issued';
+
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.onclick = () => { window.location.href = `/book/${book.id}`; };
+
+            let holderInfoHtml = '';
+            if (!isAvail && book.current_holder) {
+                // If the backend sends current_holder, display it (usually for admins)
+                holderInfoHtml = `<div class="book-holder">Currently with: ${book.current_holder}</div>`;
+            }
+
+            const subject = book.subject || book.category || 'General';
+            const author = book.author || 'Unknown Author';
+            const title = book.title;
+
+            card.innerHTML = `
+                <div class="book-cover">
+                    <i data-lucide="book" style="stroke: var(--cream); width: 32px; height: 32px; stroke-width: 1.5;"></i>
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title font-playfair">${title}</h3>
+                    <p class="book-author">by ${author}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                        <span style="font-size: 11px; color: var(--text-muted);">${subject}</span>
+                        <span class="pill ${statusClass}">${statusText}</span>
+                    </div>
+                    ${holderInfoHtml}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => fetchBooks(searchInput.value));
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            fetchBooks(searchInput.value);
+        });
+    }
+
+    // Initial load fetch
+    fetchBooks();
+});
+</script>
 {% endblock %}

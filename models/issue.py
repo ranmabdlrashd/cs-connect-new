@@ -8,9 +8,11 @@ class Issue:
     @staticmethod
     def create_issue(book_id, user_id):
         conn = get_db()
+        from datetime import datetime, timedelta
+        due_date = datetime.now() + timedelta(days=14)
         conn.execute(
-            "INSERT INTO issues (book_id, user_id, status) VALUES (%s, %s, 'issued')",
-            (book_id, user_id),
+            "INSERT INTO issues (book_id, user_id, status, due_date) VALUES (%s, %s, 'issued', %s)",
+            (book_id, user_id, due_date),
         )
         conn.commit()
         conn.close()

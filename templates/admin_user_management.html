@@ -1,106 +1,308 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Connect - User Management</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard_system.css') }}">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
 
-{% block title %}User Management - CS Connect Admin{% endblock %}
-
-{% block extra_css %}
-<style>
-    .um-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-    .um-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 20px; }
-    .um-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0; font-size: 28px; }
-    .um-header p { color: #A0A0A0; margin: 8px 0 0; font-size: 14px; }
-    
-    .um-toolbar { display: flex; gap: 16px; margin-bottom: 24px; }
-    .um-search { flex: 1; background: #121212; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 16px; border-radius: 8px; outline: none; }
-    .um-filter { background: #121212; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 16px; border-radius: 8px; outline: none; }
-    .um-btn { background: #8B1D1D; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .um-btn:hover { background: #a32222; }
-
-    .um-table-wrapper { background: #121212; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); overflow: hidden; }
-    .um-table { width: 100%; border-collapse: collapse; }
-    .um-table th { background: #1A1A1A; color: #A0A0A0; padding: 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .um-table td { padding: 16px; color: #D0D0D0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .um-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-    .role-student { background: rgba(23,162,184,0.15); color: #38bdf8; border: 1px solid rgba(23,162,184,0.3); }
-    .role-faculty { background: rgba(255,193,7,0.15); color: #facc15; border: 1px solid rgba(255,193,7,0.3); }
-    .role-admin { background: rgba(220,53,69,0.15); color: #f87171; border: 1px solid rgba(220,53,69,0.3); }
-
-    .action-link { color: #F5E6BE; text-decoration: none; font-size: 13px; font-weight: 500; margin-right: 12px; transition: 0.2s; }
-    .action-link:hover { color: #fff; text-decoration: underline; }
-    .action-del { color: #f87171; }
-    .action-del:hover { color: #ef4444; }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="um-page">
-    <div class="um-header">
-        <div>
-            <h2>User Management</h2>
-            <p>Add, edit, or suspend user accounts across the platform.</p>
+<div class="admin-layout" id="appRoot">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="header-area">
+            <div class="logo-row">
+                <div class="logo-square"></div>
+                <div class="logo-text">CS Connect</div>
+            </div>
+            <div class="sub-text">Admin Panel</div>
         </div>
-        <button class="um-btn" onclick="alert('Open Add User Modal')"><i class="fas fa-plus"></i> New User</button>
-    </div>
+        
+        <nav class="nav-sections">
+            <div>
+                <div class="nav-section-label">Overview</div>
+                <a href="{{ url_for('admin_bp.admin_command_center') }}" class="nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="label">Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin_bp.admin_users') }}" class="nav-item active">
+                    <i data-lucide="users"></i>
+                    <span class="label">User Management</span>
+                </a>
+            </div>
 
-    <div class="um-toolbar">
-        <input type="text" class="um-search" placeholder="Search by name, ID, or email...">
-        <select class="um-filter">
-            <option value="all">All Roles</option>
-            <option value="student">Students</option>
-            <option value="faculty">Faculty</option>
-            <option value="admin">Admins</option>
-        </select>
-    </div>
+            <div>
+                <div class="nav-section-label">Academic</div>
+                <div class="nav-item">
+                    <i data-lucide="book-open"></i>
+                    <span class="label">Courses</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="check-square"></i>
+                    <span class="label">Attendance</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="calendar"></i>
+                    <span class="label">Timetable</span>
+                </div>
+            </div>
 
-    <div class="um-table-wrapper">
-        <table class="um-table">
-            <thead>
-                <tr>
-                    <th>User ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Mock Data -->
-                <tr>
-                    <td>AIS-CS-042</td>
-                    <td><strong style="color:#fff;">Arjun Kumar</strong></td>
-                    <td>arjun@aisat.ac.in</td>
-                    <td><span class="role-badge role-student">Student</span></td>
-                    <td><span style="color:#4ade80;">Active</span></td>
-                    <td>
-                        <a href="#" class="action-link">Edit</a>
-                        <a href="#" class="action-link action-del">Suspend</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>FAC-CS-012</td>
-                    <td><strong style="color:#fff;">Dr. Thomas Kurian</strong></td>
-                    <td>thomas.k@aisat.ac.in</td>
-                    <td><span class="role-badge role-faculty">Faculty</span></td>
-                    <td><span style="color:#4ade80;">Active</span></td>
-                    <td>
-                        <a href="#" class="action-link">Edit</a>
-                        <a href="#" class="action-link action-del">Suspend</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>ADM-SYS-01</td>
-                    <td><strong style="color:#fff;">System Admin</strong></td>
-                    <td>admin@aisat.ac.in</td>
-                    <td><span class="role-badge role-admin">Admin</span></td>
-                    <td><span style="color:#4ade80;">Active</span></td>
-                    <td>
-                        <a href="#" class="action-link" style="opacity:0.5; cursor:not-allowed;">Edit</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div>
+                <div class="nav-section-label">Content</div>
+                <div class="nav-item">
+                    <i data-lucide="bell-ring"></i>
+                    <span class="label">Notice Board</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="briefcase"></i>
+                    <span class="label">Placements</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="nav-section-label">Finance</div>
+                <a href="{{ url_for('admin_bp.admin_fees') }}" class="nav-item">
+                    <i data-lucide="credit-card"></i>
+                    <span class="label">Fee Management</span>
+                </a>
+            </div>
+
+            <div>
+                <div class="nav-section-label">Analytics</div>
+                <a href="{{ url_for('admin_bp.admin_analytics') }}" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span class="label">Reports & Analytics</span>
+                </a>
+            </div>
+            
+            <div>
+                <div class="nav-section-label">System</div>
+                <a href="{{ url_for('admin_bp.admin_library_management') }}" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span class="label">Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="bottom-user-block">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <span class="user-name">System Admin</span>
+                <span class="user-role">Full Access</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="breadcrumb">
+                Admin &middot; <span class="breadcrumb-active">User Management</span>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-ghost" id="exportBtn">Export CSV</button>
+                <button class="btn btn-primary" id="openAddModalBtn">
+                    <i data-lucide="user-plus" style="width:12px; height:12px"></i> Add User
+                </button>
+                <div class="notification-bell">
+                    <i data-lucide="bell"></i>
+                    <div class="bell-dot"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-area">
+            
+            <!-- HEADER -->
+            <div class="welcome-header">
+                <div>
+                    <h1 class="welcome-title">User Management</h1>
+                    <p class="welcome-sub">Manage all student, faculty and admin accounts</p>
+                </div>
+            </div>
+
+            <div id="errorContainer"></div>
+
+            <!-- METRICS ROW -->
+            <div class="metric-grid" id="metricsRow">
+                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar">
+                <div class="filter-pills" id="roleFilters">
+                    <div class="filter-pill active" data-filter="all">All Users</div>
+                    <div class="filter-pill" data-filter="student">Students</div>
+                    <div class="filter-pill" data-filter="faculty">Faculty</div>
+                    <div class="filter-pill" data-filter="admin">Admin</div>
+                    <div class="filter-pill" data-filter-status="Pending">Pending</div>
+                    <div class="filter-pill" data-filter-status="Inactive">Inactive</div>
+                </div>
+                <div class="search-input-wrap">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search name, ID...">
+                </div>
+            </div>
+            
+            <!-- BULK BAR -->
+            <div id="bulkActionBar" class="bulk-action-bar" style="display: none;">
+                <span class="bulk-action-text" id="bulkActionCount">0 users selected</span>
+                <div class="bulk-action-buttons">
+                    <button class="btn btn-action-approve" id="bulkApproveBtn">Approve All</button>
+                    <button class="btn btn-action-danger" id="bulkDisableBtn">Disable All</button>
+                    <button class="btn btn-ghost" id="bulkExportBtn">Export Selected</button>
+                </div>
+            </div>
+
+            <!-- USERS TABLE -->
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="td-checkbox">
+                                    <input type="checkbox" class="custom-checkbox" id="selectAllCheckbox">
+                                </th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>ID/Roll No.</th>
+                                <th>Batch/Dept</th>
+                                <th>Email</th>
+                                <th>Registered</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="9"><div class="skeleton" style="height:20px; width:100%"></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="pagination-row">
+                    <div class="pagination-info" id="paginationInfo">Showing 0 of 0 users</div>
+                    <div class="pagination-controls" id="paginationControls">
+                        <!-- Buttons injected dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- MODALS -->
+
+<!-- Add / Edit User Modal -->
+<div class="modal-overlay" id="userModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="userModalTitle">Add User</h2>
+            <button class="modal-close" onclick="closeModal('userModal')"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="userForm">
+                <input type="hidden" id="userIdField">
+                
+                <div class="role-tabs" id="modalRoleTabs">
+                    <div class="role-tab active" data-role="student">Student</div>
+                    <div class="role-tab" data-role="faculty">Faculty</div>
+                    <div class="role-tab" data-role="admin">Admin</div>
+                </div>
+                <input type="hidden" id="roleField" value="student">
+
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" id="nameField" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" id="emailField" class="form-input" placeholder="user@aisat.ac.in" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ID / Roll No. <span id="rollLabelAsterisk">*</span></label>
+                    <input type="text" id="rollNoField" class="form-input" required>
+                </div>
+                
+                <!-- Dynamic fields based on role -->
+                <div id="studentFields">
+                    <div class="form-group">
+                        <label class="form-label">Batch / Semester</label>
+                        <select id="batchField" class="form-select">
+                            <option value="">Select Batch</option>
+                            <option value="2024">Batch 2024</option>
+                            <option value="2025">Batch 2025</option>
+                            <option value="2026">Batch 2026</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="facultyFields" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select id="departmentField" class="form-select">
+                            <option value="">Select Dept</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Electronics">Electronics</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Designation</label>
+                        <input type="text" id="designationField" class="form-input" placeholder="e.g. Associate Professor">
+                    </div>
+                </div>
+
+                <div class="form-group" id="passwordGroup">
+                    <label class="form-label">Temporary Password</label>
+                    <input type="text" id="passwordField" class="form-input" readonly value="auto-generated">
+                    <span style="font-size: 9px; color: #666; display: block; margin-top: 4px;">Will be auto-generated and sent via email</span>
+                </div>
+                
+                <div class="form-group" style="display:flex; align-items:center; gap: 8px;">
+                    <input type="checkbox" id="sendEmailField" class="custom-checkbox" checked>
+                    <label class="form-label" style="margin:0;">Send welcome email with credentials</label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('userModal')">Cancel</button>
+            <button class="btn btn-primary" id="saveUserBtn">Save User</button>
+        </div>
     </div>
 </div>
-{% endblock %}
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content" style="width: 400px;">
+        <div class="modal-header" style="border:none;">
+            <h2 class="modal-title" style="color:var(--red)">Confirm Action</h2>
+            <button class="modal-close" onclick="closeModal('confirmModal')"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" id="confirmMessage" style="padding-top:0;">
+            Are you sure you want to disable this user? They will lose access immediately.
+        </div>
+        <div class="modal-footer" style="border:none;">
+            <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+            <button class="btn btn-primary" style="background:var(--red); color:var(--cream)" id="confirmActionBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- JS Main Logic -->
+<script src="{{ url_for('static', filename='js/admin_user_management.js') }}"></script>
+</body>
+</html>

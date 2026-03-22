@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Attendance Overview - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_attendance.css') }}">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #121212;
+  --bg-card: #0e0e0e;
+  --bg-hover: #160808;
+  --accent: #8B1D1D;
+  --accent-hover: #a82222;
+  --accent-dark: #6B1010;
+  --cream: #F5E6BE;
+  --text-primary: #e0d6c8;
+  --text-muted: #A0A0A0;
+  --text-dim: #666666;
+  --text-ghost: #555555;
+  --text-dead: #444444;
+  --border: rgba(245,230,190,0.06);
+  --border-accent: rgba(139,29,29,0.3);
+  --border-focus: rgba(139,29,29,0.4);
+  --green: #3a8834;
+  --amber: #b85a00;
+  --red: #8B1D1D;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-attendance-page" style="background:#0A0A0A; color:var(--text-primary); min-height:100vh;">
+  <!-- Topbar -->
+  <header class="topbar" style="padding:13px 24px; border-bottom:1px solid var(--border); background:#0A0A0A; display:flex; justify-content:space-between; align-items:center;">
+    <div class="breadcrumb" style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase;">
+      Admin <span style="color:#A0A0A0;">· Attendance</span>
+    </div>
+    <div class="topbar-right" style="display:flex; gap:12px; align-items:center;">
+      <button class="btn btn-ghost" id="exportReportBtn">Export Report</button>
+      <button class="btn btn-primary" id="sendAlertsBtn">Send Alerts</button>
+    </div>
+  </header>
+
+  <section class="page-header" style="padding:24px 28px;">
+    <h1 style="font-family:'Playfair Display', serif; font-size:20px; color:var(--cream); margin:0;">Attendance Overview</h1>
+    <p style="font-size:12px; color:var(--text-ghost); margin-top:4px;">
+      Department-wide attendance monitoring · Semester <span id="sem_no"></span> · <span id="year"></span>
+    </p>
+  </section>
+
+  <!-- Filters -->
+  <div class="filters" style="display:flex; flex-wrap:wrap; gap:8px; padding:0 28px; margin-bottom:16px;">
+    <div class="batch-pills" id="batchPills"></div>
+    <select id="subjectFilter" class="filter-select"><option>All Subjects</option></select>
+    <select id="facultyFilter" class="filter-select"><option>All Faculty</option></select>
+    <input type="text" id="studentSearch" placeholder="Search student..." class="filter-input" />
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="metric-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; padding:0 28px;">
+    <div class="card" id="cardDeptAvg" style="border-bottom:2px solid var(--accent);"></div>
+    <div class="card" id="cardSafe" style="border-bottom:2px solid var(--green);"></div>
+    <div class="card" id="cardRisk" style="border-bottom:2px solid var(--amber);"></div>
+    <div class="card" id="cardLow" style="border-bottom:2px solid var(--red);"></div>
+  </div>
+
+  <!-- Two Column Layout -->
+  <div class="two-col" style="display:flex; gap:24px; padding:24px 28px; flex-wrap:wrap;">
+    <!-- Left Panel -->
+    <div class="left-panel" style="flex:1; min-width:300px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:10px; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:var(--cream); margin:0;">Subject-wise Attendance Average</h3>
+        <a href="#" class="action-link" style="color:var(--accent); font-size:12px;">Full Report →</a>
+      </div>
+      <div id="subjectBars"></div>
+    </div>
+    <!-- Right Panel -->
+    <div class="right-panel" style="flex:1; min-width:300px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:10px; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:var(--cream); margin:0;">Students Below 75% — Alerts</h3>
+        <button class="btn btn-primary btn-small-action" id="bulkAlertBtn">Send Bulk Notice →</button>
+      </div>
+      <div id="atRiskStudents"></div>
+    </div>
+  </div>
+
+  <!-- Detailed Table -->
+  <div class="table-panel" style="background:var(--bg-secondary); border:1px solid var(--border); border-radius:10px; margin:24px 28px; padding:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="color:var(--cream); margin:0;">All Students — Attendance Details</h3>
+      <button class="btn btn-ghost btn-small-action" id="exportCsvBtn">Export CSV →</button>
+    </div>
+    <table class="data-table" id="studentsTable" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Roll No.</th>
+          <th>Batch</th>
+          <th>Overall %</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTbody"></tbody>
+    </table>
+    <div id="pagination" style="margin-top:12px; display:flex; justify-content:center; gap:8px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_attendance.js') }}"></script>
+{% endblock %}
