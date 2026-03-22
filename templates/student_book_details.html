@@ -1,0 +1,592 @@
+{% extends "base.html" %}
+
+{% block title %}CS Connect · Library · Book Details{% endblock %}
+
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg-primary:    #0A0A0A;
+    --bg-secondary:  #121212;
+    --bg-card:       #0e0e0e;
+    --bg-hover:      #160808;
+    --accent:        #8B1D1D;
+    --accent-hover:  #a82222;
+    --accent-dark:   #6B1010;
+    --cream:         #F5E6BE;
+    --text-primary:  #e0d6c8;
+    --text-muted:    #A0A0A0;
+    --text-dim:      #666666;
+    --text-ghost:    #555555;
+    --text-dead:     #444444;
+    --border:        rgba(245,230,190,0.06);
+    --border-accent: rgba(139,29,29,0.3);
+    --border-focus:  rgba(139,29,29,0.4);
+    --green:         #3a8834;
+    --amber:         #b85a00;
+    --red:           #8B1D1D;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    margin: 0; padding: 0; overflow: hidden;
+  }
+
+  .custom-nav, .news-ticker { display: none !important; }
+
+  h1, h2, h3, h4, .font-playfair { font-family: 'Playfair Display', serif; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* SIDEBAR */
+  .dash-sidebar-item {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: all 0.2s ease; margin-bottom: 8px;
+  }
+  .dash-sidebar-item.active { background: rgba(139,29,29,0.2); }
+  .dash-sidebar-item:hover { background: rgba(139,29,29,0.1); }
+
+  .layout-container { display: flex; height: 100vh; background: var(--bg-primary); overflow: hidden; }
+  .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+
+  /* TOP BAR & BREADCRUMB */
+  .top-bar {
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .breadcrumb { font-size: 11px; color: var(--text-ghost); letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+
+  /* PAGE CONTENT */
+  .page-pad { padding: 30px 40px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--accent); cursor: pointer;
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+    margin-bottom: 20px; text-decoration: none; transition: all 0.2s;
+  }
+  .back-link:hover { color: var(--accent-hover); transform: translateX(-2px); }
+
+  /* HERO SECTION */
+  .hero-layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; margin-bottom: 40px; }
+
+  /* LEFT CARD */
+  .left-card {
+    background: var(--bg-secondary); border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; align-items: center;
+    border: 1px solid var(--border); height: fit-content;
+  }
+  .spine-visual {
+    width: 140px; height: 200px; border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 20px 10px; text-align: center; margin-bottom: 12px;
+  }
+  .spine-title { font-size: 11px; color: var(--cream); font-family: 'Playfair Display', serif; line-height: 1.3; }
+  .spine-author { font-size: 9px; color: rgba(245,230,190,0.5); }
+  
+  .shelf-meta { font-size: 10px; color: #555; margin-bottom: 4px; }
+  .avail-meta { font-size: 11px; font-weight: 600; margin-bottom: 20px; }
+
+  .actions-stack { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+
+  .btn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; padding: 12px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: none; width: 100%; box-sizing: border-box; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: var(--cream); box-shadow: 0 4px 12px rgba(139,29,29,0.3); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,29,29,0.4); }
+  .btn-outline { background: transparent; border: 1px solid var(--border-accent); color: var(--accent); }
+  .btn-outline:hover { background: rgba(139,29,29,0.05); }
+  .btn-ghost { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #888; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .btn-disabled { background: rgba(255,255,255,0.05); color: #555; cursor: not-allowed; }
+  
+  .btn-subtext { font-size: 10px; color: #555; text-align: center; line-height: 1.2; }
+
+  /* RIGHT INFO */
+  .right-info { display: flex; flex-direction: column; }
+  .info-eyebrow { font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; font-weight: 600; margin-bottom: 8px; }
+  .info-title { font-size: 28px; color: var(--cream); font-weight: 700; line-height: 1.2; margin: 0 0 6px 0; }
+  .info-author { font-size: 14px; color: #888; margin: 0 0 16px 0; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .info-tag { background: rgba(255,255,255,0.03); border: 1px solid rgba(245,230,190,0.07); border-radius: 5px; padding: 4px 10px; font-size: 10px; color: #666; }
+
+  /* AVAILABILITY CARD */
+  .avail-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 24px; max-width: 400px; }
+  .avail-top { font-size: 16px; font-family: 'Playfair Display', serif; margin-bottom: 12px; }
+  .avail-row { display: flex; justify-content: space-between; font-size: 11px; padding: 8px 0; border-bottom: 1px solid rgba(245,230,190,0.04); }
+  .avail-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .avail-lbl { color: #666; }
+  .avail-val { color: var(--cream); font-weight: 500; }
+  .loan-banner { background: rgba(180,130,40,0.08); border: 1px solid rgba(180,130,40,0.2); border-radius: 6px; padding: 10px; margin-top: 12px; font-size: 10px; color: var(--amber); }
+
+  /* DESCRIPTION / SUBJECTS */
+  .section-label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
+  .desc-text { font-size: 12px; color: #777; line-height: 1.8; margin-bottom: 20px; }
+  
+  .subj-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .subj-pill { background: rgba(139,29,29,0.08); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 600; }
+
+  /* BORROWING ACTIVITY */
+  .activity-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 40px; }
+  .panel-title { font-size: 16px; color: var(--cream); margin: 0 0 16px 0; font-family: 'Playfair Display', serif; }
+  
+  .activity-flex { display: flex; gap: 32px; align-items: center; }
+  .demand-box { flex: 1; }
+  .demand-val { font-size: 10px; color: #555; margin-bottom: 6px; }
+  .demand-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; position: relative; overflow: hidden; }
+  .demand-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); border-radius: 3px; }
+  
+  .rating-box {  display: flex; flex-direction: column; align-items: flex-end; }
+  .stars { font-size: 16px; color: var(--amber); letter-spacing: 2px; margin-bottom: 4px; }
+  .reviews { font-size: 9px; color: #555; text-transform: uppercase; }
+
+  /* RELATED BOOKS */
+  .related-title { font-size: 18px; color: var(--cream); margin: 0 0 16px 0; font-family: 'Playfair Display', serif; }
+  .related-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 12px; cursor: grab; }
+  .related-scroll::-webkit-scrollbar { height: 4px; }
+  
+  .rel-card { width: 140px; flex-shrink: 0; cursor: pointer; display: flex; flex-direction: column; }
+  .rel-spine { width: 100%; height: 160px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; padding: 14px 10px; box-sizing: border-box; text-align: center; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  .rel-spine-title { font-size: 9px; color: var(--cream); font-family: 'Playfair Display', serif; }
+  .rel-title { font-size: 11px; color: var(--cream); font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rel-author { font-size: 9px; color: #666; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pill-mini { font-size: 8px; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+
+  /* MODALS */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  
+  .modal-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; width: 400px; max-width: 90%; position: relative; overflow: hidden; }
+  .modal-hdr { background: rgba(255,255,255,0.02); padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-hdr-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--cream); margin: 0; }
+  .modal-close { cursor: pointer; color: #555; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text-primary); }
+  
+  .modal-body { padding: 24px 20px; }
+  .modal-foot { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+  
+  .modal-info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px; }
+  .modal-info-lbl { color: #666; }
+  .modal-info-val { color: var(--cream); font-weight: 500; }
+  
+  .modal-success-state { text-align: center; display: none; padding: 40px 20px; }
+
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block content %}
+<div class="layout-container">
+
+  <!-- ── SIDEBAR ── -->
+  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 100;">
+    <div style="width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+      <i data-lucide="library" style="stroke: var(--cream); width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    </div>
+    <div class="dash-sidebar-item" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard" style="stroke: #555;"></i></div>
+    <div class="dash-sidebar-item"><i data-lucide="clipboard-check" style="stroke: #555;"></i></div>
+    <div class="dash-sidebar-item"><i data-lucide="award" style="stroke: #555;"></i></div>
+    <div class="dash-sidebar-item"><i data-lucide="file-text" style="stroke: #555;"></i></div>
+    <div class="dash-sidebar-item active" onclick="location.href='/student-dashboard/library'"><i data-lucide="book-open" style="stroke: var(--accent);"></i></div>
+    <div class="dash-sidebar-item"><i data-lucide="calendar" style="stroke: #555;"></i></div>
+    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
+      <div class="dash-sidebar-item" onclick="location.href='/dashboard/settings'"><i data-lucide="settings" style="stroke: #555;"></i></div>
+      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--cream);">{{ session.get('name', 'S')[:2].upper() }}</div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main-content">
+    
+    <div class="top-bar">
+      <div class="breadcrumb" id="bcrumbs">
+        <i data-lucide="book-open" style="width:14px;height:14px;color:var(--accent);"></i>
+        CS Connect &middot; Library &middot; Catalogue &middot; Loading...
+      </div>
+      <div></div>
+    </div>
+
+    <div class="page-pad" id="pageContainer" style="opacity:0; transition:opacity 0.3s;">
+      
+      <a class="back-link" onclick="history.back()"><i data-lucide="arrow-left" style="width:12px;height:12px;"></i> Back to Catalogue</a>
+
+      <!-- HERO SECTION -->
+      <div class="hero-layout">
+        <div class="left-card">
+          <div class="spine-visual" id="bkSpine">
+            <div class="spine-title" id="bkSpineTitle">Title</div>
+            <div class="spine-author" id="bkSpineAuthor">Author</div>
+          </div>
+          <div class="shelf-meta" id="bkShelf">Shelf Location: ...</div>
+          <div class="avail-meta" id="bkAvailText">...</div>
+          
+          <div class="actions-stack" id="bkActions"></div>
+        </div>
+
+        <div class="right-info">
+          <div class="info-eyebrow" id="bkCat">Category</div>
+          <h1 class="info-title" id="bkTitle">Loading...</h1>
+          <h2 class="info-author" id="bkAuthor">...</h2>
+
+          <div class="tag-row" id="bkTags"></div>
+
+          <div class="avail-card">
+            <div class="avail-top" id="avTopTitle">0 Copies Available</div>
+            <div class="avail-row">
+              <span class="avail-lbl">Total copies</span>
+              <span class="avail-val" id="avTotal">0</span>
+            </div>
+            <div class="avail-row">
+              <span class="avail-lbl">Currently available</span>
+              <span class="avail-val" id="avAvail">0</span>
+            </div>
+            <div class="avail-row">
+              <span class="avail-lbl">Currently issued</span>
+              <span class="avail-val" id="avIssued">0</span>
+            </div>
+            <div id="loanBannerContainer"></div>
+          </div>
+
+          <div class="section-label">About This Book</div>
+          <div class="desc-text" id="bkDesc">...</div>
+          
+          <div class="subj-row" id="bkSubjRow"></div>
+        </div>
+      </div>
+
+      <!-- BORROWING ACTIVITY -->
+      <div class="activity-panel">
+        <h3 class="panel-title">Borrowing Activity</h3>
+        <div class="activity-flex">
+          <div class="demand-box">
+             <div class="demand-val" id="actDemandVal">...</div>
+             <div class="demand-track">
+                <div class="demand-fill" id="actDemandFill" style="width:0%"></div>
+             </div>
+          </div>
+          <div class="rating-box" id="actRatingBox">
+             <div class="stars">★★★★☆ <span style="color:#F5E6BE;font-weight:600;font-size:14px;font-family:'Inter',sans-serif;">4.5</span></div>
+             <div class="reviews" id="actRevCount">0 student reviews</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATED BOOKS -->
+      <h3 class="related-title">Students Also Borrowed</h3>
+      <div class="related-scroll" id="relatedScroll"></div>
+      
+    </div>
+
+  </div>
+</div>
+
+<!-- BORROW MODAL -->
+<div class="modal-overlay" id="borrowModal">
+   <div class="modal-card">
+      <!-- Step 1 -->
+      <div id="borStep1">
+        <div class="modal-hdr">
+          <h3 class="modal-hdr-title">Confirm Borrow</h3>
+          <i data-lucide="x" class="modal-close" onclick="closeModal('borrowModal')"></i>
+        </div>
+        <div class="modal-body">
+          <div style="font-size:14px; color:var(--cream); margin-bottom:4px; font-weight:600;" id="borTit">Title</div>
+          <div style="font-size:11px; color:#888; margin-bottom:24px;" id="borAut">Author</div>
+          
+          <div class="modal-info-row"><span class="modal-info-lbl">Issue Date</span><span class="modal-info-val" id="borIssD"></span></div>
+          <div class="modal-info-row"><span class="modal-info-lbl">Due Date</span><span class="modal-info-val" style="color:#b85" id="borDueD"></span></div>
+          
+          <div style="background:rgba(180,130,40,0.05); border:1px solid rgba(180,130,40,0.2); border-radius:6px; padding:10px; margin-top:20px;">
+             <div style="font-size:11px; color:var(--amber); font-weight:600; margin-bottom:2px;">Return or renew before due date</div>
+             <div style="font-size:10px; color:#888;">Fine applies: ₹2 per day after due date</div>
+          </div>
+        </div>
+        <div class="modal-foot">
+           <button class="btn btn-ghost" style="width:auto; padding:8px 16px;" onclick="closeModal('borrowModal')">Cancel</button>
+           <button class="btn btn-primary" style="width:auto; padding:8px 16px; background:#3a8834; box-shadow:none;" onclick="execBorrow()">Confirm Borrow</button>
+        </div>
+      </div>
+      
+      <!-- Step 2 -->
+      <div id="borStep2" class="modal-success-state">
+         <i data-lucide="check-circle" style="width:48px;height:48px;color:#3a8834;margin-bottom:16px;"></i>
+         <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); margin:0 0 10px 0;">Book Borrowed Successfully!</h3>
+         <div style="font-size:12px; color:#888; margin-bottom:24px;">Due back by <span style="color:var(--cream);" id="borSuccDue"></span></div>
+         <button class="btn btn-outline" onclick="location.href='/student-dashboard/library'">View My Books &rarr;</button>
+      </div>
+   </div>
+</div>
+
+<!-- RESERVE MODAL -->
+<div class="modal-overlay" id="reserveModal">
+   <div class="modal-card">
+      <!-- Step 1 -->
+      <div id="resStep1">
+        <div class="modal-hdr">
+          <h3 class="modal-hdr-title">Reserve Book</h3>
+          <i data-lucide="x" class="modal-close" onclick="closeModal('reserveModal')"></i>
+        </div>
+        <div class="modal-body">
+          <div style="font-size:14px; color:var(--cream); margin-bottom:24px; font-weight:600;" id="resTit">Title</div>
+          
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:16px;">
+             <div class="modal-info-row"><span class="modal-info-lbl">Queue Position</span><span class="modal-info-val" id="resPos"></span></div>
+             <div class="modal-info-row" style="margin-bottom:0;"><span class="modal-info-lbl">Estimated Wait</span><span class="modal-info-val" id="resWait"></span></div>
+          </div>
+          
+          <div style="font-size:11px; color:#777; margin-top:20px; display:flex; gap:8px; align-items:flex-start;">
+             <input type="checkbox" checked style="margin-top:2px;"> We'll notify you when available.
+          </div>
+        </div>
+        <div class="modal-foot">
+           <button class="btn btn-ghost" style="width:auto; padding:8px 16px;" onclick="closeModal('reserveModal')">Cancel</button>
+           <button class="btn btn-primary" style="width:auto; padding:8px 16px;" onclick="execReserve()">Confirm Reservation</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="resStep2" class="modal-success-state">
+         <i data-lucide="check-circle" style="width:48px;height:48px;color:#3a8834;margin-bottom:16px;"></i>
+         <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--cream); margin:0 0 10px 0;">Reservation Confirmed</h3>
+         <div style="font-size:12px; color:#888; margin-bottom:24px;">You are <span style="color:var(--cream);" id="resSuccPos">...</span> in the queue</div>
+         <button class="btn btn-outline" onclick="location.reload()">Return to Details</button>
+      </div>
+   </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentBookId = {{ book_id }};
+let loadedData = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    fetchBookData();
+});
+
+// Helper for Category Gradients
+function getCatTheme(cat) {
+    if(!cat) return { str: 'linear-gradient(160deg,rgba(80,80,80,0.3),rgba(10,10,10,0.9))', bdr:'rgba(80,80,80,0.3)' };
+    let c = cat.toLowerCase();
+    if(c.includes('computer')) return { str: 'linear-gradient(160deg,rgba(139,29,29,0.3),rgba(10,10,10,0.9))', bdr:'rgba(139,29,29,0.3)' };
+    if(c.includes('math')) return { str: 'linear-gradient(160deg,rgba(29,58,139,0.3),rgba(10,10,10,0.9))', bdr:'rgba(29,58,139,0.3)' };
+    if(c.includes('electron') || c.includes('net')) return { str: 'linear-gradient(160deg,rgba(29,100,29,0.3),rgba(10,10,10,0.9))', bdr:'rgba(29,100,29,0.3)' };
+    return { str: 'linear-gradient(160deg,rgba(100,100,100,0.3),rgba(10,10,10,0.9))', bdr:'rgba(100,100,100,0.3)' };
+}
+
+async function fetchBookData() {
+    try {
+        const res = await fetch(`/api/library/books/${currentBookId}`);
+        if(!res.ok) {
+           document.getElementById('pageContainer').innerHTML = `<h2 style="color:#8B1D1D;">Error loading book details.</h2>`;
+           document.getElementById('pageContainer').style.opacity = '1';
+           return;
+        }
+        loadedData = await res.json();
+        
+        const b = loadedData.book;
+        const av = loadedData.availability;
+        const theme = getCatTheme(b.category);
+
+        // BREADCRUMB
+        document.getElementById('bcrumbs').innerHTML = `<i data-lucide="book-open" style="width:14px;height:14px;color:var(--accent);"></i> CS Connect &middot; Library &middot; Catalogue &middot; <span style="color:var(--cream);">${b.title}</span>`;
+
+        // LEFT CARD
+        document.getElementById('bkSpine').style.background = theme.str;
+        document.getElementById('bkSpine').style.borderColor = theme.bdr;
+        document.getElementById('bkSpineTitle').innerText = b.title;
+        document.getElementById('bkSpineAuthor').innerText = b.author;
+        
+        document.getElementById('bkShelf').innerText = `Shelf Location: ${b.shelf_code || 'General'}`;
+
+        let avHtml = '', actsHtml = '';
+
+        if(b.is_reference) {
+            avHtml = `<span style="color:#555;">Reference Only</span>`;
+            actsHtml = `
+              <button class="btn btn-disabled"><i data-lucide="book" style="width:14px;height:14px;"></i> Reference Only — In Library</button>
+            `;
+        } else if(av.available > 0) {
+            avHtml = `<span style="color:var(--green);">${av.available} of ${av.total} available</span>`;
+            if (loadedData.student_loan) {
+                actsHtml = `
+                  <button class="btn btn-disabled">Already Borrowed</button>
+                  <div class="btn-subtext">Due back: ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}</div>
+                `;
+            } else {
+                let d = new Date(); d.setDate(d.getDate()+14);
+                actsHtml = `
+                  <button class="btn btn-primary" onclick="openBorrowModal()"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Borrow This Book</button>
+                  <div class="btn-subtext">Due back: ${d.toLocaleDateString()}</div>
+                `;
+            }
+        } else {
+            avHtml = `<span style="color:var(--red);">0 of ${av.total} available</span>`;
+            if(loadedData.queue_info) {
+               actsHtml = `
+                 <button class="btn btn-outline" style="color:var(--amber); border-color:var(--amber);" onclick="cancelReserve(${loadedData.queue_info.reservation_id})">Cancel Reservation</button>
+                 <div class="btn-subtext">You are #${loadedData.queue_info.position} in queue.</div>
+               `;
+            } else {
+               actsHtml = `
+                 <button class="btn btn-outline" onclick="openReserveModal()"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Reserve — Join Queue</button>
+                 <div class="btn-subtext">Est. wait: ${(av.reserved+1)*7} days &middot; #${av.reserved+1} in queue</div>
+               `;
+            }
+        }
+        actsHtml += `<button class="btn btn-ghost" style="margin-top:4px;"><i data-lucide="heart" style="width:14px;height:14px;"></i> Add to Wishlist</button>`;
+
+        document.getElementById('bkAvailText').innerHTML = avHtml;
+        document.getElementById('bkActions').innerHTML = actsHtml;
+
+        // RIGHT INFO
+        document.getElementById('bkCat').innerText = b.category || 'General';
+        document.getElementById('bkTitle').innerText = b.title;
+        document.getElementById('bkAuthor').innerText = `by ${b.author}`;
+        
+        let tags = [];
+        if(b.isbn) tags.push(`ISBN: ${b.isbn}`);
+        if(b.publisher) tags.push(b.publisher);
+        if(b.edition) tags.push(`Edition ${b.edition}`);
+        if(b.year) tags.push(b.year);
+        if(b.pages) tags.push(`${b.pages} Pages`);
+        tags.push('English'); // default lang
+        document.getElementById('bkTags').innerHTML = tags.map(t => `<div class="info-tag">${t}</div>`).join('');
+
+        // AVAIL CARD
+        let aTopColor = av.available > 0 ? 'var(--green)' : (b.is_reference ? '#555' : 'var(--red)');
+        document.getElementById('avTopTitle').innerHTML = `<span style="color:${aTopColor};">${b.is_reference ? 'Reference Copy' : `${av.available} Copies Available`}</span>`;
+        document.getElementById('avTotal').innerText = av.total;
+        document.getElementById('avAvail').innerText = av.available;
+        document.getElementById('avIssued').innerText = av.issued;
+
+        if(loadedData.student_loan) {
+           document.getElementById('loanBannerContainer').innerHTML = `
+             <div class="loan-banner">
+                <i data-lucide="info" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+                You currently have this book. Due on ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}.
+             </div>
+           `;
+        }
+
+        document.getElementById('bkDesc').innerText = b.description || 'No description provided for this book.';
+        
+        let sTags = b.subject ? (b.subject.includes(',') ? b.subject.split(',') : [b.subject]) : ['General', 'Textbook'];
+        document.getElementById('bkSubjRow').innerHTML = `<span class="section-label" style="margin:0 8px 0 0;">Subjects: </span>` + sTags.map(t=>`<span class="subj-pill">${t}</span>`).join('');
+
+        // BORROW ACTIVITY
+        let bstats = loadedData.borrow_stats;
+        let dText = `${bstats.borrowed_this_sem} students borrowed this semester`;
+        let perc = Math.min((bstats.borrowed_this_sem / 20) * 100, 100);
+        document.getElementById('actDemandVal').innerText = dText;
+        document.getElementById('actDemandFill').style.width = perc + '%';
+        document.getElementById('actRevCount').innerText = `${bstats.review_count} student reviews`;
+
+        // RELATED BOOKS
+        if(loadedData.related_books && loadedData.related_books.length > 0) {
+            document.getElementById('relatedScroll').innerHTML = loadedData.related_books.map(rb => {
+                let rt = getCatTheme(rb.category);
+                let p = rb.available_copies > 0 
+                  ? `<div class="pill-mini" style="background:rgba(60,180,100,0.1);color:#5c5;">Available</div>`
+                  : `<div class="pill-mini" style="background:rgba(180,130,40,0.1);color:#b85;">Queue</div>`;
+                return `
+                <div class="rel-card" onclick="location.href='/student-dashboard/library/books/${rb.id}'">
+                  <div class="rel-spine" style="background:${rt.str}; border:1px solid ${rt.bdr}">
+                     <div class="rel-spine-title">${rb.title}</div>
+                  </div>
+                  <div class="rel-title">${rb.title}</div>
+                  <div class="rel-author">${rb.author}</div>
+                  <div>${p}</div>
+                </div>`;
+            }).join('');
+        } else {
+            document.getElementById('relatedScroll').innerHTML = '<div style="font-size:11px;color:#555;">No related books found.</div>';
+        }
+
+        lucide.createIcons();
+        document.getElementById('pageContainer').style.opacity = '1';
+
+    } catch(e) { console.error(e); }
+}
+
+// MODAL LOGIC
+function openBorrowModal() {
+    let d = new Date(); 
+    document.getElementById('borIssD').innerText = d.toLocaleDateString();
+    d.setDate(d.getDate()+14);
+    document.getElementById('borDueD').innerText = d.toLocaleDateString();
+    document.getElementById('borTit').innerText = loadedData.book.title;
+    document.getElementById('borAut').innerText = `by ${loadedData.book.author}`;
+    
+    document.getElementById('borStep1').style.display='block';
+    document.getElementById('borStep2').style.display='none';
+    document.getElementById('borrowModal').classList.add('active');
+}
+
+function openReserveModal() {
+    document.getElementById('resTit').innerText = loadedData.book.title;
+    document.getElementById('resPos').innerText = `#${loadedData.availability.reserved + 1}`;
+    document.getElementById('resWait').innerText = `~${(loadedData.availability.reserved + 1)*7} days`;
+    
+    document.getElementById('resStep1').style.display='block';
+    document.getElementById('resStep2').style.display='none';
+    document.getElementById('reserveModal').classList.add('active');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+async function execBorrow() {
+    try {
+        const res = await fetch('/api/library/borrow', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ book_id: currentBookId })
+        });
+        const d = await res.json();
+        if(d.success) {
+            document.getElementById('borSuccDue').innerText = new Date(d.due_date).toLocaleDateString();
+            document.getElementById('borStep1').style.display='none';
+            document.getElementById('borStep2').style.display='block';
+            setTimeout(() => { if(document.getElementById('borrowModal').classList.contains('active')) location.reload(); }, 3000);
+        } else { alert('Borrow failed: ' + d.error); }
+    } catch(e) { console.error(e); }
+}
+
+async function execReserve() {
+    try {
+        const res = await fetch('/api/library/reserve', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ book_id: currentBookId })
+        });
+        const d = await res.json();
+        if(d.success) {
+            document.getElementById('resSuccPos').innerText = `#${d.queue_position}`;
+            document.getElementById('resStep1').style.display='none';
+            document.getElementById('resStep2').style.display='block';
+        } else { alert('Reserve failed: ' + d.error); }
+    } catch(e) { console.error(e); }
+}
+
+async function cancelReserve(reqId) {
+    if(!confirm("Are you sure you want to cancel your reservation?")) return;
+    try {
+        const res = await fetch(`/api/library/reservations/${reqId}`, { method: 'DELETE' });
+        const d = await res.json();
+        if(d.success) location.reload();
+        else alert('Cancellation failed: ' + d.error);
+    } catch(e) { console.error(e); }
+}
+
+</script>
+{% endblock %}

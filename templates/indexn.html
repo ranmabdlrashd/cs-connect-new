@@ -27,29 +27,29 @@
 <!-- 2.3 Stats Bar -->
 <div class="stats-bar reveal">
     {% if stats %}
-        {% for stat in stats %}
-        <div class="stat-item">
-            <span class="stat-number">{{ stat.value }}</span>
-            <span class="stat-label">{{ stat.label }}</span>
-        </div>
-        {% endfor %}
+    {% for stat in stats %}
+    <div class="stat-item">
+        <span class="stat-number">{{ stat.value }}</span>
+        <span class="stat-label">{{ stat.label }}</span>
+    </div>
+    {% endfor %}
     {% else %}
-        <div class="stat-item">
-            <span class="stat-number">500+</span>
-            <span class="stat-label">Students</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">50+</span>
-            <span class="stat-label">Faculty</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">100%</span>
-            <span class="stat-label">Placement</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">15+</span>
-            <span class="stat-label">Research Labs</span>
-        </div>
+    <div class="stat-item">
+        <span class="stat-number">500+</span>
+        <span class="stat-label">Students</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">50+</span>
+        <span class="stat-label">Faculty</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Placement</span>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">15+</span>
+        <span class="stat-label">Research Labs</span>
+    </div>
     {% endif %}
 </div>
 
@@ -71,46 +71,70 @@
             <div class="highlights-grid reveal">
                 <!-- Card 1 -->
                 <div class="highlight-card">
-                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M12 15l-8-4 8-4 8 4-8 4z"></path><path d="M4 11v6l8 4 8-4v-6"></path></svg>
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon">
+                        <path d="M12 15l-8-4 8-4 8 4-8 4z"></path>
+                        <path d="M4 11v6l8 4 8-4v-6"></path>
+                    </svg>
                     <h3 class="highlight-title">National Hackathon Victory</h3>
-                    <p class="highlight-desc">Team AlphaCode secured 1st place at CodeFest 2024, defeating 320+ teams across India</p>
+                    <p class="highlight-desc">Team AlphaCode secured 1st place at CodeFest 2024, defeating 320+ teams
+                        across India</p>
                     <span class="highlight-date">March 10, 2025</span>
                 </div>
                 <!-- Card 2 -->
                 <div class="highlight-card">
-                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
                     <h3 class="highlight-title">IEEE Research Publication</h3>
-                    <p class="highlight-desc">Faculty &amp; students published 3 papers in IEEE Transactions on Neural Networks &amp; Learning Systems</p>
+                    <p class="highlight-desc">Faculty &amp; students published 3 papers in IEEE Transactions on Neural
+                        Networks &amp; Learning Systems</p>
                     <span class="highlight-date">February 28, 2025</span>
                 </div>
                 <!-- Card 3 -->
                 <div class="highlight-card">
-                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon">
+                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                    </svg>
                     <h3 class="highlight-title">AI Lab Inauguration</h3>
-                    <p class="highlight-desc">New AI &amp; ML research lab inaugurated with GPU cluster, open for final year project students</p>
+                    <p class="highlight-desc">New AI &amp; ML research lab inaugurated with GPU cluster, open for final
+                        year project students</p>
                     <span class="highlight-date">February 14, 2025</span>
                 </div>
             </div>
-            
+
             <!-- Row 2 (2 cols) -->
             <div class="highlights-grid row-2 reveal">
                 <!-- Card 4 -->
                 <div class="highlight-card">
-                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
                     <h3 class="highlight-title">Industry MoU Signed</h3>
-                    <p class="highlight-desc">New partnership with TCS &amp; Infosys for campus recruitment and internship programs</p>
+                    <p class="highlight-desc">New partnership with TCS &amp; Infosys for campus recruitment and
+                        internship programs</p>
                     <span class="highlight-date">January 20, 2025</span>
                 </div>
                 <!-- Card 5 -->
                 <div class="highlight-card">
-                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                    <svg viewBox="0 0 24 24" class="icon-stroke highlight-icon">
+                        <circle cx="12" cy="8" r="7"></circle>
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                    </svg>
                     <h3 class="highlight-title">NAAC A++ Accreditation</h3>
-                    <p class="highlight-desc">CSE dept awarded highest grade in institutional quality assessment for academic excellence</p>
+                    <p class="highlight-desc">CSE dept awarded highest grade in institutional quality assessment for
+                        academic excellence</p>
                     <span class="highlight-date">January 05, 2025</span>
                 </div>
             </div>
         </div>
-        
+
         <!-- Right: Notice Board -->
         <div class="notice-panel reveal">
             <h3 class="notice-title">Notice Board</h3>
@@ -145,34 +169,41 @@
                         <div class="notice-dot"></div>
                         <div class="notice-item-title">Scholarship Notifications</div>
                     </div>
-                    <div class="notice-item-desc">Merit scholarship applications for 2025 batch now open via online portal</div>
+                    <div class="notice-item-desc">Merit scholarship applications for 2025 batch now open via online
+                        portal</div>
                     <div class="notice-item-date">Mar 05, 2025</div>
                 </div>
             </div>
             <a href="/notice-archive" class="btn-notice-all">View All Notices &rarr;</a>
         </div>
     </div>
-    
+
     <!-- 2.6 Faculty Spotlight -->
     <div class="faculty-spotlight reveal">
         <div class="faculty-left">
             <span class="spotlight-label">Faculty Spotlight &mdash; HOD's Message</span>
             <div class="spotlight-quote-mark">&ldquo;</div>
             <p class="spotlight-quote">
-                Our department is not just a place of learning &mdash; it is a crucible where ideas are forged into innovations. We equip our students with both the technical mastery and the ethical foundation to shape the digital future.
+                Our department is not just a place of learning &mdash; it is a crucible where ideas are forged into
+                innovations. We equip our students with both the technical mastery and the ethical foundation to shape
+                the digital future.
             </p>
-            <div class="spotlight-name">Dr. Mathew Joseph</div>
-            <div class="spotlight-credentials">HOD &middot; Dept. of Computer Science &amp; Engineering &middot; Ph.D. (IIT Bombay)</div>
+            <div class="spotlight-name">Dr. Jeswin Roy Dcouth</div>
+            <div class="spotlight-credentials">HOD &middot; Dept. of Computer Science &amp; Engineering &middot; Ph.D.
+                (IIT Bombay)</div>
         </div>
         <div class="faculty-right">
             <div class="portrait-circle">
-                <svg viewBox="0 0 24 24" class="icon-stroke"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <svg viewBox="0 0 24 24" class="icon-stroke">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
             </div>
-            <h3 class="spotlight-name">Dr. Mathew Joseph</h3>
+            <h3 class="spotlight-name">Dr. Jeswin Roy Dcouth</h3>
             <div class="portrait-badge">Head of Dept.</div>
         </div>
     </div>
-    
+
     <!-- 2.7 Academic Excellence Grid -->
     <div class="section-header reveal" style="margin-top: 80px;">
         <div>
@@ -180,38 +211,54 @@
             <div class="section-header-subtitle">Resources &amp; opportunities</div>
         </div>
     </div>
-    
+
     <div class="excellence-grid reveal">
         <div class="excellence-card">
             <div class="excellence-icon-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
             </div>
             <h3 class="excellence-title">Syllabus &amp; Curriculum</h3>
             <p class="excellence-desc">Access semester-wise syllabi, lab manuals and reference materials</p>
             <a href="{{ url_for('academics') }}" class="excellence-link">Explore &rarr;</a>
         </div>
-        
+
         <div class="excellence-card">
             <div class="excellence-icon-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
             </div>
             <h3 class="excellence-title">Research Labs</h3>
             <p class="excellence-desc">AI/ML, Cybersecurity, IoT and Cloud Computing research facilities</p>
             <a href="#" class="excellence-link">Explore &rarr;</a>
         </div>
-        
+
         <div class="excellence-card">
             <div class="excellence-icon-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
             </div>
             <h3 class="excellence-title">Placements</h3>
             <p class="excellence-desc">Industry partnerships, placement records and career guidance resources</p>
             <a href="{{ url_for('placements') }}" class="excellence-link">Explore &rarr;</a>
         </div>
-        
+
         <div class="excellence-card">
             <div class="excellence-icon-wrapper">
-                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                <svg viewBox="0 0 24 24" width="24" height="24" class="icon-stroke">
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                </svg>
             </div>
             <h3 class="excellence-title">Achievements</h3>
             <p class="excellence-desc">Awards, publications, patents and national-level competition wins</p>

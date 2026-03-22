@@ -343,6 +343,12 @@ def init_db():
     # Add columns if they don't exist (safety for existing db)
     cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE")
     cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Active'")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS batch TEXT")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS department TEXT")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS designation TEXT")
+    cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT")
     
     # 2. faculty
     cursor.execute('''
@@ -376,6 +382,15 @@ def init_db():
     cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS subject TEXT')
     cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS description TEXT')
     cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS availability BOOLEAN DEFAULT TRUE')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS isbn TEXT')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS total_copies INTEGER DEFAULT 1')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS available_copies INTEGER DEFAULT 1')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS is_reference BOOLEAN DEFAULT FALSE')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS publisher TEXT')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS year INTEGER')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS edition TEXT')
+    cursor.execute('ALTER TABLE books ADD COLUMN IF NOT EXISTS shelf_code TEXT')
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS issues (
@@ -383,10 +398,13 @@ def init_db():
             book_id INTEGER,
             user_id INTEGER,
             issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            due_date TIMESTAMP,
             return_date TIMESTAMP,
             status TEXT
         )
     ''')
+    cursor.execute('ALTER TABLE issues ADD COLUMN IF NOT EXISTS due_date TIMESTAMP')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS requests (
             id SERIAL PRIMARY KEY,
@@ -396,6 +414,31 @@ def init_db():
             status TEXT
         )
     ''')
+    
+    # Fines
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS library_fines (
+            id SERIAL PRIMARY KEY,
+            student_id INTEGER,
+            book_id INTEGER,
+            issue_id INTEGER,
+            amount DECIMAL(10,2),
+            days_overdue INTEGER,
+            rate_per_day DECIMAL(10,2) DEFAULT 1.00,
+            paid BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cursor.execute('''
+        ALTER TABLE library_fines 
+        ADD COLUMN IF NOT EXISTS book_id INTEGER,
+        ADD COLUMN IF NOT EXISTS issue_id INTEGER,
+        ADD COLUMN IF NOT EXISTS amount DECIMAL(10,2),
+        ADD COLUMN IF NOT EXISTS days_overdue INTEGER,
+        ADD COLUMN IF NOT EXISTS rate_per_day DECIMAL(10,2) DEFAULT 1.00,
+        ADD COLUMN IF NOT EXISTS paid BOOLEAN DEFAULT FALSE
+    ''')
+
     # Notifications
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
@@ -552,6 +595,31 @@ def init_db():
         )
     ''')
 
+    # 17. portal_sessions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS portal_sessions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER,
+            ip_address TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP
+        )
+    ''')
+
+    # 18. pending_approvals
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pending_approvals (
+            id SERIAL PRIMARY KEY,
+            type TEXT NOT NULL,
+            requestor_id INTEGER,
+            requestor_name TEXT,
+            details TEXT,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     # Seed S2 CSE A data (only if empty)
     cursor.execute("SELECT COUNT(*) FROM timetable")
     existing = cursor.fetchone()[0]
@@ -667,6 +735,37 @@ def init_db():
             note TEXT
         )
     ''')
+
+    # Seed Books
+    cursor.execute("SELECT COUNT(*) FROM books")
+    if cursor.fetchone()[0] == 0:
+        books_data = [
+            ('The Pragmatic Programmer', 'Andrew Hunt', 'Computer Science', '978-0201616224', True),
+            ('Clean Code', 'Robert C. Martin', 'Computer Science', '978-0132350884', True),
+            ('Introduction to Algorithms', 'Thomas H. Cormen', 'Computer Science', '978-0262033848', True),
+            ('Artificial Intelligence', 'Stuart Russell', 'Computer Science', '978-0136042594', True),
+            ('Structure & Interpretation', 'Harold Abelson', 'Computer Science', '978-0262510875', True),
+            ('Computer Networks', 'Andrew Tanenbaum', 'Computer Science', '978-0132126953', True),
+            ('Database System Concepts', 'Abraham Silberschatz', 'Computer Science', '978-0073523323', False),
+            ('Operating System Concepts', 'Abraham Silberschatz', 'Computer Science', '978-1118063330', True),
+            ('Concrete Mathematics', 'Donald Knuth', 'Mathematics', '978-0201558029', True),
+            ('Calculus', 'James Stewart', 'Mathematics', '978-1285740621', True),
+            ('Digital Design', 'M. Morris Mano', 'Electronics', '978-0132774208', True),
+            ('ACM Transactions', 'Various', 'Journals', '0730-0301', True)
+        ]
+        cursor.executemany("INSERT INTO books (title, author, category, isbn, availability) VALUES (%s, %s, %s, %s, %s)", books_data)
+
+    # Seed a Dummy fine for User 1 if exists
+    cursor.execute("SELECT id FROM users WHERE id = 1")
+    if cursor.fetchone():
+        cursor.execute("SELECT id FROM library_fines WHERE student_id = 1")
+        if not cursor.fetchone():
+            from datetime import datetime, timedelta
+            issue_date = datetime.now() - timedelta(days=20)
+            due_date = datetime.now() - timedelta(days=5)
+            cursor.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (8, 1, %s, %s, 'issued') RETURNING id", (issue_date, due_date))
+            issue_id = cursor.fetchone()[0]
+            cursor.execute("INSERT INTO library_fines (student_id, book_id, issue_id, amount, days_overdue, rate_per_day, paid) VALUES (1, 8, %s, 50, 5, 10, false)", (issue_id,))
 
     conn.commit()
     conn.close()

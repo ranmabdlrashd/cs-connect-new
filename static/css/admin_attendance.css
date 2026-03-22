@@ -1,0 +1,144 @@
+/* Admin Attendance Overview Styles */
+/* Uses design system variables defined in base CSS */
+
+/* Metric Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  color: var(--text-primary);
+}
+
+/* Data Table */
+.data-table th, .data-table td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.data-table th {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+}
+.data-table td {
+  font-size: 11px;
+  color: var(--text-primary);
+}
+.data-table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  gap: 4px;
+}
+.status-safe { background-color: rgba(60,180,100,0.1); color: var(--green); border-color: rgba(60,180,100,0.2); }
+.status-warn { background-color: rgba(180,130,40,0.1); color: var(--amber); border-color: rgba(180,130,40,0.2); }
+.status-danger { background-color: rgba(139,29,29,0.1); color: var(--red); border-color: rgba(139,29,29,0.2); }
+
+/* Buttons */
+.btn {
+  font-family: 'Inter', sans-serif;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-accent);
+  color: var(--text-ghost);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: var(--cream);
+}
+.btn-small-action {
+  font-size: 9px;
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+/* Filter selects and inputs */
+.filter-select, .filter-input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+/* Subject Bars */
+.subject-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.subject-name {
+  width: 130px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-right: 8px;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.bar-perc {
+  width: 36px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* At Risk Student Card */
+.at-risk-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(139,29,29,0.15);
+  border-radius: 7px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.at-risk-card .info {
+  font-size: 11px;
+  color: var(--cream);
+  font-weight: 500;
+}
+.at-risk-card .details {
+  font-size: 9px;
+  color: var(--text-ghost);
+}
+
+/* Pagination */
+.pagination-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.pagination-btn.active {
+  background: var(--accent);
+  color: var(--cream);
+}
