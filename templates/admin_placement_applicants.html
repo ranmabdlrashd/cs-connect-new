@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Applicants | Admin</title>
+    <!-- Reuse the primary layout styles from placements -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_placements.css') }}">
+    <!-- Custom additions for applicant bulk grid if needed -->
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .top-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .ts-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ts-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ts-val {
+            font-size: 18px;
+            color: var(--cream);
+            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .pill-applied {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+        }
+
+        .pill-shortlisted {
+            background: rgba(106, 172, 255, 0.1);
+            color: #6aacff;
+        }
+
+        .pill-selected {
+            background: rgba(60, 180, 100, 0.1);
+            color: #5c5;
+        }
+
+        .pill-rejected {
+            background: rgba(139, 29, 29, 0.1);
+            color: var(--accent);
+        }
+
+        .bulk-actions {
+            padding: 12px 14px;
+            background: rgba(139, 29, 29, 0.04);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        th input[type="checkbox"],
+        td input[type="checkbox"] {
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <!-- Exact same structural sidebar -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">CS</div>
+            <div class="sidebar-title">
+                <span class="main">CS Connect</span>
+                <span class="sub">Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-label">Content</div>
+                <a href="/admin-dashboard/placements" class="nav-item active">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                    </svg>
+                    <span class="nav-item-label">Placements</span>
+                </a>
+                <a href="/admin-dashboard/events" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="nav-item-label">Events</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- CONTENT -->
+    <main id="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="breadcrumb">
+                Admin <span>·</span> <a href="/admin-dashboard/placements">Placements</a> <span>·</span> <span
+                    id="bc-company">Loading...</span> <span>·</span> Applicants
+            </div>
+            <div class="topbar-actions">
+                <a href="/admin-dashboard/placements" class="btn btn-ghost">← Back to Drives</a>
+            </div>
+        </header>
+
+        <div class="page-container">
+            <!-- HEADER -->
+            <div class="page-header">
+                <div>
+                    <h1 id="drive-title">Loading...</h1>
+                    <div class="sub" id="drive-sub">...</div>
+                </div>
+                <div class="top-stats">
+                    <div class="ts-item">
+                        <span class="ts-label">Applied</span>
+                        <span class="ts-val" id="st-applied">0</span>
+                    </div>
+                    <div class="ts-item">
+                        <span class="ts-label" style="color:#6aacff">Shortlisted</span>
+                        <span class="ts-val" id="st-short">0</span>
+                    </div>
+                    <div class="ts-item">
+                        <span class="ts-label" style="color:#5c5">Selected</span>
+                        <span class="ts-val" id="st-sel">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APPLICANTS LIST PANEL -->
+            <div class="card" style="padding:0; display:flex; flex-direction:column; background:var(--bg-card)">
+
+                <div class="bulk-actions">
+                    <span style="font-size:11px;color:var(--text-ghost)">Bulk Actions (Selected: <span
+                            id="bulk-count">0</span>):</span>
+                    <button class="btn btn-primary btn-small bulk-btn" data-action="shortlist" disabled>Shortlist
+                        Selected</button>
+                    <button class="btn btn-ghost btn-small bulk-btn" style="color:#5c5" data-action="select"
+                        disabled>Mark Hired</button>
+                    <button class="btn btn-ghost btn-small bulk-btn" style="color:var(--accent)" data-action="reject"
+                        disabled>Reject</button>
+                </div>
+
+                <div class="table-wrapper" style="border:none; border-radius: 0 0 10px 10px">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;"><input type="checkbox" id="check-all"></th>
+                                <th>Student</th>
+                                <th>Academic</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="app-tbody">
+                            <!-- JS binds here -->
+                            <tr>
+                                <td colspan="6">
+                                    <div class="skeleton" style="height:30px; margin: 10px;"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- We inject the drive ID securely from FLASK as a JS variable -->
+    <script>
+        const DRIVE_ID = "{{ drive_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/admin_placement_applicants.js') }}"></script>
+</body>
+
+</html>

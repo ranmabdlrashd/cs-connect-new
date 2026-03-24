@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Management | Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_placements.css') }}">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">CS</div>
+            <div class="sidebar-title">
+                <span class="main">CS Connect</span>
+                <span class="sub">Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-label">Overview</div>
+                <a href="/admin-dashboard" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="nav-item-label">Dashboard</span>
+                </a>
+                <a href="/admin-dashboard/users" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span class="nav-item-label">User Management</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-label">Academic</div>
+                <a href="#" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    <span class="nav-item-label">Courses</span>
+                </a>
+                <a href="/admin-dashboard/attendance" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        <path d="M9 14l2 2 4-4"></path>
+                    </svg>
+                    <span class="nav-item-label">Attendance</span>
+                </a>
+                <a href="/admin-dashboard/results" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span class="nav-item-label">Results & Marks</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="nav-item-label">Lab Bookings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="nav-item-label">Timetable</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-label">Content</div>
+                <a href="/admin-dashboard/notices" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="nav-item-label">Notice Board</span>
+                </a>
+                <a href="/admin-dashboard/events" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="nav-item-label">Events</span>
+                </a>
+                <a href="/admin-dashboard/placements" class="nav-item active">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                    </svg>
+                    <span class="nav-item-label">Placements</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-label">Finance & Sys</div>
+                <a href="/admin/fees" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span class="nav-item-label">Fee Management</span>
+                </a>
+                <a href="/admin/analytics" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span class="nav-item-label">Reports & Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    <span class="nav-item-label">Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <span class="user-name playfair">System Admin</span>
+                <span class="user-role">Full Access</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main id="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="breadcrumb">
+                Admin <span>·</span> Placements
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-ghost">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Report
+                </button>
+                <button class="btn btn-primary" onclick="document.getElementById('compose-company').focus();">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Drive
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="page-container" id="page-container">
+            <div class="page-header">
+                <h1>Placement Management</h1>
+                <div class="sub">Manage campus drives, applications and placement statistics</div>
+            </div>
+
+            <!-- STATS ROW -->
+            <div class="stats-row" id="stats-row">
+                <div class="metric-card accent-red">
+                    <span class="mc-title">Total Placed</span>
+                    <span class="mc-val playfair" id="stat-total">...</span>
+                </div>
+                <div class="metric-card accent-green">
+                    <span class="mc-title">Highest Package</span>
+                    <span class="mc-val playfair" id="stat-high">...</span>
+                </div>
+                <div class="metric-card accent-blue">
+                    <span class="mc-title">Avg Package</span>
+                    <span class="mc-val playfair" id="stat-avg">...</span>
+                </div>
+                <div class="metric-card accent-amber">
+                    <span class="mc-title">Active Drives</span>
+                    <span class="mc-val playfair" id="stat-active">...</span>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <!-- ADD DRIVE FORM PANEL -->
+                <div class="panel">
+                    <div class="panel-title">Add New Drive</div>
+                    <form id="compose-form" class="card" style="display:flex; flex-direction:column; gap:12px;">
+
+                        <div class="form-group">
+                            <label class="form-label">Company Name (required)</label>
+                            <input type="text" id="compose-company" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Role / Position (required)</label>
+                            <input type="text" id="compose-role" class="form-control" required>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <div class="form-group">
+                                <label class="form-label">Min Package (LPA)</label>
+                                <input type="number" step="0.1" id="compose-pmin" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max Package (LPA)</label>
+                                <input type="number" step="0.1" id="compose-pmax" class="form-control">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <div class="form-group">
+                                <label class="form-label">Min CGPA</label>
+                                <input type="number" step="0.1" id="compose-cgpa" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Batch Year</label>
+                                <select id="compose-batch" class="form-select">
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Eligible Branches</label>
+                            <div class="checkbox-grid" id="compose-branches">
+                                <label class="checkbox-item"><input type="checkbox" value="CSE" checked><span
+                                        class="checkbox-label">CSE</span></label>
+                                <label class="checkbox-item"><input type="checkbox" value="IT"><span
+                                        class="checkbox-label">IT</span></label>
+                                <label class="checkbox-item"><input type="checkbox" value="ECE"><span
+                                        class="checkbox-label">ECE</span></label>
+                                <label class="checkbox-item"><input type="checkbox" value="EEE"><span
+                                        class="checkbox-label">EEE</span></label>
+                                <label class="checkbox-item"><input type="checkbox" value="ME"><span
+                                        class="checkbox-label">ME</span></label>
+                                <label class="checkbox-item"><input type="checkbox" value="CE"><span
+                                        class="checkbox-label">CE</span></label>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <div class="form-group">
+                                <label class="form-label">Drive Date</label>
+                                <input type="date" id="compose-rdate" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Aptitude Date (Opt)</label>
+                                <input type="date" id="compose-adate" class="form-control">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select id="compose-status" class="form-select">
+                                    <option value="Open">Open</option>
+                                    <option value="Upcoming">Upcoming</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Apply Deadline</label>
+                                <input type="date" id="compose-deadline" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Venue</label>
+                            <input type="text" id="compose-venue" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Job Description</label>
+                            <textarea id="compose-desc" class="form-textarea" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Company Link</label>
+                            <input type="url" id="compose-link" class="form-control">
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary btn-full" id="compose-btn"
+                            style="margin-top: 8px;">
+                            Add Drive <svg viewBox="0 0 24 24" width="12" height="12">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- DRIVES LIST PANEL -->
+                <div class="panel" style="display:flex; flex-direction:column;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: -4px;">
+                        <div class="panel-title">All Placement Drives</div>
+                        <div class="filter-pills" id="drive-filters">
+                            <div class="filter-pill active" data-cat="All">All</div>
+                            <div class="filter-pill" data-cat="Open">Open</div>
+                            <div class="filter-pill" data-cat="Upcoming">Upcoming</div>
+                            <div class="filter-pill" data-cat="Closed">Closed</div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Role & Package</th>
+                                    <th>Criteria</th>
+                                    <th>Dates</th>
+                                    <th>Status & Apps</th>
+                                    <th style="text-align:right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drives-tbody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="skeleton" style="height:30px"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="skeleton" style="height:30px"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- STATS BOTTOM PANEL -->
+                    <div class="stats-panel" style="margin-top:20px;">
+                        <div class="stats-panel-title">Annual Placement Distribution</div>
+                        <div class="chart-container" id="bar-chart">
+                            <div class="skeleton" style="height: 100%; width: 100%"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- EDIT MODAL (Simplified for brevity) -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-box">
+            <div class="modal-title playfair">Edit Drive</div>
+            <form id="edit-form" style="display:flex; flex-direction:column; gap:12px;">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <input type="text" id="edit-role" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="edit-status" class="form-select">
+                        <option value="Open">Open</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="edit-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="edit-save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CLOSE CONFIRMATION -->
+    <div class="modal-overlay" id="close-modal">
+        <div class="modal-box" style="width:340px;">
+            <div class="modal-title playfair" style="color:var(--amber)">Close Drive?</div>
+            <div class="modal-desc">
+                Marking "<strong id="close-target-title"></strong>" as Closed will prevent any further student
+                applications.<br><br>
+                Proceed to close?
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" id="close-cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" style="background:var(--amber)"
+                    id="close-confirm-btn">Close Drive</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin_placements.js') }}"></script>
+</body>
+
+</html>
