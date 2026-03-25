@@ -29,17 +29,15 @@ function openQuickReport(typeStr) {
 async function initHydration() {
     try {
         // Concurrently run structural fetches
-        const [overviewRes, activityRes, cgpaRes, placementRes] = await Promise.all([
+        const [overviewRes, activityRes, cgpaRes] = await Promise.all([
             fetch("/api/admin/analytics/overview"),
             fetch("/api/admin/analytics/activity"),
-            fetch("/api/admin/analytics/cgpa"),
-            fetch("/api/admin/analytics/placement")
+            fetch("/api/admin/analytics/cgpa")
         ]);
 
         renderOverview(await overviewRes.json());
         renderActivityChart(await activityRes.json());
         renderCGPAChart(await cgpaRes.json());
-        renderPlacementList(await placementRes.json());
 
     } catch (err) { console.error("Global analytics rendering interrupted.", err); }
 }
@@ -51,57 +49,9 @@ function renderOverview(data) {
     // Top Row KPIs
     document.getElementById("kpi-logins").innerText = data.logins_today || 0;
     document.getElementById("kpi-cgpa").innerText = data.avg_cgpa || '0.0';
-    document.getElementById("kpi-placement").innerText = `${data.placement_rate || 0}%`;
     document.getElementById("kpi-papers").innerText = data.research_papers || 0;
 
-    // Attendance Donut
-    // Assumes payload shape: { attendance: { above: 400, risk: 150, below: 50, avg: 82 } }
-    const att = data.attendance || { above: 0, risk: 0, below: 0, avg: 0 };
-    const total = att.above + att.risk + att.below || 1; // Prevent Div0
-
-    // Calculate degree vectors natively
-    const pctAbove = (att.above / total) * 100;
-    const pctRisk = (att.risk / total) * 100;
-    const pctBelow = (att.below / total) * 100;
-
-    // Colors mapping: Above(#8B1D1D) Risk(#3a8834) Below(#b85a00)
-    const riskStart = pctAbove;
-    const belowStart = pctAbove + pctRisk;
-
-    const conicString = `conic-gradient(#8B1D1D 0% ${pctAbove}%, #3a8834 ${riskStart}% ${belowStart}%, #b85a00 ${belowStart}% 100%)`;
-
-    let html = `
-    <div class="donut-chart" style="background: ${conicString}">
-        <div class="donut-hole">
-            <div class="donut-center-val playfair">${att.avg}%</div>
-            <div class="donut-center-lbl">Avg Overall</div>
-        </div>
-    </div>
-    <div class="donut-legend">
-        <div class="lg-item">
-            <div class="lg-top">
-                <div class="lg-lbl"><div class="lg-dot" style="background:#8B1D1D"></div> Above 75%</div>
-                <div class="lg-val">${att.above}</div>
-            </div>
-            <div class="lg-track"><div class="lg-fill" style="width:${pctAbove}%; background:#8B1D1D"></div></div>
-        </div>
-        <div class="lg-item">
-            <div class="lg-top">
-                <div class="lg-lbl"><div class="lg-dot" style="background:#3a8834"></div> At Risk (65-74%)</div>
-                <div class="lg-val">${att.risk}</div>
-            </div>
-            <div class="lg-track"><div class="lg-fill" style="width:${pctRisk}%; background:#3a8834"></div></div>
-        </div>
-        <div class="lg-item">
-            <div class="lg-top">
-                <div class="lg-lbl"><div class="lg-dot" style="background:#b85a00"></div> Below 65%</div>
-                <div class="lg-val">${att.below}</div>
-            </div>
-            <div class="lg-track"><div class="lg-fill" style="width:${pctBelow}%; background:#b85a00"></div></div>
-        </div>
-    </div>`;
-
-    document.getElementById("chart-attendance").innerHTML = html;
+    // Attendance section removed
 }
 
 // -----------------------------------------------------------------

@@ -4,13 +4,6 @@
    ========================================= #}
 
 <div class="chatbot-container">
-    <!-- Quick Pills (Visible when closed) -->
-    <div class="chatbot-quick-pills" id="chatbotQuickPills">
-        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('Check my attendance')"><span class="pill-dot"></span>Check my attendance</div>
-        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('View today\'s schedule')"><span class="pill-dot"></span>View today's schedule</div>
-        <div class="chatbot-quick-pill" onclick="sendChatbotQuick('Library due dates')"><span class="pill-dot"></span>Library due dates</div>
-    </div>
-
     <!-- Tooltip -->
     <div class="chatbot-tooltip" id="chatbotTooltip">Ask CS Connect AI anything</div>
 
@@ -24,7 +17,7 @@
                 </div>
                 <div class="bot-info">
                     <div class="bot-name">CS Connect AI</div>
-                    <div class="bot-status"><span class="status-dot"></span>Online &middot; Powered by Claude</div>
+                    <div class="bot-status"><span class="status-dot"></span>Online &middot; Virtual Assistant</div>
                 </div>
             </div>
             <div class="chat-header-actions">
@@ -61,11 +54,9 @@
 
         <!-- Suggestion Chips -->
         <div class="chat-suggestion-chips" id="suggestionChips">
-            <button class="suggestion-chip" onclick="sendChatbotQuick('All subject attendance')">All subject attendance</button>
             <button class="suggestion-chip" onclick="sendChatbotQuick('Next ML class')">Next ML class</button>
             <button class="suggestion-chip" onclick="sendChatbotQuick('My CGPA')">My CGPA</button>
             <button class="suggestion-chip" onclick="sendChatbotQuick('Library dues')">Library dues</button>
-            <button class="suggestion-chip" onclick="sendChatbotQuick('Placement drives')">Placement drives</button>
         </div>
 
         <!-- Input Area -->
@@ -74,13 +65,13 @@
                 <button class="chat-attach-btn" title="Attach file (Coming soon)">
                     <svg width="16" height="16" viewBox="0 0 24 24" class="icon-stroke"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                 </button>
-                <input type="text" id="chatInput" placeholder="Ask about attendance, results, library..." autocomplete="off">
+                <input type="text" id="chatInput" placeholder="Ask about results, library..." autocomplete="off">
                 <button class="chat-send-btn" onclick="sendChat()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="icon-fill"><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor"/></svg>
                 </button>
             </div>
             <div class="chat-input-hints">
-                <span>Powered by Claude API &middot; Context-aware</span>
+                <span>AI-powered &middot; Context-aware</span>
                 <span>Press Enter to send</span>
             </div>
         </div>

@@ -21,7 +21,16 @@ def library():
     if "user_id" not in session:
         flash("Please log in to access the library.", "warning")
         return redirect(url_for("login"))
-    return render_template("library.html", active_page="library")
+    books = Book.get_all()
+    user_id = session.get("user_id")
+    has_active_issue = False
+    if user_id and session.get("role") == "student":
+        has_active_issue = Issue.get_user_active_issued_count(user_id) >= 1
+
+    for b in books:
+        if not b.get("availability", True):
+            b["current_holder"] = Issue.get_current_holder(b["id"])
+    return render_template("library.html", active_page="library", books=books, has_active_issue=has_active_issue)
 
 
 @library_bp.route("/student-dashboard/library")
@@ -133,23 +142,32 @@ def issue_book(book_id):
         flash("Book not found.", "danger")
         return redirect(url_for("library_bp.library"))
 
+    # Requirements check
+    if Issue.get_user_active_issued_count(user_id) >= 1:
+        flash("You must return your current book before issuing another.", "warning")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+    if Issue.has_outstanding_fines(user_id):
+        flash("You have outstanding fines. Please clear them before issuing a new book.", "danger")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
     if not book.get("availability", True):
-        flash("This book is already issued.", "danger")
-    elif Issue.has_user_issued_book(user_id, book_id):
-        flash("You have already issued this book.", "danger")
+        # Allow requesting a book already taken by someone else
+        if Request.has_pending_request(user_id, book_id, 'request'):
+            flash("You have already requested this book.", "info")
+        else:
+            Request.create_request(book_id, user_id, 'request')
+            flash("Book is already taken. Request sent to admin for approval.", "success")
+            Notification.notify_admin(f"User {session.get('name')} (ID: {user_id}) requested the book '{book['title']}' (Book ID: {book_id}).")
+    elif Request.has_pending_request(user_id, book_id, 'issue'):
+        flash("You already have a pending issue request for this book.", "info")
     else:
-        # Issue the book
-        Issue.create_issue(book_id, user_id)
-        Book.update_availability(book_id, False)
-
-        # Notify Admin (Role based notification: here we just need a way to notify admins.
-        # Usually we might leave user_id=0 for all admins, or find admin IDs.
-        # For this requirement, let's assume user_id=0 means general admin notification)
-        Notification.notify_admin(
-            f"User {session.get('name')} issued book '{book['title']}' (ID: {book_id})."
-        )
-
-        flash("Book issued successfully.", "success")
+        # Create Issue Request
+        req_id = Request.create_request(book_id, user_id, 'issue')
+        action_html = f" <form action='/admin/approve_request/{req_id}' method='POST' style='display:inline; margin-left: 10px;'><button type='submit' style='background:#28a745; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;'>Approve</button></form>"
+        msg = f"{session.get('name')} (ID: {user_id}) has requested for issuing '{book['title']}' (Book ID: {book_id})." + action_html
+        Notification.notify_admin(msg)
+        flash("Issue request sent to admin for approval.", "success")
 
     return redirect(url_for("library_bp.book_details", book_id=book_id))
 
@@ -174,16 +192,15 @@ def return_book(book_id):
         flash("This book is not currently issued.", "warning")
     elif not Issue.is_user_issuer(user_id, book_id):
         flash("You cannot return a book issued by another user.", "danger")
+    elif Request.has_pending_request(user_id, book_id, 'return'):
+        flash("A return request is already pending for this book.", "info")
     else:
-        # Return book
-        Issue.return_book(book_id)
-        Book.update_availability(book_id, True)
-
-        Notification.notify_admin(
-            f"User {session.get('name')} returned book '{book['title']}' (ID: {book_id})."
-        )
-
-        flash("Book returned successfully.", "success")
+        # Create Return Request
+        req_id = Request.create_request(book_id, user_id, 'return')
+        action_html = f" <form action='/admin/approve_request/{req_id}' method='POST' style='display:inline; margin-left: 10px;'><button type='submit' style='background:#28a745; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;'>Approve</button></form>"
+        msg = f"{session.get('name')} (ID: {user_id}) has requested for returning '{book['title']}' (Book ID: {book_id})." + action_html
+        Notification.notify_admin(msg)
+        flash("Return request sent to admin for approval.", "success")
 
     return redirect(url_for("library_bp.book_details", book_id=book_id))
 
@@ -208,11 +225,11 @@ def request_book(book_id):
         flash("This book is already available. You can issue it.", "info")
     else:
         # Request book
-        Request.create_request(book_id, user_id)
+        Request.create_request(book_id, user_id, 'request')
 
         # Notify admin of the request
         Notification.notify_admin(
-            f"User {session.get('name')} requested to reserve book '{book['title']}' (ID: {book_id})."
+            f"User {session.get('name')} (ID: {user_id}) requested the book '{book['title']}' (Book ID: {book_id})."
         )
         
         # Check if book is currently issued, and notify the current issuer
@@ -739,7 +756,10 @@ def api_library_reserve():
 def student_library_book_details(book_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
-    return render_template("student_book_details.html", active_page="library", book_id=book_id)
+    user_id = session["user_id"]
+    from models.request import Request
+    pending_req = Request.has_pending_request(user_id, book_id, 'issue') or Request.has_pending_request(user_id, book_id, 'reserve') if user_id else None
+    return render_template("student_book_details.html", active_page="library", book_id=book_id, pending_req=pending_req)
 
 @library_bp.route("/api/library/books/<int:book_id>")
 def api_library_book_details(book_id):
@@ -815,13 +835,19 @@ def api_library_book_details(book_id):
     
     conn.close()
     
+    # Check if this user has a pending request for this book
+    from models.request import Request
+    user_id = session.get("user_id")
+    pending_req = Request.has_pending_request(user_id, book_id) if user_id else None
+
     return jsonify({
         "book": b_dict,
         "availability": availability,
+        "borrow_stats": borrow_stats,
         "student_loan": student_loan,
         "queue_info": queue_info,
         "related_books": related_books,
-        "borrow_stats": borrow_stats
+        "pending_req": pending_req
     })
 
 @library_bp.route("/api/library/reservations/<int:res_id>", methods=["DELETE"])
@@ -905,7 +931,8 @@ def api_library_fines_receipt(fine_id):
     fine = conn.execute("""
         SELECT f.*, b.title as book_title, u.name as student_name
         FROM library_fines f
-        JOIN books b ON f.book_id = b.id
+        JOIN issues i ON f.issue_id = i.id
+        JOIN books b ON i.book_id = b.id
         JOIN users u ON f.student_id = u.id
         WHERE f.id = %s AND f.student_id = %s AND f.paid = true
     """, (fine_id, user_id)).fetchone()
@@ -953,4 +980,33 @@ def api_library_fines_challan():
     import string
     challan_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     return jsonify({"success": True, "challan_number": challan_id})
+
+
+@library_bp.route("/api/notifications/unread-count")
+def api_unread_notifications_count():
+    if "user_id" not in session:
+        return jsonify({"count": 0})
+    count = Notification.get_unread_count()
+    return jsonify({"count": count})
+
+@library_bp.route("/api/notifications/list")
+def api_get_notifications_list():
+    if "user_id" not in session:
+        return jsonify([])
+    notifs = Notification.get_user_notifications()
+    return jsonify(notifs)
+
+@library_bp.route("/api/notifications/mark-read/<int:notif_id>", methods=["POST"])
+def api_mark_notification_read_id(notif_id):
+    if "user_id" not in session:
+        return jsonify({"success": False}), 401
+    Notification.mark_read(notif_id)
+    return jsonify({"success": True})
+
+@library_bp.route("/api/notifications/mark-all-read", methods=["POST"])
+def api_mark_all_notifications_read_all():
+    if "user_id" not in session:
+        return jsonify({"success": False}), 401
+    Notification.mark_all_read()
+    return jsonify({"success": True})
 

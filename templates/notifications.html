@@ -141,9 +141,6 @@
       <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
     </div>
     
-    <div class="dash-sidebar-item" title="Attendance" onclick="location.href='/dashboard/attendance'">
-      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
 
     <!-- Bottom avatar -->
     <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
@@ -188,7 +185,6 @@
         <button class="filter-pill" onclick="setFilter('Exam')">Exam (<span id="count-Exam">0</span>)</button>
         <button class="filter-pill" onclick="setFilter('Library')">Library (<span id="count-Library">0</span>)</button>
         <button class="filter-pill" onclick="setFilter('Placement')">Placement (<span id="count-Placement">0</span>)</button>
-        <button class="filter-pill" onclick="setFilter('Attendance')">Attendance (<span id="count-Attendance">0</span>)</button>
         <button class="filter-pill" onclick="setFilter('Academic')">Academic (<span id="count-Academic">0</span>)</button>
       </div>
 
@@ -246,9 +242,6 @@
     if (cat === 'Placement') {
       return { icon: 'briefcase', bg: 'rgba(100,150,255,0.1)', stroke: '#6ab' };
     }
-    if (cat === 'Attendance') {
-      return { icon: 'clipboard-check', bg: 'rgba(180,130,40,0.1)', stroke: '#b85' };
-    }
     // Default fallback
     return { icon: 'bell', bg: 'rgba(255,255,255,0.06)', stroke: '#888' };
   }
@@ -265,7 +258,7 @@
   }
 
   function updateCounts() {
-    const counts = { All: allNotifications.length, Exam: 0, Library: 0, Placement: 0, Attendance: 0, Academic: 0 };
+    const counts = { All: allNotifications.length, Exam: 0, Library: 0, Placement: 0, Academic: 0 };
     let unreadCount = 0;
     allNotifications.forEach(n => {
       const cat = n.category || 'Academic';

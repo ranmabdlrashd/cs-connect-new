@@ -33,9 +33,6 @@
         <div class="nav-item" data-tip="Download Syllabus" onclick="location.href='/dashboard/syllabus'">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
         </div>
-        <div class="nav-item" data-tip="Attendance" onclick="location.href='/student-dashboard'">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        </div>
         <div class="nav-item" data-tip="Performance" onclick="location.href='/student-dashboard'">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         </div>
@@ -70,9 +67,6 @@
           CS Connect <span>·</span> <b>Dashboard</b>
         </div>
         
-        <div class="search-bar">
-          <input type="text" placeholder="Search resources, labs, or faculty...">
-        </div>
 
         <div class="top-actions">
           <div class="notif-bell" onclick="location.href='/dashboard/notifications'" style="cursor: pointer;">
@@ -99,18 +93,6 @@
       <!-- BENTO GRID -->
       <div class="bento-grid">
         
-        <!-- Attendance -->
-        <div class="card">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            Attendance
-          </div>
-          <div class="card-value">{{ data.attendance if data else '87' }}%</div>
-          <div class="card-subtext">87% minimum required</div>
-          <div class="progress-container">
-            <div class="progress-fill" style="width: {{ data.attendance if data else '87' }}%;"></div>
-          </div>
-        </div>
 
         <!-- CGPA -->
         <div class="card">
@@ -135,15 +117,6 @@
           <div class="card-subtext" style="color: #8B1D1D;">Due in {{ data.due_days if data else '3' }} days</div>
         </div>
 
-        <!-- Assignments -->
-        <div class="card warning-tint">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            Assignments
-          </div>
-          <div class="card-value">{{ data.pending_assignments if data else '3' }}</div>
-          <div class="card-subtext">Pending Submissions</div>
-        </div>
 
         <!-- Today's Schedule -->
         <div class="card card-schedule">
@@ -202,9 +175,6 @@
             </button>
             <button class="hub-btn">
               <span>Lab Bookings</span>
-            </button>
-            <button class="hub-btn">
-              <span>Assignment Portal</span>
             </button>
           </div>
         </div>

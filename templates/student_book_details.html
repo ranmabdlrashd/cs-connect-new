@@ -416,31 +416,55 @@ async function fetchBookData() {
             actsHtml = `
               <button class="btn btn-disabled"><i data-lucide="book" style="width:14px;height:14px;"></i> Reference Only — In Library</button>
             `;
+        } else if (loadedData.pending_req) {
+            avHtml = `<span style="color:var(--amber);">Request Pending Approval</span>`;
+            actsHtml = `
+              <div style="padding: 12px; background: rgba(180,130,40,0.1); border: 1px solid var(--amber); border-radius: 8px; color: var(--amber); text-align: center; font-weight: 600;">
+                  <i data-lucide="clock" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;"></i>
+                  PENDING APPROVAL
+              </div>
+            `;
         } else if(av.available > 0) {
             avHtml = `<span style="color:var(--green);">${av.available} of ${av.total} available</span>`;
             if (loadedData.student_loan) {
                 actsHtml = `
-                  <button class="btn btn-disabled">Already Borrowed</button>
-                  <div class="btn-subtext">Due back: ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}</div>
+                  <form action="/library/return/${currentBookId}" method="POST" style="width:100%;">
+                    <button type="submit" class="btn btn-outline" style="border-color:var(--amber); color:var(--amber);">
+                      <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Request Return
+                    </button>
+                  </form>
+                  <div class="btn-subtext" style="margin-top:8px;">Due back: ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}</div>
                 `;
             } else {
                 let d = new Date(); d.setDate(d.getDate()+14);
                 actsHtml = `
-                  <button class="btn btn-primary" onclick="openBorrowModal()"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Borrow This Book</button>
-                  <div class="btn-subtext">Due back: ${d.toLocaleDateString()}</div>
+                  <form action="/library/issue/${currentBookId}" method="POST" style="width:100%;">
+                    <button type="submit" class="btn btn-primary"><i data-lucide="book-open" style="width:14px;height:14px;"></i> Request Issue</button>
+                  </form>
+                  <div class="btn-subtext" style="margin-top:8px;">Approval required by Admin</div>
                 `;
             }
         } else {
             avHtml = `<span style="color:var(--red);">0 of ${av.total} available</span>`;
-            if(loadedData.queue_info) {
+            if (loadedData.student_loan) {
+                actsHtml = `
+                  <form action="/library/return/${currentBookId}" method="POST" style="width:100%;">
+                    <button type="submit" class="btn btn-outline" style="border-color:var(--amber); color:var(--amber);">
+                      <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Request Return
+                    </button>
+                  </form>
+                `;
+            } else if(loadedData.queue_info) {
                actsHtml = `
                  <button class="btn btn-outline" style="color:var(--amber); border-color:var(--amber);" onclick="cancelReserve(${loadedData.queue_info.reservation_id})">Cancel Reservation</button>
                  <div class="btn-subtext">You are #${loadedData.queue_info.position} in queue.</div>
                `;
             } else {
                actsHtml = `
-                 <button class="btn btn-outline" onclick="openReserveModal()"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Reserve — Join Queue</button>
-                 <div class="btn-subtext">Est. wait: ${(av.reserved+1)*7} days &middot; #${av.reserved+1} in queue</div>
+                 <form action="/library/request/${currentBookId}" method="POST" style="width:100%;">
+                    <button type="submit" class="btn btn-outline"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Request Reservation</button>
+                 </form>
+                 <div class="btn-subtext" style="margin-top:8px;">Est. wait: ${(av.reserved+1)*7} days &middot; #${av.reserved+1} in queue</div>
                `;
             }
         }

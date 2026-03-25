@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+from models.notification import Notification
 from models.issue import Issue
 from models.request import Request
-from models.notification import Notification
+from models.book import Book
+from models.internal_mark import InternalMark
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 
 admin_bp = Blueprint("admin_bp", __name__)
 
@@ -15,6 +17,9 @@ def admin_library():
     if not admin_required():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
+
+    # Update fines before fetching data
+    Issue.update_fines()
 
     # Get all issues and requests to display in admin dashboard (Active)
     issues = Issue.get_all_active_issues()
@@ -82,16 +87,110 @@ def send_request_message(request_id):
         holder_id = Issue.get_current_holder_id(book_id)
 
         if holder_id:
-            msg = "Another student has requested this book. Please return it soon."
+            msg = f"Another student has requested the book '{req.get('book_title') or 'you have'}' (ID: {book_id}). Please return it soon."
             Notification.notify_user(holder_id, msg)
-
-            # Optionally mark the request as processed
-            Request.mark_processed(request_id)
             flash("Message sent to the current holder.", "success")
         else:
             flash("Book is already available or holder not found.", "info")
             
     return redirect(url_for("admin_bp.admin_library"))
+
+
+@admin_bp.route("/admin/approve_request/<int:request_id>", methods=["POST"])
+def approve_request(request_id):
+    if not admin_required():
+        return redirect(url_for("login"))
+    req = Request.get_by_id(request_id)
+    if not req:
+        flash("Request not found.", "danger")
+        return redirect(url_for("admin_bp.admin_library"))
+
+    book_id = req["book_id"]
+    user_id = req["requested_by"]
+    req_type = req.get("request_type", "reserve")
+
+    if req_type == "issue":
+        # Check if book is still available
+        book = Book.get_by_id(book_id)
+        if not book or not book.get("availability", True):
+            flash("Book is no longer available for issue.", "warning")
+            return redirect(url_for("admin_bp.admin_library"))
+        
+        # Check if student already has a book (double check)
+        if Issue.get_user_active_issued_count(user_id) >= 1:
+            flash("Student already has an issued book. Cannot approve second issue.", "danger")
+            return redirect(url_for("admin_bp.admin_library"))
+
+        # Process Issue
+        Issue.create_issue(book_id, user_id)
+        Book.update_availability(book_id, False)
+        Request.mark_processed(request_id, "Approved by Admin")
+        Notification.notify_user(user_id, f"Your request to issue '{book['title']}' has been approved.")
+        flash(f"Issue request for '{book['title']}' approved.", "success")
+
+    elif req_type == "return":
+        # Process Return
+        Issue.return_book(book_id)
+        Book.update_availability(book_id, True)
+        Request.mark_processed(request_id, "Approved by Admin")
+        Notification.notify_user(user_id, f"Your return of '{req.get('book_title', 'the book')}' has been approved.")
+        flash(f"Return request for '{req.get('book_title')}' approved.", "success")
+        
+        # Check if there are reservations for this book and notify next in queue
+        pending_res = Request.get_pending_requests_by_book(book_id)
+        if pending_res:
+            next_req = pending_res[0] # Sorted by date ASC
+            Notification.notify_user(next_req['requested_by'], f"The book '{next_req['book_title']}' you reserved is now available. You can now request to issue it.")
+
+    elif req_type == "reserve":
+        # Reservation is just a notification to admin/user, normally doesn't need "approval" 
+        # but we can mark it as processed if admin acknowledged it.
+        Request.mark_processed(request_id, "Acknowledged by Admin")
+        flash("Reservation request acknowledged.", "success")
+
+    return redirect(url_for("admin_bp.admin_library"))
+
+
+@admin_bp.route("/admin/reject_request/<int:request_id>", methods=["POST"])
+def reject_request(request_id):
+    if not admin_required():
+        return redirect(url_for("login"))
+
+    feedback = request.form.get("feedback", "Rejected by Admin")
+    req = Request.get_by_id(request_id)
+    if req:
+        Request.reject(request_id, feedback)
+        Notification.notify_user(req["requested_by"], f"Your {req.get('request_type')} request for '{req.get('book_title', 'the book')}' was rejected: {feedback}")
+        flash("Request rejected.", "info")
+    
+@admin_bp.route("/admin/internal-marks")
+def admin_internal_marks():
+    if not admin_required():
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for("login"))
+    
+    marks = InternalMark.get_all_marks()
+    return render_template("admin_internal_marks.html", internal_marks=marks)
+
+@admin_bp.route("/admin/api/internal-marks/update", methods=["POST"])
+def update_internal_marks():
+    if not admin_required():
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+    
+    data = request.get_json()
+    mark_id = data.get("id")
+    in1 = data.get("internal_1")
+    in2 = data.get("internal_2")
+    assign = data.get("assignment")
+    
+    if not mark_id:
+        return jsonify({"success": False, "error": "Missing mark ID"}), 400
+    
+    try:
+        InternalMark.update_marks(mark_id, in1, in2, assign)
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @admin_bp.route("/admin/fees")
 def legacy_admin_fees():
@@ -108,185 +207,15 @@ def legacy_admin_analytics():
     return render_template("admin_analytics.html", active_page="admin_dashboard")
 
 # ─────────────────────────────────────────────────────────────────
-# ADMIN COMMAND CENTER ROUTES
-# ─────────────────────────────────────────────────────────────────
-
-from flask import jsonify
-
-@admin_bp.route("/admin-dashboard")
+#@admin_bp.route("/admin-dashboard")
 def admin_command_center():
     if not admin_required():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
     return render_template("admin_dashboard.html", active_page="admin_dashboard")
 
-    # ─────────────────────────────────────────────────────────────────
-    # ADMIN ATTENDANCE OVERVIEW ROUTES
-    # ─────────────────────────────────────────────────────────────────
 
-    @admin_bp.route("/admin-dashboard/attendance")
-    def admin_attendance_overview():
-        if not admin_required():
-            flash("Access denied! Admins only.", "danger")
-            return redirect(url_for("login"))
-        return render_template("admin_attendance.html", active_page="admin_attendance")
-
-    @admin_bp.route("/api/admin/attendance")
-    def api_admin_attendance_summary():
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        from app import get_db_connection
-        conn = get_db_connection()
-        try:
-            query = """
-                SELECT
-                    AVG(percentage) as dept_average,
-                    SUM(CASE WHEN avg_att >= 75 THEN 1 ELSE 0 END) as safe_count,
-                    SUM(CASE WHEN avg_att BETWEEN 65 AND 74 THEN 1 ELSE 0 END) as risk_count,
-                    SUM(CASE WHEN avg_att < 65 THEN 1 ELSE 0 END) as low_count
-                FROM (
-                    SELECT student_id, AVG(percentage) as avg_att
-                    FROM attendance
-                    WHERE semester = (SELECT current_semester FROM settings LIMIT 1)
-                    GROUP BY student_id
-                ) subq;
-            """
-            res = conn.execute(query).fetchone()
-            data = {
-                "dept_average": round(res["dept_average"] or 0, 2),
-                "safe_count": res["safe_count"] or 0,
-                "risk_count": res["risk_count"] or 0,
-                "low_count": res["low_count"] or 0,
-            }
-            return jsonify(data)
-        finally:
-            conn.close()
-
-    @admin_bp.route("/api/admin/attendance/students")
-    def api_admin_attendance_students():
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        from app import get_db_connection
-        conn = get_db_connection()
-        try:
-            query = """
-                SELECT u.id as student_id, u.name, u.roll_no, AVG(a.percentage) as avg_att,
-                       COUNT(CASE WHEN a.percentage < 75 THEN 1 END) as low_subjects
-                FROM attendance a
-                JOIN users u ON a.student_id = u.id
-                WHERE a.semester = (SELECT current_semester FROM settings LIMIT 1)
-                GROUP BY u.id
-                HAVING avg_att < 75
-                ORDER BY avg_att ASC
-                LIMIT 5;
-            """
-            rows = conn.execute(query).fetchall()
-            result = []
-            for r in rows:
-                d = dict(r)
-                d["avg_att"] = round(d["avg_att"] or 0, 2)
-                result.append(d)
-            return jsonify(result)
-        finally:
-            conn.close()
-
-    @admin_bp.route("/api/admin/attendance/all")
-    def api_admin_attendance_all():
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        from app import get_db_connection
-        conn = get_db_connection()
-        try:
-            query = """
-                SELECT u.name, u.roll_no, u.batch, u.id as student_id,
-                       STRING_AGG(a.subject_name || ':' || a.percentage, ',') as subjects,
-                       AVG(a.percentage) as avg_att,
-                       COUNT(CASE WHEN a.percentage < 75 THEN 1 END) as low_subjects
-                FROM attendance a
-                JOIN users u ON a.student_id = u.id
-                WHERE a.semester = (SELECT current_semester FROM settings LIMIT 1)
-                GROUP BY u.id
-                ORDER BY avg_att ASC;
-            """
-            rows = conn.execute(query).fetchall()
-            result = []
-            for r in rows:
-                d = dict(r)
-                d["avg_att"] = round(d["avg_att"] or 0, 2)
-                result.append(d)
-            return jsonify(result)
-        finally:
-            conn.close()
-
-    @admin_bp.route("/api/admin/attendance/export")
-    def api_admin_attendance_export():
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        from app import get_db_connection
-        import io, csv
-        conn = get_db_connection()
-        try:
-            query = """
-                SELECT u.name, u.roll_no, u.batch,
-                       GROUP_CONCAT(a.subject_name || ':' || a.percentage) as subjects,
-                       AVG(a.percentage) as overall_avg
-                FROM attendance a
-                JOIN users u ON a.student_id = u.id
-                WHERE a.semester = (SELECT current_semester FROM settings LIMIT 1)
-                GROUP BY u.id
-                ORDER BY overall_avg ASC;
-            """
-            rows = conn.execute(query).fetchall()
-            output = io.StringIO()
-            writer = csv.writer(output)
-            writer.writerow(["Name", "Roll No.", "Batch", "Subjects (subject:percentage)", "Overall %"])
-            for r in rows:
-                writer.writerow([
-                    r["name"],
-                    r["roll_no"],
-                    r["batch"],
-                    r["subjects"],
-                    round(r["overall_avg"] or 0, 2)
-                ])
-            return (
-                output.getvalue(),
-                200,
-                {
-                    "Content-Type": "text/csv",
-                    "Content-Disposition": "attachment; filename=attendance_report.csv"
-                },
-            )
-        finally:
-            conn.close()
-
-    @admin_bp.route("/api/admin/attendance/send-alert/<int:student_id>", methods=["POST"])
-    def api_admin_attendance_send_alert(student_id):
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        msg = "Attendance Alert: Your attendance is below the required threshold. Please review your attendance record."
-        Notification.notify_user(student_id, msg)
-        return jsonify({"success": True})
-
-    @admin_bp.route("/api/admin/attendance/send-bulk-alert", methods=["POST"])
-    def api_admin_attendance_send_bulk_alert():
-        if not admin_required():
-            return jsonify({"error": "Unauthorized"}), 401
-        from app import get_db_connection
-        conn = get_db_connection()
-        try:
-            query = """
-                SELECT u.id FROM attendance a
-                JOIN users u ON a.student_id = u.id
-                WHERE a.semester = (SELECT current_semester FROM settings LIMIT 1)
-                GROUP BY u.id
-                HAVING AVG(a.percentage) < 75;
-            """
-            rows = conn.execute(query).fetchall()
-            for r in rows:
-                Notification.notify_user(r["id"], "Attendance Alert: Your attendance is below the required threshold. Please take action.")
-            return jsonify({"success": True, "notified": len(rows)})
-        finally:
-            conn.close()
+# ─────────────────────────────────────────────────────────────────
 
 
 @admin_bp.route("/api/admin/dashboard")
@@ -298,17 +227,13 @@ def api_admin_dashboard():
         total_students = conn.execute("SELECT COUNT(*) FROM users WHERE role='student'").fetchone()[0] or 0
         total_faculty = conn.execute("SELECT COUNT(*) FROM users WHERE role='faculty'").fetchone()[0] or 0
         active_sessions = conn.execute("SELECT COUNT(*) FROM portal_sessions WHERE created_at >= NOW() - INTERVAL '1 hour'").fetchone()[0] or 0
-        pending_approvals = conn.execute("SELECT COUNT(*) FROM pending_approvals WHERE status='pending'").fetchone()[0] or 0
-        new_users = conn.execute("SELECT COUNT(*) FROM users WHERE is_verified=true").fetchone()[0] or 0
-        
-        # Placement Rate (Mocked for dashboard, could be fetched from placement_stats)
-        placement_rate = "94%"
+        pending_approvals = conn.execute("SELECT COUNT(*) FROM requests WHERE status='pending'").fetchone()[0] or 0
+        new_users = conn.execute("SELECT COUNT(*) FROM users WHERE created_at >= NOW() - INTERVAL '7 days'").fetchone()[0] or 0
         return jsonify({
             "total_students": total_students,
             "total_faculty": total_faculty,
             "active_sessions": active_sessions,
             "pending_approvals": pending_approvals,
-            "placement_rate": placement_rate,
             "new_users_this_week": new_users
         })
     finally:
@@ -320,23 +245,27 @@ def api_admin_recent_users():
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        # Assuming you want the 8 most recent
         users = conn.execute("""
-            SELECT id, name, role, user_id as roll_no, email, 
-                   is_verified as status 
-            FROM users 
+            SELECT id, name, role, user_id as roll_no, email,
+                   COALESCE(status, 'Active') as status,
+                   created_at
+            FROM users
             ORDER BY id DESC LIMIT 8
         """).fetchall()
-        
         res = []
         for u in users:
             d = dict(u)
-            d['status'] = 'Active' if d['status'] else 'Pending'
-            d['created_at'] = 'Recently'  # Add proper timestamp if column exists
+            if d.get('created_at') and hasattr(d['created_at'], 'strftime'):
+                d['created_at'] = d['created_at'].strftime("%b %d, %Y")
+            else:
+                d['created_at'] = str(d.get('created_at', 'Recently')).split(' ')[0] if d.get('created_at') else 'Recently'
             res.append(d)
         return jsonify(res)
     finally:
         conn.close()
+
+
+
 
 @admin_bp.route("/api/admin/activity-chart")
 def api_admin_activity_chart():
@@ -418,7 +347,6 @@ def api_notices():
         for n in notices:
             d = dict(n)
             d['created_at'] = d['created_at'].isoformat() if d['created_at'] else ''
-            # Generate dummy views
             d['views'] = d['id'] * 12 + 45
             res.append(d)
         return jsonify(res)
@@ -427,18 +355,77 @@ def api_notices():
     finally:
         conn.close()
 
+@admin_bp.route("/api/admin/notices", methods=["POST"])
+def api_admin_post_notice():
+    if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
+    from app import get_db_connection
+    from models.notification import Notification
+
+    data = request.json or {}
+    title = data.get('title', 'Notice')
+    body = data.get('body', title)
+    category = data.get('category', 'Academic')
+
+    # Post to all students
+    conn = get_db_connection()
+    try:
+        student_ids = conn.execute("SELECT id FROM users WHERE role='student'").fetchall()
+        for s in student_ids:
+            Notification.notify_user(s['id'], body, title=title, category=category)
+        return jsonify({"success": True, "notified": len(student_ids)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@admin_bp.route("/api/admin/library-requests")
+def api_admin_library_requests():
+    if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
+    from models.request import Request
+    try:
+        reqs = Request.get_all_pending_requests()
+        return jsonify(reqs)
+    except Exception as e:
+        return jsonify([])
+
+@admin_bp.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
+def api_admin_delete_user(user_id):
+    if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
+    from app import get_db_connection
+    conn = get_db_connection()
+    try:
+        conn.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 400
+    finally:
+        conn.close()
+
+
+
 # ─────────────────────────────────────────────────────────────────
 # ADMIN LIBRARY MANAGEMENT ROUTES
 # ─────────────────────────────────────────────────────────────────
 
-from flask import jsonify
 
 @admin_bp.route("/admin-dashboard/library")
 def admin_library_management():
     if not admin_required():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
-    return render_template("admin_library.html", active_page="library")
+    
+    from models.book import Book
+    books = Book.get_all()
+    
+    from app import get_db_connection
+    conn = get_db_connection()
+    total_books = conn.execute("SELECT COUNT(*) FROM books").fetchone()[0] or 0
+    active_loans = conn.execute("SELECT COUNT(*) FROM issues WHERE status = 'active'").fetchone()[0] or 0
+    conn.close()
+    
+    return render_template("admin_library.html", active_page="library", books=books, total_books=total_books, active_loans=active_loans)
 
 @admin_bp.route("/api/admin/library/stats")
 def api_admin_library_stats():

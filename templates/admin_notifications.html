@@ -1,45 +1,87 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Notifications{% endblock %}
+{% block title %}Admin Notifications | CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
+<style>
+    /* Page-specific overrides */
+    nav, .news-ticker { display: none !important; }
+    body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+
+    .notif-hero { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+    .notif-hero h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 1.8rem; }
+    
+    .notif-list { display: flex; flex-direction: column; gap: 12px; }
+    .notif-item { background: white; border: 1px solid var(--border-accent); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: all 0.2s; }
+    .notif-item:hover { border-color: var(--accent-crimson); }
+    .notif-item.unread { border-left: 4px solid var(--accent-crimson); }
+    
+    .notif-icon { width: 40px; height: 40px; background: #FDFCF8; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-crimson); border: 1px solid var(--border-accent); }
+    .notif-body { flex: 1; }
+    .notif-msg { font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px; }
+    .notif-time { font-size: 0.75rem; color: var(--text-muted); }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
 
 {% block content %}
-<section class="page-header" style="height: 250px;">
-    <div class="header-overlay" style="display: flex; align-items: center; justify-content: center;">
-        <div class="header-content reveal" style="text-align: center;">
-            <h1>Admin Notifications</h1>
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="bell" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item active" title="Notifications"><i data-lucide="bell"></i></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">System &middot; <b>Recent Alerts</b></div>
+      <div style="display:flex; gap:12px;">
+        <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;">Mark all as read</button>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      <div class="notif-hero">
+        <h1>Security & Activity</h1>
+        <div style="text-align:right;">
+           <div style="font-size:0.65rem; color:var(--text-muted); font-weight:800;">UNREAD</div>
+           <div style="font-size:1.4rem; font-weight:800; color:var(--accent-crimson); font-family:'Playfair Display', serif;">3 New</div>
         </div>
-    </div>
-</section>
+      </div>
 
-<div class="container mt-5 mb-5" style="max-width: 900px; margin: 50px auto; padding: 0 20px;">
-    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-        <h3 style="margin-top: 0; margin-bottom: 25px; color: #333;"><i class="fas fa-bell"
-                style="color: #4facfe; margin-right: 10px;"></i> Recent Notifications</h3>
-
+      <div class="notif-list">
         {% if notifications %}
-        <ul style="list-style: none; padding: 0; margin: 0;">
-            {% for notif in notifications %}
-            <li class="{% if not notif.read_status %}unread-notif{% endif %}"
-                style="padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; gap: 15px;">
-                <div
-                    style="background: #e9ecef; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6c757d;">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <div>
-                    <div style="font-size: 1.05rem; color: #444; margin-bottom: 5px;">{{ notif.message }}</div>
-                    <div style="font-size: 0.85rem; color: #888;"><i class="far fa-clock"
-                            style="margin-right: 5px;"></i> {{ notif.created_at.strftime('%Y-%m-%d %H:%M') if
-                        notif.created_at else notif.created_at }}</div>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+          {% for notif in notifications %}
+          <div class="notif-item {% if not notif.read_status %}unread{% endif %}">
+            <div class="notif-icon"><i data-lucide="info" style="width:20px;"></i></div>
+            <div class="notif-body">
+              <div class="notif-msg">{{ notif.message | safe }}</div>
+              <div class="notif-time">{{ notif.created_at.strftime('%Y-%m-%d %H:%M') if notif.created_at else 'Just now' }}</div>
+            </div>
+          </div>
+          {% endfor %}
         {% else %}
-        <div style="text-align: center; padding: 40px 0;">
-            <i class="far fa-bell" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
-            <p style="color: #888; margin: 0;">You have no new notifications.</p>
-        </div>
+          <div style="text-align:center; padding:60px; color:var(--text-muted);">
+             <i data-lucide="bell-off" style="width:48px; margin-bottom:16px; opacity:0.3;"></i>
+             <div style="font-size:0.9rem;">No recent activity to log.</div>
+          </div>
         {% endif %}
+      </div>
     </div>
+  </main>
 </div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
 {% endblock %}

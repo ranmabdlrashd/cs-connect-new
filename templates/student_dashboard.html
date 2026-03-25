@@ -3,101 +3,54 @@
 {% block title %}Student Dashboard - CS Connect{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/student_dash.css') }}">
 <style>
-  /* Hide the global top navbar for this page */
-  .custom-nav { display: none !important; }
-  .news-ticker { display: none !important; } /* Hidden as per choice to clean up dashboard */
+  /* Hide the global top navbar and ticker for the dashboard view to maximize space */
+
   
-  /* Reset some body/base styles to let the new layout fit properly */
-  body { margin: 0; padding: 0; overflow: hidden; background: #0A0A0A; }
-  
-  /* Active logic */
-  .dash-sidebar-item {
-    width: 40px; height: 40px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 8px; /* added spacing between items */
-  }
-  .dash-sidebar-item.active {
-    background: rgba(139,29,29,0.2);
-  }
-  .dash-sidebar-item:hover {
-    background: rgba(139,29,29,0.1);
-  }
+  body { margin: 0; padding: 0; background: var(--bg-color); }
 </style>
 <!-- Load Lucide icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<div style="display:flex; height:100vh; background:#0A0A0A; overflow:hidden;">
+<div class="dash-wrapper fade-up">
 
   <!-- ── SIDEBAR ── -->
-  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid rgba(245,230,190,0.06); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 10;">
+  <aside class="dash-sidebar">
     
     <!-- Logo -->
-    <div style="width:36px; height:36px; background:linear-gradient(135deg,#8B1D1D,#6B1010); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="#F5E6BE">
+    <div class="dash-sidebar-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
       </svg>
     </div>
 
     <!-- Nav icons -->
-    <!-- Dashboard - ACTIVE -->
-    <div class="dash-sidebar-item active" title="Dashboard" onclick="location.href='/student-dashboard'">
-      <i data-lucide="layout-dashboard" style="stroke: #8B1D1D; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Attendance -->
-    <div class="dash-sidebar-item" title="Attendance" onclick="location.href='/dashboard/attendance'">
-      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Results -->
-    <div class="dash-sidebar-item" title="Results" onclick="location.href='/dashboard/results'">
-      <i data-lucide="award" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Assignments -->
-    <div class="dash-sidebar-item" title="Assignments" onclick="location.href='/dashboard/assignments'">
-      <i data-lucide="file-text" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Library -->
-    <div class="dash-sidebar-item" title="Library" onclick="location.href='/student-dashboard/library'">
-      <i data-lucide="book-open" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Download Syllabus -->
-    <div class="dash-sidebar-item" title="Download Syllabus" onclick="location.href='/dashboard/syllabus'">
-      <i data-lucide="download" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Lab Bookings -->
-    <div class="dash-sidebar-item" title="Lab Bookings">
-      <i data-lucide="flask-conical" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Timetable -->
-    <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
-      <i data-lucide="calendar" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    
-    <!-- Placements -->
-    <div class="dash-sidebar-item" title="Placements" onclick="location.href='/dashboard/placements'">
-      <i data-lucide="briefcase" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+    <div class="dash-sidebar-items">
+      <!-- Dashboard - ACTIVE -->
+      <div class="dash-sidebar-item active" title="Dashboard" onclick="location.href='/student-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+      </div>
+      
+      <!-- Results -->
+      <div class="dash-sidebar-item" title="Results" onclick="location.href='/dashboard/results'">
+        <i data-lucide="award"></i>
+      </div>
+      
+      <!-- Timetable -->
+      <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
+        <i data-lucide="calendar"></i>
+      </div>
     </div>
 
     <!-- Bottom section -->
-    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
-      <!-- Settings -->
-      <div class="dash-sidebar-item" title="Settings" onclick="location.href='/dashboard/settings'">
-        <i data-lucide="settings" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-      </div>
+    <div class="dash-sidebar-bottom">
       
       <!-- Avatar with student initials -->
-      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#8B1D1D,#6B1010); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#F5E6BE; font-family:'Inter',sans-serif;">
+      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
         {% set sname = session.get('name', 'Student') %}
         {% set parts = sname.split() %}
         {% if parts|length > 1 %}
@@ -110,175 +63,127 @@
   </aside>
 
   <!-- ── MAIN CONTENT ── -->
-  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+  <div class="dash-main">
     
     <!-- Top bar -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:1px solid rgba(245,230,190,0.06); background:#0A0A0A; flex-shrink:0;">
-      
+    <header class="dash-topbar">
       <!-- Breadcrumb -->
-      <div style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase; font-family:'Inter',sans-serif;">
-        CS Connect · <span style="color:#A0A0A0">Dashboard</span>
+      <div class="dash-breadcrumb">
+        CS Connect · <b>Student Dashboard</b>
       </div>
       
-      <!-- Right side -->
-      <div style="display:flex; align-items:center; gap:12px;">
-        <!-- Search bar -->
-        <input placeholder="Search portal..." style="background:#121212; border:1px solid rgba(245,230,190,0.06); border-radius:8px; padding:7px 14px; font-size:11px; color:#888; outline:none; width:180px; font-family:'Inter',sans-serif;" />
-        
-        <!-- Notification bell -->
-        <div onclick="location.href='/dashboard/notifications'" style="width:32px; height:32px; background:rgba(139,29,29,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(139,29,29,0.2); position:relative; cursor:pointer;">
-          <i data-lucide="bell" style="stroke: #8B1D1D; width: 15px; height: 15px; stroke-width: 1.5;"></i>
-          {% if notif_count and notif_count > 0 %}
-          <span style="position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: #8B1D1D;"></span>
-          {% endif %}
+        <!-- Right side -->
+        <div class="dash-top-actions">
         </div>
-      </div>
-    </div>
+    </header>
 
     <!-- Scrollable content area -->
-    <div style="flex:1; overflow-y:auto; padding:24px 28px; padding-bottom: 80px;">
+    <div class="dash-content">
       
-      <!-- ALL EXISTING DASHBOARD CONTENT -->
-<div class="dash-page" style="padding: 0;">
-  <div class="dash-container fade-up" style="margin: 0; max-width: none;">
-      <div class="prof-avatar">
-        {{ session.get('name', 'Student')[:2].upper() }}
-      </div>
-      <div class="prof-info">
-        <h1 class="prof-name">{{ session.get('name', 'Student Name') }}</h1>
-        <div class="prof-meta">
-          <div class="meta-chip">USN/Roll: <strong>AIS22CS045</strong></div>
-          <div class="meta-chip">Current CGPA: <strong>8.42</strong></div>
-          <div class="meta-chip">Semester: <strong>S6</strong></div>
+      <!-- Profile Header Snapshot -->
+      <div class="prof-header fade-up">
+        <div class="prof-avatar">
+          {{ session.get('name', 'Student')[:2].upper() }}
         </div>
-        <button class="edit-prof-btn" onclick="openModal()">Edit Profile</button>
+        <div class="prof-info">
+          <h1 class="prof-name">{{ session.get('name', 'Student Name') }}</h1>
+          <div class="prof-meta">
+            <div class="meta-chip">USN: <strong>{{ session.get('user_id', 'AIS22CS045') }}</strong></div>
+            <div class="meta-chip">CGPA: <strong>{{ performance.cgpa if performance else '0.0' }}</strong></div>
+            <div class="meta-chip">Semester: <strong>S6</strong></div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- MAIN GRID -->
-    <div class="dashboard-grid">
-
-      <!-- LEFT COL -->
-      <div class="grid-left">
+ 
+      <!-- BENTO GRID CONTENT -->
+      <div class="bento-grid">
         
-        <!-- 2. ACADEMIC & PLACEMENT TRACKER -->
-        <section class="dash-section" style="margin-bottom: 32px;">
-          <div class="section-title">Academic & Placement Tracker</div>
-          <div class="tracker-grid">
-            <div class="track-card">
-              <span class="track-label">Attendance %</span>
-              <span class="track-val">87.5%</span>
+        <div class="dash-card">
+          <div class="dash-card-title">
+            <i data-lucide="trending-up" style="width:14px; height:14px;"></i> Academic Tracker
+          </div>
+          <div style="display: flex; gap: 20px;">
+            <div style="flex:1;">
+              <div class="track-label">Credits Earned</div>
+              <div class="dash-card-value">{{ performance.credits if performance else '0' }}</div>
             </div>
-            <div class="track-card">
-              <span class="track-label">Credits Earned</span>
-              <span class="track-val">104</span>
-            </div>
-            <div class="track-card">
-              <span class="track-label">Current Backlogs</span>
-              <span class="track-val">0</span>
+            <div style="flex:1;">
+              <div class="track-label">Semester</div>
+              <div class="dash-card-value">S6</div>
             </div>
           </div>
-          <!-- Placement Eligibility -->
-          <div class="eligibility-banner">
-            <span class="eligibility-icon">✔️</span>
-            <span>Placement Status: Eligible for Tier-1 Drives</span>
-          </div>
-        </section>
+        </div>
 
-        <!-- Classes & Quick Access (preserving old logic) -->
-        <section class="dash-section">
-          <div class="section-title">Class Timetables</div>
+        <!-- Class Timetables -->
+        <div class="dash-card">
+          <div class="dash-card-title">
+            <i data-lucide="clock" style="width:14px; height:14px;"></i> Class Timetables
+          </div>
           <div class="batch-grid">
             {% for batch in all_batches %}
             <a class="batch-card" href="{{ url_for('timetable', batch=batch) }}">
-              🕒 {{ batch }}
+              {{ batch }}
             </a>
             {% endfor %}
           </div>
-        </section>
-      </div>
+        </div>
 
-      <!-- RIGHT COL -->
-      <div class="grid-right">
-        
-        <!-- 3. PROJECT SHOWCASE -->
-        <section class="dash-section" style="margin-bottom: 32px;">
-          <div class="section-title">Project Showcase</div>
-          <div class="proj-list">
-            <div class="proj-card">
-              <h3 class="proj-title">Smart Attendance System</h3>
-              <div class="proj-tags">
-                <span class="ptag">Python</span>
-                <span class="ptag">OpenCV</span>
-                <span class="ptag">MySQL</span>
-              </div>
-            </div>
-            <div class="proj-card">
-              <h3 class="proj-title">CS Connect Portal</h3>
-              <div class="proj-tags">
-                <span class="ptag">React</span>
-                <span class="ptag">Node.js</span>
-                <span class="ptag">Flask</span>
-              </div>
-            </div>
+        <!-- Internal Marks -->
+        <div class="dash-card card-wide">
+          <div class="dash-card-title">
+            <i data-lucide="award" style="width:14px; height:14px;"></i> Internal Marks (Recent)
           </div>
-        </section>
+          <div style="overflow-x: auto;">
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem;">
+              <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #f0f0f0;">
+                  <th style="padding: 8px 4px;">Subject</th>
+                  <th style="padding: 8px 4px;">In-1</th>
+                  <th style="padding: 8px 4px;">In-2</th>
+                  <th style="padding: 8px 4px;">Assgn</th>
+                  <th style="padding: 8px 4px; font-weight:700;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if internal_marks %}
+                  {% for mark in internal_marks %}
+                  <tr style="border-bottom: 1px solid #f9f9f9;">
+                    <td style="padding: 8px 4px; color: var(--text-primary);">{{ mark.subject_name }}</td>
+                    <td style="padding: 8px 4px;">{{ mark.internal_1 }}</td>
+                    <td style="padding: 8px 4px;">{{ mark.internal_2 }}</td>
+                    <td style="padding: 8px 4px;">{{ mark.assignment }}</td>
+                    <td style="padding: 8px 4px; font-weight:700; color: var(--accent-crimson);">{{ mark.total }}</td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">No records found.</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-        <!-- 4. DOCUMENT VAULT -->
-        <section class="dash-section">
-          <div class="section-title">Document Vault</div>
+        <!-- Documents -->
+        <div class="dash-card">
+          <div class="dash-card-title">
+            <i data-lucide="file-check" style="width:14px; height:14px;"></i> Document Vault
+          </div>
           <div class="doc-list">
-            <div class="doc-item">
-              <div class="doc-name">📄 Resume_v3_Final.pdf</div>
-              <a href="#" class="doc-action">View</a>
-            </div>
             <div class="doc-item">
               <div class="doc-name">📊 S5_Grade_Card.pdf</div>
               <a href="#" class="doc-action">View</a>
             </div>
           </div>
-          <button class="upload-btn">+ Upload New Document</button>
-          <button class="upload-btn" onclick="location.href='/dashboard/syllabus'" style="margin-top: 12px; background: rgba(139,29,29,0.1); border: 1px solid rgba(139,29,29,0.3); color: #8B1D1D;">
-            <i data-lucide="download" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> Download Syllabus & Resources
-          </button>
-        </section>
+          <button class="upload-btn" style="border-style: dashed; border-width: 1px;">+ Upload New</button>
+        </div>
 
-      </div>
-    </div>
-
-      </div>
+      </div><!-- End Bento -->
+      
     </div>
   </div>
 </div>
 
-<!-- EDIT PROFILE MODAL (SLIDE OVER / POPUP) -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal-content">
-    <div class="modal-hdr">
-      <h2>Edit Profile</h2>
-      <button class="close-modal" onclick="closeModal()">&times;</button>
-    </div>
-    <form onsubmit="event.preventDefault(); alert('Profile Updated Successfully!'); closeModal();">
-      <div class="form-group">
-        <label>Primary Email</label>
-        <input type="email" value="student@aisat.ac.in" required>
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" value="+91 98765 43210" required>
-      </div>
-      <div class="form-group">
-        <label>LinkedIn Profile URL</label>
-        <input type="url" value="https://linkedin.com/in/student" required>
-      </div>
-      <div class="form-group">
-        <label>GitHub Profile URL</label>
-        <input type="url" value="https://github.com/student" required>
-      </div>
-      <button type="submit" class="save-btn">Save Changes</button>
-    </form>
-  </div>
-</div>
+<!-- Dashboard content ends -->
 
 {% endblock %}
 
@@ -288,28 +193,5 @@
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
-
-  // Simple Modal Logic
-  const modal = document.getElementById('editModal');
-  function openModal() {
-    modal.classList.add('active');
-  }
-  function closeModal() {
-    modal.classList.remove('active');
-  }
-  // Close on outside click
-  modal.addEventListener('click', (e) => {
-    if(e.target === modal) closeModal();
-  });
-
-  // Fade Up
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.fade-up').forEach(el => {
-      setTimeout(() => {
-        el.style.opacity = 1;
-        el.style.transform = 'translateY(0)';
-      }, 50);
-    });
-  });
 </script>
 {% endblock %}

@@ -33,7 +33,7 @@
                 <div style="flex: 1;">
                     <p style="margin: 0 0 6px 0; font-size: 0.92rem; color: #222; line-height: 1.5;
                                   font-weight: {{ '600' if not n.read_status else 'normal' }};">
-                        {{ n.message }}
+                        {{ n.message|safe }}
                     </p>
                     <p style="margin: 0; font-size: 0.78rem; color: #aaa;">
                         <i class="far fa-clock" style="margin-right: 4px;"></i>

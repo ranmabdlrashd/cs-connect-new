@@ -10,12 +10,6 @@ class Placement:
         conn.close()
         return dict(user) if user else None
 
-    @staticmethod
-    def get_average_attendance(student_id):
-        conn = get_db()
-        att_row = conn.execute("SELECT AVG(percentage) FROM attendance WHERE student_id = %s", (student_id,)).fetchone()
-        conn.close()
-        return float(att_row[0]) if att_row and att_row[0] is not None else 0.0
 
     @staticmethod
     def get_active_drives(user_cgpa, user_branch, user_batch):

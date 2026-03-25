@@ -3,8 +3,8 @@
    ============================================================================= */
 
 .faculty-detail-page {
-  background: #0A0A0A;
-  color: #F5E6BE;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   padding: 40px 48px;
@@ -13,7 +13,7 @@
 /* --- 1. SKELETON LOADER --- */
 .pulse-skeleton {
   animation: pulse-bg 1.5s infinite ease-in-out;
-  background: rgba(245, 230, 190, 0.03);
+  background: var(--border);
   border-radius: 8px;
 }
 @keyframes pulse-bg {
@@ -32,7 +32,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 10px;
   margin-bottom: 32px;
@@ -52,8 +52,8 @@
 .profile-card-sticky {
   position: sticky;
   top: 100px;
-  background: #121212;
-  border: 1px solid rgba(245,230,190,0.06);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 32px;
   text-align: center;
@@ -66,7 +66,7 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(139,29,29,0.3);
-  background: #0d0d0d;
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,7 +76,7 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #8B1D1D, #6B1010);
-  color: #F5E6BE;
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,13 +115,13 @@
   text-decoration: none;
   transition: 0.3s;
 }
-.contact-btn:hover { background: #8B1D1D; color: #fff; }
+.contact-btn:hover { background: #8B1D1D; color: #FFFFFF; }
 
 .profile-bio {
   font-size: 12px;
-  color: #666;
+  color: var(--text-muted);
   line-height: 1.6;
-  border-top: 1px solid rgba(245,230,190,0.05);
+  border-top: 1px solid var(--border);
   padding-top: 20px;
 }
 
@@ -142,7 +142,7 @@
 .section-title {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: #F5E6BE;
+  color: var(--text-primary);
 }
 
 /* Academic Background */
@@ -152,29 +152,29 @@
   padding-left: 24px;
   border-left: 1px solid rgba(139,29,29,0.2);
 }
-.acad-degree { color: #F5E6BE; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.acad-degree { color: var(--text-primary); font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 .acad-major { color: #8B1D1D; font-size: 11px; margin-bottom: 2px; }
-.acad-univ { color: #666; font-size: 11px; }
+.acad-univ { color: var(--text-muted); font-size: 11px; }
 
 /* Research & Publications */
 .pub-list { display: grid; grid-template-columns: 1fr; gap: 16px; }
 .pub-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(245,230,190,0.04);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   padding: 18px;
   border-radius: 10px;
 }
-.pub-title { font-size: 12px; font-style: italic; color: #A0A0A0; margin-bottom: 8px; line-height: 1.5; }
-.pub-meta { color: #666; font-size: 10px; display: flex; justify-content: space-between; align-items: center; }
+.pub-title { font-size: 12px; font-style: italic; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.pub-meta { color: var(--text-muted); font-size: 10px; display: flex; justify-content: space-between; align-items: center; }
 .pub-link { color: #8B1D1D; text-decoration: none; font-weight: 600; }
 .pub-link:hover { text-decoration: underline; }
 
 /* Interests Tags */
 .tags-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
 .interest-tag {
-  background: #121212;
-  border: 1px solid rgba(139,29,29,0.2);
-  color: #F5E6BE;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  color: var(--text-primary);
   padding: 6px 14px;
   border-radius: 50px;
   font-size: 11px;
@@ -185,7 +185,7 @@
 .activity-list li {
   position: relative;
   padding-left: 20px;
-  color: #888;
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.8;
   margin-bottom: 12px;

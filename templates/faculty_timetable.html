@@ -1,109 +1,124 @@
-{% extends "faculty_dashboard.html" %}
+{% extends "base.html" %}
 
 {% block title %}Faculty Timetable - CS Connect{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-    .ft-page { max-width: 1200px; margin: 40px auto; padding: 0 20px 60px; }
-    .ft-header { background: linear-gradient(135deg, #121212, #0a0a0a); border: 1px solid rgba(245,230,190,0.1); color: #fff; border-radius: 14px; padding: 30px 36px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .ft-header h1 { margin: 0; font-size: 1.7rem; color: #F5E6BE; font-family: 'Playfair Display', serif; }
-    .ft-header p { margin: 4px 0 0; color: #A0A0A0; font-size: 0.9rem; }
-    .ft-badge { background: rgba(139,29,29,0.15); border: 1px solid rgba(139,29,29,0.3); border-radius: 8px; padding: 8px 18px; font-size: 0.85rem; font-weight: 600; color: #D0D0D0; }
+  /* Page-specific overrides */
+  nav, .news-ticker { display: none !important; }
+  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
-    .ft-table-wrap { overflow-x: auto; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.2); border: 1px solid rgba(245,230,190,0.05); }
-    table.ft-tbl { width: 100%; border-collapse: collapse; background: #0A0A0A; font-size: 0.82rem; min-width: 780px; }
-    table.ft-tbl th { background: #121212; color: #A0A0A0; padding: 12px 10px; text-align: center; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    table.ft-tbl td { padding: 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
-    table.ft-tbl td.day-label { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; background: #121212; color: #F5E6BE; padding: 10px 12px; }
+  .timetable-card {
+    background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 0; overflow: hidden;
+  }
+  .ft-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  .ft-table th { background: #FDFCF8; padding: 14px; font-size: 0.7rem; color: var(--accent-crimson); text-transform: uppercase; border-right: 1px solid #F0EBE0; border-bottom: 2px solid #F0EBE0; }
+  .ft-table td { border-right: 1px solid #F0EBE0; border-bottom: 1px solid #F0EBE0; padding: 0; vertical-align: middle; text-align: center; }
+  .day-label { background: #FDFCF8; font-weight: 800; color: var(--accent-crimson); font-size: 0.8rem; padding: 16px !important; }
 
-    .ft-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px 6px; min-height: 60px; height: 100%; border-radius: 6px; margin: 3px; color: #fff; font-weight: 600; font-size: 0.82rem; transition: 0.2s; background: rgba(139,29,29,0.2); border: 1px solid rgba(139,29,29,0.4); cursor: pointer; }
-    .ft-slot:hover { transform: scale(1.04); background: rgba(139,29,29,0.4); border-color: #8B1D1D; z-index: 2; position: relative; }
-    .ft-slot .subj { font-size: 0.88rem; font-weight: 700; color: #F5E6BE; }
-    .ft-slot .batch { font-size: 0.68rem; color: #D0D0D0; }
-    .ft-empty { background: transparent; }
-    
-    .back-btn { display: inline-block; color: #888; text-decoration: none; margin-bottom: 24px; font-weight: 500; font-size: 14px; transition: 0.2s;}
-    .back-btn:hover { color: #F5E6BE; transform: translateX(-4px); }
+  .slot {
+    padding: 10px; margin: 4px; border-radius: 8px; font-size: 0.8rem; font-weight: 700;
+    display: flex; flex-direction: column; gap: 2px;
+    background: #FFF9F9; border: 1px solid rgba(139, 29, 29, 0.1); color: var(--accent-crimson);
+    transition: all 0.2s;
+  }
+  .slot:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+  .slot .batch { font-size: 0.65rem; color: var(--text-secondary); font-weight: 500; }
+  
+  .slot-lab { background: #E8F5E9; border-color: rgba(46, 125, 50, 0.1); color: #2E7D32; }
 </style>
+<script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
-{% block faculty_content %}
-<div class="ft-page">
-    <a href="/faculty-dashboard" class="back-btn">&larr; Back to Faculty Dashboard</a>
-
-    <div class="ft-header">
-        <div>
-            <h1>Faculty Master Schedule</h1>
-            <p>Your personalized class and lab schedule across all batches.</p>
-        </div>
-        <span class="ft-badge">Current Semester Term</span>
+{% block content %}
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="calendar" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/faculty-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item" title="Marks" onclick="location.href='/marks-entry'"><i data-lucide="edit-3"></i></div>
+      <div class="dash-sidebar-item active" title="Timetable"><i data-lucide="calendar"></i></div>
+      <div class="dash-sidebar-item" title="Materials" onclick="location.href='/faculty/upload-material'"><i data-lucide="upload"></i></div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/library'"><i data-lucide="book-open"></i></div>
+    </nav>
+    <div class="dash-sidebar-bottom">
+      <div class="dash-sidebar-item" title="Logout" onclick="location.href='/logout'"><i data-lucide="log-out"></i></div>
     </div>
+  </aside>
 
-    <div class="ft-table-wrap">
-        <table class="ft-tbl">
-            <thead>
-                <tr>
-                    <th>Day / Period</th>
-                    <th>P1 (8:30 - 9:30)</th>
-                    <th>P2 (9:30 - 10:30)</th>
-                    <th>P3 (10:45 - 11:45)</th>
-                    <th>P4 (11:45 - 12:45)</th>
-                    <th>P5 (1:30 - 2:30)</th>
-                    <th>P6 (2:30 - 3:30)</th>
-                    <th>P7 (3:30 - 4:30)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Mock Faculty Timetable Data -->
-                <tr>
-                    <td class="day-label">MON</td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (A)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td colspan="2"><div class="ft-slot" style="background: rgba(38, 166, 154, 0.2); border-color: rgba(38, 166, 154, 0.4);"><span class="subj" style="color: #4db6ac;">CSL332 (LAB)</span><span class="batch">Batch 9 (B1)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (B)</span></div></td>
-                    <td class="ft-empty"></td>
-                </tr>
-                <tr>
-                    <td class="day-label">TUE</td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (A)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (B)</span></div></td>
-                    <td colspan="2"><div class="ft-slot" style="background: rgba(38, 166, 154, 0.2); border-color: rgba(38, 166, 154, 0.4);"><span class="subj" style="color: #4db6ac;">CSL332 (LAB)</span><span class="batch">Batch 9 (B2)</span></div></td>
-                    <td class="ft-empty"></td>
-                </tr>
-                <tr>
-                    <td class="day-label">WED</td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (B)</span></div></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (C)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (A)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td class="ft-empty"></td>
-                </tr>
-                <tr>
-                    <td class="day-label">THU</td>
-                    <td class="ft-empty"></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (C)</span></div></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (A)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (B)</span></div></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (C)</span></div></td>
-                </tr>
-                <tr>
-                    <td class="day-label">FRI</td>
-                    <td colspan="2"><div class="ft-slot" style="background: rgba(38, 166, 154, 0.2); border-color: rgba(38, 166, 154, 0.4);"><span class="subj" style="color: #4db6ac;">CSL332 (LAB)</span><span class="batch">Batch 9 (B3)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td class="ft-empty"></td>
-                    <td><div class="ft-slot"><span class="subj">CS304</span><span class="batch">Batch 9 (C)</span></div></td>
-                    <td class="ft-empty"></td>
-                    <td class="ft-empty"></td>
-                </tr>
-            </tbody>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Faculty &middot; <b>Class Schedule</b></div>
+
+    </header>
+
+    <div class="dash-content">
+      <div class="dashboard-header" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent-crimson); font-weight: 800; margin: 0;">Master Schedule</h1>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 4px 0 0 0;">Weekly timetable for current semester.</p>
+          </div>
+          <button class="dash-btn-primary" style="padding: 10px 16px; font-size: 0.8rem;">
+            <i data-lucide="download" style="width:14px; height:14px;"></i> Export PDF
+          </button>
+      </div>
+
+      <div class="timetable-card">
+        <table class="ft-table">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Day</th>
+              <th>P1 <br><small>8:30-9:30</small></th>
+              <th>P2 <br><small>9:30-10:30</small></th>
+              <th>P3 <br><small>10:45-11:45</small></th>
+              <th>P4 <br><small>11:45-12:45</small></th>
+              <th>P5 <br><small>1:30-2:30</small></th>
+              <th>P6 <br><small>2:30-3:30</small></th>
+              <th>P7 <br><small>3:30-4:30</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="day-label">MON</td>
+              <td><div class="slot"><span>CS304</span><span class="batch">S6 CSE A</span></div></td>
+              <td></td>
+              <td colspan="2"><div class="slot slot-lab"><span>CSL332</span><span class="batch">S6 CSE B1</span></div></td>
+              <td></td>
+              <td><div class="slot"><span>CS304</span><span class="batch">S6 CSE A</span></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="day-label">TUE</td>
+              <td></td>
+              <td><div class="slot"><span>CS304</span><span class="batch">S6 CSE A</span></div></td>
+              <td></td>
+              <td><div class="slot"><span>CS202</span><span class="batch">S4 CSE A</span></div></td>
+              <td colspan="2"><div class="slot slot-lab"><span>CSL332</span><span class="batch">S6 CSE B2</span></div></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="day-label">WED</td>
+              <td><div class="slot"><span>CS304</span><span class="batch">S6 CSE B</span></div></td>
+              <td><div class="slot"><span>CS401</span><span class="batch">S8 CSE A</span></div></td>
+              <td></td>
+              <td></td>
+              <td><div class="slot"><span>CS202</span><span class="batch">S4 CSE A</span></div></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
+  </main>
 </div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
 {% endblock %}

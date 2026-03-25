@@ -1,22 +1,22 @@
 /* =============================================================================
    CHATBOT UI — PREMIUM DARK FLOATING WIDGET
-   Design: Dark Academic   |   Accent: Crimson #8B1D1D   |   Text: #F5E6BE
+   Design: Dark Academic   |   Accent: Crimson #8B1D1D   |   Text: var(--text-primary)
    ============================================================================= */
 
 /* ── Variables ─────────────────────────────────────────────────────── */
 :root {
-  --chat-bg:         #0e0e0e;
-  --chat-surface:    #161616;
-  --chat-surface-2:  #1e1e1e;
+  --chat-bg:         var(--surface);
+  --chat-surface:    var(--bg-color);
+  --chat-surface-2:  #F4F1EA;
   --chat-accent:     #8B1D1D;
   --chat-accent-dk:  #6B1010;
-  --chat-text:       #F5E6BE;
-  --chat-text-sec:   #A0A0A0;
-  --chat-border:     rgba(245,230,190,0.08);
-  --chat-border-acc: rgba(139,29,29,0.35);
+  --chat-text:       var(--text-primary);
+  --chat-text-sec:   var(--text-muted);
+  --chat-border:     rgba(45, 41, 38, 0.1);
+  --chat-border-acc: rgba(139, 29, 29, 0.2);
   --chat-radius:     20px;
   --chat-w:          380px;
-  --chat-h:          560px;
+  --chat-h:          500px;
 }
 
 /* ── Animations ────────────────────────────────────────────────────── */
@@ -40,53 +40,16 @@
 /* ── Container ─────────────────────────────────────────────────────── */
 .chatbot-container {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
-  z-index: 9990;
+  bottom: 24px;
+  right: 24px;
+  z-index: 20000;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
 }
 
-/* ── Quick Pills (closed state) ────────────────────────────────────── */
-.chatbot-quick-pills {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.chatbot-quick-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  background: var(--chat-surface);
-  border: 1px solid var(--chat-border-acc);
-  border-radius: 30px;
-  color: var(--chat-text);
-  font-size: 12px;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s, transform 0.2s;
-  user-select: none;
-}
-.chatbot-quick-pill:hover {
-  background: var(--chat-accent-dk);
-  transform: translateX(-4px);
-}
-.pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--chat-accent);
-  flex-shrink: 0;
-}
-
-/* ── Tooltip ───────────────────────────────────────────────────────── */
+/* -- Tooltip -- */
 .chatbot-tooltip {
   padding: 7px 14px;
   background: var(--chat-surface);
@@ -122,8 +85,8 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-dk));
-  color: var(--chat-text);
+  background: var(--chat-accent);
+  color: #F4F1EA;
   border: none;
   cursor: pointer;
   display: flex;
@@ -154,20 +117,21 @@
   width: 42px;
   height: 42px;
   background: var(--chat-surface-2);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
 /* ── Chat Window ───────────────────────────────────────────────────── */
 .chatbot-window {
   position: fixed;
-  bottom: 100px;
-  right: 28px;
+  bottom: 92px;
+  right: 24px;
   width: var(--chat-w);
   height: var(--chat-h);
+  max-height: calc(100vh - 220px);
   background: var(--chat-bg);
   border: 1px solid var(--chat-border);
   border-radius: var(--chat-radius);
-  box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px var(--chat-border-acc);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 0 0 1px var(--chat-border-acc);
   display: none;
   flex-direction: column;
   overflow: hidden;
@@ -184,7 +148,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  background: linear-gradient(135deg, var(--chat-accent-dk) 0%, #0e0e0e 100%);
+  background: var(--chat-accent);
   border-bottom: 1px solid var(--chat-border-acc);
   flex-shrink: 0;
 }
@@ -201,10 +165,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: transparent;
+  color: #F4F1EA;
 }
 .gradient-avatar {
-  background: linear-gradient(135deg, var(--chat-accent), #3a0a0a);
-  border: 1px solid var(--chat-border-acc);
+  background: transparent;
+  border: none;
 }
 .mini-bot-avatar {
   width: 28px;
@@ -218,11 +184,11 @@
   font-family: 'Playfair Display', serif;
   font-size: 15px;
   font-weight: 600;
-  color: var(--chat-text);
+  color: #FFFFFF;
 }
 .bot-status {
   font-size: 11px;
-  color: var(--chat-text-sec);
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   gap: 5px;
@@ -243,14 +209,14 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(245,230,190,0.07);
-  border: 1px solid var(--chat-border);
-  color: var(--chat-text-sec);
+  background: rgba(244, 241, 234, 0.15);
+  border: 1px solid rgba(244, 241, 234, 0.3);
+  color: #F4F1EA;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 .chat-action-btn:hover {
   background: rgba(139,29,29,0.3);
@@ -276,7 +242,7 @@
 }
 .chat-context-bar-login {
   padding: 6px 16px;
-  background: rgba(245,230,190,0.04);
+  background: var(--border);
   border-bottom: 1px solid var(--chat-border);
   font-size: 11px;
   color: var(--chat-text-sec);
@@ -337,7 +303,7 @@
 }
 .user-bubble {
   background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-dk));
-  color: var(--chat-text);
+  color: #FFFFFF;
   border-bottom-right-radius: 4px;
   box-shadow: 0 4px 14px rgba(139,29,29,0.35);
 }
@@ -357,7 +323,7 @@
   height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-dk));
-  color: var(--chat-text);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -474,7 +440,7 @@
   border-radius: 9px;
   background: linear-gradient(135deg, var(--chat-accent), var(--chat-accent-dk));
   border: none;
-  color: var(--chat-text);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -493,7 +459,7 @@
   justify-content: space-between;
   padding: 4px 2px 0;
   font-size: 10px;
-  color: #555;
+  color: var(--text-muted);
   font-family: 'Inter', sans-serif;
 }
 

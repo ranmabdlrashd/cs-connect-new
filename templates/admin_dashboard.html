@@ -1,237 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS Connect - Admin Command Center</title>
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard_system.css') }}">
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="admin-layout" id="appRoot">
+{% block title %}Admin Dashboard - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard_system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+<style>
+
+  body { margin: 0; padding: 0; background: var(--bg-color); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrapper fade-up">
     <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-        <div class="header-area">
-            <div class="logo-row">
-                <div class="logo-square"></div>
-                <div class="logo-text">CS Connect</div>
-            </div>
-            <div class="sub-text">Admin Panel</div>
+    <aside class="dash-sidebar">
+        <div class="dash-sidebar-logo">
+            <div style="width:20px; height:20px; background:white; border-radius:4px;"></div>
         </div>
         
-        <nav class="nav-sections">
-            <div>
-                <div class="nav-section-label">Overview</div>
-                <div class="nav-item active">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span class="label">Dashboard</span>
-                </div>
-                <a href="{{ url_for('admin_bp.admin_users') }}" class="nav-item">
-                    <i data-lucide="users"></i>
-                    <span class="label">User Management</span>
-                </a>
+        <nav class="dash-sidebar-items">
+            <div class="dash-sidebar-item active" title="Dashboard" onclick="location.href='{{ url_for('admin_bp.admin_command_center') }}'">
+                <i data-lucide="layout-dashboard"></i>
             </div>
-
-            <div>
-                <div class="nav-section-label">Academic</div>
-                <div class="nav-item">
-                    <i data-lucide="book-open"></i>
-                    <span class="label">Courses</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="check-square"></i>
-                    <span class="label">Attendance</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="calendar"></i>
-                    <span class="label">Timetable</span>
-                </div>
+            <div class="dash-sidebar-item" title="Users" onclick="location.href='{{ url_for('admin_bp.admin_users') }}'">
+                <i data-lucide="users"></i>
             </div>
-
-            <div>
-                <div class="nav-section-label">Content</div>
-                <div class="nav-item">
-                    <i data-lucide="bell-ring"></i>
-                    <span class="label">Notice Board</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="briefcase"></i>
-                    <span class="label">Placements</span>
-                </div>
+            <div class="dash-sidebar-item" title="Library Requests" onclick="location.href='{{ url_for('admin_bp.admin_library_dashboard') }}'">
+                <i data-lucide="bell-ring"></i>
             </div>
-
-            <div>
-                <div class="nav-section-label">Finance</div>
-                <a href="{{ url_for('admin_bp.admin_fees') }}" class="nav-item">
-                    <i data-lucide="credit-card"></i>
-                    <span class="label">Fee Management</span>
-                </a>
+            <div class="dash-sidebar-item" title="Library Management" onclick="location.href='{{ url_for('admin_bp.admin_library_management') }}'">
+                <i data-lucide="book"></i>
             </div>
-
-            <div>
-                <div class="nav-section-label">Analytics</div>
-                <a href="{{ url_for('admin_bp.admin_analytics') }}" class="nav-item">
-                    <i data-lucide="bar-chart-2"></i>
-                    <span class="label">Reports & Analytics</span>
-                </a>
+            <div class="dash-sidebar-item" title="Internal Marks" onclick="location.href='{{ url_for('admin_bp.admin_internal_marks') }}'">
+                <i data-lucide="edit-3"></i>
             </div>
-            
-            <div>
-                <div class="nav-section-label">System</div>
-                <a href="{{ url_for('admin_bp.admin_library_management') }}" class="nav-item">
-                    <i data-lucide="settings"></i>
-                    <span class="label">Settings</span>
-                </a>
+            <div class="dash-sidebar-item" title="Fees" onclick="location.href='{{ url_for('admin_bp.admin_fees') }}'">
+                <i data-lucide="credit-card"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Analytics" onclick="location.href='{{ url_for('admin_bp.admin_analytics') }}'">
+                <i data-lucide="bar-chart-2"></i>
             </div>
         </nav>
 
-        <div class="bottom-user-block">
-            <div class="user-avatar"></div>
-            <div class="user-info">
-                <span class="user-name">System Admin</span>
-                <span class="user-role">Full Access</span>
+        <div class="dash-sidebar-bottom">
+            <div class="dash-sidebar-item" title="Settings">
+                <i data-lucide="settings"></i>
+            </div>
+            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
+                AD
             </div>
         </div>
     </aside>
 
     <!-- MAIN -->
-    <main class="admin-main">
+    <main class="dash-main">
         <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="breadcrumb">
-                Admin &middot; <span class="breadcrumb-active">Dashboard</span>
+        <header class="dash-topbar">
+            <div class="dash-breadcrumb">
+                Admin &middot; <b>Command Center</b>
             </div>
-            <div class="topbar-right">
-                <button class="btn btn-ghost" id="exportBtn">Export Report</button>
-                <button class="btn btn-primary" id="addNoticeBtn">
-                    <i data-lucide="plus" style="width:12px; height:12px"></i> Add Notice
-                </button>
-                <div class="notification-bell">
-                    <i data-lucide="bell"></i>
-                    <div class="bell-dot"></div>
+            <div class="dash-top-actions">
+                <button class="btn-login" style="font-size: 0.8rem; padding: 6px 16px;" id="exportBtn">Export Report</button>
+                <div class="notif-container" style="position:relative; cursor:pointer;">
                 </div>
-                <div class="topbar-date" id="currentDateDisplay">Date Here</div>
             </div>
         </header>
 
         <!-- CONTENT -->
-        <div class="content-area">
+        <div class="dash-content">
             
-            <div class="welcome-header">
-                <div>
-                    <h1 class="welcome-title">Department Command Center</h1>
-                    <p class="welcome-sub">Full administrative overview &mdash; CS Connect Portal</p>
-                </div>
-                <div class="date-badge" id="badgeDateDisplay">Date Here</div>
+            <div class="welcome-header" style="margin-bottom: 32px;">
+                <h1 style="font-family: var(--font-heading); font-size: 2.2rem; color: var(--text-primary); margin-bottom: 8px;">
+                    Department Command Center
+                </h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Full administrative overview — CS Connect Portal</p>
             </div>
 
             <div id="errorContainer"></div>
 
             <!-- METRICS ROW -->
-            <div class="metric-grid" id="metricsRow">
-                <!-- Injected via JS -->
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+            <div class="bento-grid" id="metricsRow">
+                <!-- Skeleton loader while JS fetches data -->
+                <div class="dash-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="dash-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="dash-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
+                <div class="dash-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
             </div>
 
-            <!-- ROW 1 -->
-            <div class="grid-2col">
-                <!-- Users Table -->
-                <div class="card">
-                    <div class="panel-header">
-                        <h2 class="panel-title">Recent User Registrations</h2>
-                        <a href="{{ url_for('admin_bp.admin_users') }}" class="panel-action">Manage Users &rarr;</a>
+            <!-- MAIN GRID -->
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+                
+                <!-- Recent Users -->
+                <div class="dash-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2 style="font-family:var(--font-heading); font-size:1.2rem;">Recent Registrations</h2>
+                        <a href="{{ url_for('admin_bp.admin_users') }}" style="font-size:0.8rem; color:var(--accent-crimson); text-decoration:none; font-weight:600;">Manage &rarr;</a>
                     </div>
-                    <div class="table-container">
-                        <table>
+                    <div class="admin-table-container">
+                        <table class="admin-table">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Role</th>
-                                    <th>ID/Roll</th>
-                                    <th>Registered</th>
                                     <th>Status</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="recentUsersBody">
-                                <tr><td colspan="6"><div class="skeleton" style="height:20px; width:100%"></div></td></tr>
-                                <tr><td colspan="6"><div class="skeleton" style="height:20px; width:100%"></div></td></tr>
+                                <!-- Injected via JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Activity Chart -->
-                <div class="card" style="display:flex; flex-direction:column;">
-                    <h2 class="panel-title" style="margin-bottom:20px;">Portal Activity (This Week)</h2>
-                    <div class="chart-container" id="activityChart">
+                <div class="dash-card">
+                    <h2 style="font-family:var(--font-heading); font-size:1.2rem; margin-bottom:20px;">Portal Activity</h2>
+                    <div class="chart-container" id="activityChart" style="height:150px; background:var(--dash-active-bg); border-radius:12px; margin-bottom:16px;">
                         <!-- Bars injected via JS -->
                     </div>
-                    <div class="mini-stats-row">
-                        <div class="mini-stat">
-                            <span class="mini-stat-label">Active Now</span>
-                            <span class="mini-stat-val large-number" id="statsActiveNow">-</span>
+                    <div style="display:flex; justify-content:space-between;">
+                        <div style="text-align:center;">
+                            <div style="font-size:0.7rem; color:var(--text-muted);">Active Now</div>
+                            <div style="font-weight:700; color:var(--accent-crimson);" id="statsActiveNow">-</div>
                         </div>
-                        <div class="mini-stat">
-                            <span class="mini-stat-label">This Week</span>
-                            <span class="mini-stat-val large-number" id="statsThisWeek">-</span>
-                        </div>
-                        <div class="mini-stat">
-                            <span class="mini-stat-label">Uptime %</span>
-                            <span class="mini-stat-val large-number">99.9%</span>
+                        <div style="text-align:center;">
+                            <div style="font-size:0.7rem; color:var(--text-muted);">Uptime</div>
+                            <div style="font-weight:700; color:#28a745;">99.9%</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ROW 2 -->
-            <div class="grid-3col">
-                <!-- Notices -->
-                <div class="card" style="display:flex; flex-direction:column;">
-                    <div class="panel-header">
-                        <h2 class="panel-title">Manage Notices</h2>
-                        <a href="#" class="panel-action">+ New</a>
-                    </div>
-                    <div id="noticesList">
-                        <div class="skeleton" style="height:40px; margin-bottom:8px"></div>
-                        <div class="skeleton" style="height:40px; margin-bottom:8px"></div>
-                    </div>
-                    <div class="quick-notice-form mt-auto">
-                        <input type="text" class="quick-notice-input" placeholder="Quick Notice Title...">
-                        <button class="btn btn-primary btn-small-action">Post</button>
-                    </div>
-                </div>
-
-                <!-- Approvals -->
-                <div class="card">
-                    <div class="panel-header">
-                        <h2 class="panel-title">Pending Approvals</h2>
-                        <a href="#" class="panel-action" style="color:#555">Review All &rarr;</a>
-                    </div>
-                    <div id="approvalsList">
-                        <div class="skeleton" style="height:60px; margin-bottom:8px"></div>
-                        <div class="skeleton" style="height:60px; margin-bottom:8px"></div>
-                    </div>
-                </div>
-
-                <!-- System Status -->
-                <div class="card" style="display:flex; flex-direction:column;">
-                    <h2 class="panel-title" style="margin-bottom:16px;">System Status</h2>
-                    <div id="systemStatusList">
-                        <div class="skeleton" style="height:20px; margin-bottom:12px"></div>
-                        <div class="skeleton" style="height:20px; margin-bottom:12px"></div>
-                    </div>
-                    <div class="sys-warning" id="sysWarning" style="display:none;">
-                        Attention: One or more services are operating under degraded capacity.
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -240,5 +140,10 @@
 
 <!-- JS Main Logic -->
 <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
-</body>
-</html>
+<script src="{{ url_for('static', filename='js/notifications_handler.js') }}"></script>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+{% endblock %}

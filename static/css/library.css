@@ -1,12 +1,12 @@
 :root {
-    --primary-red: #a41f13;
-    --bg-off-white: #faf5f1;
-    --neutral-gray: #e0dbd8;
-    --dark-charcoal: #292f36;
-    --taupe-brown: #8f7a6e;
+    --primary-red: #8B1D1D;
+    --bg-off-white: #FDFCF8;
+    --neutral-gray: rgba(45, 41, 38, 0.1);
+    --dark-charcoal: #1A1A1A;
+    --taupe-brown: #595959;
     --glass: rgba(255, 255, 255, 0.9);
-    --glass-dark: rgba(41, 47, 54, 0.8);
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --glass-dark: rgba(255, 255, 255, 0.8);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -25,7 +25,7 @@ body {
 /* Page Header */
 .page-header {
     height: 40vh;
-    background: linear-gradient(135deg, var(--primary-red), var(--dark-charcoal));
+    background: linear-gradient(135deg, var(--primary-red), #5a1212);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -129,9 +129,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--dark-charcoal);
-    color: white;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     padding: 2.5rem 3rem;
+    border: 1px solid var(--border);
     border-radius: 30px;
     margin-bottom: 4rem;
 }
@@ -151,11 +152,11 @@ body {
 }
 
 .action-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     padding: 0.8rem 1.5rem;
     border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border);
     transition: 0.3s;
     cursor: pointer;
     text-decoration: none;
@@ -292,7 +293,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #888;
+    color: var(--text-muted);
     font-size: 0.95rem;
     margin-bottom: 2rem;
 }

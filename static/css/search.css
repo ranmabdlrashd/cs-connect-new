@@ -4,8 +4,8 @@
    ============================================================================= */
 
 .search-page {
-  background: #0A0A0A;
-  color: #F5E6BE;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   padding-bottom: 80px;
@@ -14,21 +14,21 @@
 /* Header */
 .search-header {
   padding: 60px 40px 40px;
-  background: linear-gradient(180deg, rgba(139,29,29,0.05) 0%, #0A0A0A 100%);
-  border-bottom: 1px solid rgba(245,230,190,0.05);
+  background: linear-gradient(180deg, #F4F1EA 0%, var(--bg-primary) 100%);
+  border-bottom: 1px solid var(--border);
 }
 .search-title {
   font-family: 'Playfair Display', serif;
   font-size: 36px;
-  color: #F5E6BE;
+  color: var(--text-primary);
   margin: 0 0 12px;
 }
 .search-meta {
   font-size: 14px;
-  color: #A0A0A0;
+  color: var(--text-muted);
 }
 .search-meta span {
-  color: #F5E6BE;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -52,7 +52,7 @@
 /* Filter Pills */
 .rs-filter-widget h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 18px; color: #F5E6BE; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px dashed rgba(139,29,29,0.3);
+  font-size: 18px; color: var(--text-primary); margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px dashed rgba(139,29,29,0.3);
 }
 .rs-filter-list {
   display: flex;
@@ -60,16 +60,16 @@
   gap: 8px;
 }
 .filter-pill {
-  width: 100%; text-align: left; padding: 12px 16px; background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(245,230,190,0.05); border-radius: 8px; color: #A0A0A0;
+  width: 100%; text-align: left; padding: 12px 16px; background: var(--bg-primary);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted);
   font-size: 13px; cursor: pointer; transition: 0.3s;
 }
-.filter-pill:hover { background: rgba(139,29,29,0.05); color: #F5E6BE; border-color: rgba(139,29,29,0.3); }
-.filter-pill.active { background: #8B1D1D; color: #fff; border-color: #8B1D1D; font-weight: 600; }
+.filter-pill:hover { background: rgba(139,29,29,0.05); color: var(--text-primary); border-color: rgba(139,29,29,0.3); }
+.filter-pill.active { background: #8B1D1D; color: #FFFFFF; border-color: #8B1D1D; font-weight: 600; }
 
 /* Intelligent Tips */
 .search-tips {
-  background: #121212;
+  background: var(--bg-secondary);
   border: 1px solid rgba(139,29,29,0.3);
   border-radius: 12px;
   padding: 24px;
@@ -81,12 +81,12 @@
 .tips-title { font-size: 14px; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 16px; }
 .tips-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .tips-list li {
-  font-size: 13px; color: #A0A0A0; line-height: 1.5; padding-left: 16px; position: relative;
+  font-size: 13px; color: var(--text-muted); line-height: 1.5; padding-left: 16px; position: relative;
 }
 .tips-list li::before {
   content: '›'; position: absolute; left: 0; color: #8B1D1D; font-weight: bold;
 }
-.tips-list li strong { color: #F5E6BE; }
+.tips-list li strong { color: var(--text-primary); }
 
 /* Results Area */
 .rs-feed {
@@ -97,8 +97,8 @@
 
 /* Result Card */
 .rs-card {
-  background: #121212;
-  border: 1px solid rgba(245,230,190,0.05);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
   transition: 0.3s;
@@ -127,17 +127,17 @@
 
 .rs-title {
   font-family: 'Playfair Display', serif;
-  font-size: 22px; color: #F5E6BE; margin: 0 0 12px;
+  font-size: 22px; color: var(--text-primary); margin: 0 0 12px;
 }
 
 .rs-snippet {
-  font-size: 14px; color: #A0A0A0; line-height: 1.6; margin: 0;
+  font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0;
 }
 
 /* Keyword Highlighting Marker */
 mark, .highlight-mark {
   background-color: rgba(139, 29, 29, 0.2) !important;
-  color: #F5E6BE !important;
+  color: var(--text-primary) !important;
   border-bottom: 1px solid #8B1D1D !important;
   padding: 0 2px;
 }
@@ -153,11 +153,11 @@ mark, .highlight-mark {
 }
 .rs-empty.active { display: block; }
 .empty-code { font-family: 'Playfair Display', serif; font-size: 48px; color: #8B1D1D; margin: 0 0 16px; }
-.empty-title { font-size: 24px; color: #F5E6BE; margin: 0 0 12px; }
-.empty-sub { font-size: 14px; color: #A0A0A0; margin-bottom: 24px; }
+.empty-title { font-size: 24px; color: var(--text-primary); margin: 0 0 12px; }
+.empty-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
 .sugg-searches { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .sugg-pill {
-  background: rgba(255,255,255,0.02); border: 1px solid rgba(245,230,190,0.1); color: #F5E6BE;
+  background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary);
   padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.3s;
 }
 .sugg-pill:hover { background: rgba(139,29,29,0.1); border-color: #8B1D1D; }

@@ -76,10 +76,7 @@
 
   // Notifications Data
   const NOTIF_FIELDS = {
-    'attendance_alerts': 'Attendance alerts (below 80%)',
-    'assignment_alerts': 'Assignment due date reminders',
     'library_alerts': 'Library due date alerts',
-    'placement_alerts': 'Placement drive notifications',
     'department_notices': 'Department notices',
     'exam_alerts': 'Exam schedule alerts'
   };

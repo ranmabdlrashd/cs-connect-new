@@ -1,441 +1,138 @@
 {% extends "base.html" %}
 
-{% block title %}Download Syllabus - CS Connect{% endblock %}
+{% block title %}Syllabus & Resources - CS Connect{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-  /* DESIGN SYSTEM — apply strictly to every element */
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+  /* Page-specific overrides */
+  nav, .news-ticker { display: none !important; }
+  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
-  :root {
-    --bg-primary: #0A0A0A;
-    --bg-secondary: #121212;
-    --bg-card: #0e0e0e;
-    --bg-hover: #160808;
-    --accent: #8B1D1D;
-    --accent-hover: #a82222;
-    --accent-dark: #6B1010;
-    --cream: #F5E6BE;
-    --text-primary: #e0d6c8;
-    --text-muted: #A0A0A0;
-    --text-dim: #666666;
-    --text-ghost: #555555;
-    --text-dead: #444444;
-    --border: rgba(245,230,190,0.06);
-    --border-accent: rgba(139,29,29,0.3);
-    --border-focus: rgba(139,29,29,0.4);
-    --green: #3a8834;
-    --amber: #b85a00;
-    --red: #8B1D1D;
-  }
+  .resource-header { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 32px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .header-content h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 2.2rem; }
+  .header-content p { margin: 8px 0 0; color: var(--text-secondary); font-size: 0.95rem; }
 
-  body {
-    margin: 0; padding: 0; overflow: hidden; background: var(--bg-primary);
-    font-family: 'Inter', sans-serif;
-    color: var(--text-primary);
+  .sem-tabs { display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px; }
+  .sem-tab {
+    padding: 10px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; border: 1px solid var(--border-accent); background: white; color: var(--text-secondary);
   }
+  .sem-tab.active { background: var(--accent-crimson); color: white; border-color: var(--accent-crimson); box-shadow: 0 4px 12px rgba(139, 29, 29, 0.15); }
 
-  h1, h2, h3, .font-playfair, .large-number {
-    font-family: 'Playfair Display', serif;
-    color: var(--cream);
-  }
-  
-  .custom-nav, .news-ticker { display: none !important; }
-
-  /* Generic UI */
-  a { text-decoration: none; }
-  button { font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s ease; }
-  
-  /* Sidebar styles matching student_dashboard */
-  .dash-sidebar-item {
-    width: 40px; height: 40px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 8px;
-  }
-  .dash-sidebar-item.active {
-    background: rgba(139,29,29,0.2);
-  }
-  .dash-sidebar-item:hover {
-    background: rgba(139,29,29,0.1);
-  }
-
-  /* BUTTONS */
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-    color: var(--cream);
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
-  .btn-primary:hover { opacity: 0.9; }
-  
-  .btn-download {
-    background: rgba(139,29,29,0.15);
-    border: 1px solid rgba(139,29,29,0.3);
-    color: var(--accent);
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .btn-download:hover { background: rgba(139,29,29,0.25); color: var(--cream); }
-
-  /* TABS */
-  .tab-pill {
-    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s ease;
-  }
-  .tab-pill.active {
-    background: rgba(139,29,29,0.2);
-    border: 1px solid rgba(139,29,29,0.4);
-    color: var(--cream);
-  }
-  .tab-pill.inactive {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(245,230,190,0.06);
-    color: #666;
-  }
-  .tab-pill.inactive:hover {
-    background: rgba(255,255,255,0.06);
-    color: var(--text-primary);
-  }
-
-  /* CARDS */
-  .panel {
-    background: #121212;
-    border: 1px solid rgba(245,230,190,0.06);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-
-  .resource-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 16px;
-  }
-
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
   .resource-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: all 0.2s ease;
+    background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px; transition: all 0.2s;
   }
-  .resource-card:hover {
-    border-color: var(--border-accent);
-    background: var(--bg-hover);
-  }
-
-  .resource-icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: rgba(139,29,29,0.1);
-    color: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .resource-middle {
-    flex: 1;
-    display: flex; flex-direction: column; gap: 4px;
-    min-width: 0;
-  }
-  .resource-name {
-    color: var(--cream); font-size: 14px; font-weight: 500;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .resource-meta {
-    color: #555; font-size: 12px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .resource-right {
-    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-  }
-  .file-size { color: #444; font-size: 12px; }
-
-  /* UTILS */
-  .skeleton {
-    animation: shimmer 1.5s infinite linear;
-    background: linear-gradient(90deg, var(--bg-secondary) 0px, #1a1a1a 40px, var(--bg-secondary) 80px);
-    background-size: 600px;
-    border-radius: 8px;
-  }
-  @keyframes shimmer { 0% { background-position: -100px; } 100% { background-position: 500px; } }
-
-  .empty-state { text-align: center; padding: 60px 20px; color: #555; }
-  .empty-icon { color: #333; margin-bottom: 16px; }
+  .resource-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: var(--accent-crimson); }
   
-  .error-banner {
-    background: rgba(139,29,29,0.1); border: 1px solid var(--border-accent);
-    padding: 16px; border-radius: 8px; color: var(--red);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
-  /* Responsive fixes */
-  @media (max-width: 992px) {
-    .resource-grid { grid-template-columns: 1fr; }
-  }
-
+  .r-top { display: flex; gap: 16px; align-items: flex-start; }
+  .r-icon { width: 48px; height: 48px; border-radius: 12px; background: #FDFCF8; border: 1px solid #F0EBE0; color: var(--accent-crimson); display: flex; align-items: center; justify-content: center; }
+  .r-title { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); font-family: 'Playfair Display', serif; }
+  .r-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+  
+  .r-meta { display: flex; gap: 16px; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: auto; padding-top: 16px; border-top: 1px solid #F0EBE0; }
+  .download-btn { width: 100%; padding: 12px; border-radius: 10px; background: #FDFCF8; border: 1px solid #F0EBE0; color: var(--accent-crimson); font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
+  .download-btn:hover { background: var(--accent-crimson); color: white; border-color: var(--accent-crimson); }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<div style="display:flex; height:100vh; background:var(--bg-primary); overflow:hidden;">
-
-  <!-- ── SIDEBAR ── -->
-  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 10;">
-    <!-- Logo -->
-    <div style="width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--cream)">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-    <!-- Nav icons -->
-    <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/dashboard'">
-      <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Attendance" onclick="location.href='/dashboard/attendance'">
-      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Results" onclick="location.href='/dashboard/results'">
-      <i data-lucide="award" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Assignments" onclick="location.href='/dashboard/assignments'">
-      <i data-lucide="file-text" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Library" onclick="location.href='/student-dashboard/library'">
-      <i data-lucide="book-open" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <!-- The new syllabus tab -->
-    <div class="dash-sidebar-item active" title="Download Syllabus">
-      <i data-lucide="download" style="stroke: var(--accent); width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
-      <i data-lucide="calendar" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Placements" onclick="location.href='/dashboard/placements'">
-      <i data-lucide="briefcase" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-    </div>
-
-    <!-- Bottom section -->
-    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
-      <div class="dash-sidebar-item" title="Settings" onclick="location.href='/dashboard/settings'">
-        <i data-lucide="settings" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5; stroke-linecap: round;"></i>
-      </div>
-      <!-- Avatar -->
-      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--cream); font-family:'Inter',sans-serif;">
-        {% set sname = session.get('name', 'Student') %}
-        {% set parts = sname.split() %}
-        {% if parts|length > 1 %}
-          {{ parts[0][0]|upper }}{{ parts[-1][0]|upper }}
-        {% else %}
-          {{ sname[:2]|upper }}
-        {% endif %}
-      </div>
-    </div>
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="book-open" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'"><i data-lucide="calendar"></i></div>
+      <div class="dash-sidebar-item active" title="Syllabus"><i data-lucide="book-open"></i></div>
+    </nav>
   </aside>
 
-  <!-- ── MAIN CONTENT ── -->
-  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-    
-    <!-- Top bar -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:1px solid var(--border); background:var(--bg-primary); flex-shrink:0;">
-      <!-- Breadcrumb -->
-      <div style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase; font-family:'Inter',sans-serif;">
-        CS Connect &middot; <span style="color:var(--text-muted)">Syllabus & Resources</span>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Academic &middot; <b>Curriculum Resources</b></div>
+      <div class="dash-top-actions">
+
+      </div>
+    </header>
+
+    <div class="dash-content">
+      <div class="resource-header">
+        <div class="header-content">
+          <h1>Syllabus & Material</h1>
+          <p>KTU 2019 Scheme &middot; B.Tech Computer Science Engineering</p>
+        </div>
+        <i data-lucide="library" style="width:64px; height:64px; color:rgba(139, 29, 29, 0.05);"></i>
+      </div>
+
+      <div class="sem-tabs">
+        <div class="sem-tab">S1</div>
+        <div class="sem-tab">S2</div>
+        <div class="sem-tab">S3</div>
+        <div class="sem-tab">S4</div>
+        <div class="sem-tab">S5</div>
+        <div class="sem-tab active">S6</div>
+        <div class="sem-tab">S7</div>
+        <div class="sem-tab">S8</div>
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <div class="r-top">
+            <div class="r-icon"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="r-title">Compiler Design</div>
+              <div class="r-desc">Core theory syllabus covering lexical analysis, parsing, and code generation.</div>
+            </div>
+          </div>
+          <div class="r-meta">
+            <span>S6 Core</span>
+            <span>2.4 MB</span>
+          </div>
+          <button class="download-btn"><i data-lucide="download" style="width:14px;"></i> Download PDF</button>
+        </div>
+
+        <div class="resource-card">
+          <div class="r-top">
+            <div class="r-icon"><i data-lucide="file-text"></i></div>
+            <div>
+              <div class="r-title">Computer Networks</div>
+              <div class="r-desc">Complete syllabus for layered architecture, TCP/IP, and network security.</div>
+            </div>
+          </div>
+          <div class="r-meta">
+            <span>S6 Core</span>
+            <span>1.8 MB</span>
+          </div>
+          <button class="download-btn"><i data-lucide="download" style="width:14px;"></i> Download PDF</button>
+        </div>
+
+        <div class="resource-card">
+          <div class="r-top">
+            <div class="r-icon"><i data-lucide="flask-conical"></i></div>
+            <div>
+              <div class="r-title">Networking Lab Manual</div>
+              <div class="r-desc">Practical guide for socket programming and network simulation experiments.</div>
+            </div>
+          </div>
+          <div class="r-meta">
+            <span>Lab Manual</span>
+            <span>5.2 MB</span>
+          </div>
+          <button class="download-btn"><i data-lucide="download" style="width:14px;"></i> Download PDF</button>
+        </div>
       </div>
     </div>
-
-    <!-- Scrollable content area -->
-    <div style="flex:1; overflow-y:auto; padding:40px 60px; padding-bottom: 80px;">
-      
-      <!-- PAGE HEADER -->
-      <div style="margin-bottom: 32px">
-        <h1 class="font-playfair" style="margin: 0 0 8px 0; font-size: 32px;">Download Syllabus</h1>
-        <div style="color: var(--text-dim); font-size: 14px;">KTU 2019 Scheme &middot; B.Tech CSE &middot; All semesters and lab manuals</div>
-      </div>
-
-      <!-- SEMESTER TABS -->
-      <div style="display:flex; gap:12px; margin-bottom: 32px; overflow-x:auto; padding-bottom:4px;" id="tabs-container">
-        <!-- Filled by JS -->
-      </div>
-
-      <!-- RESOURCES PANEL -->
-      <div class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h2 class="font-playfair" style="margin:0; font-size:20px;" id="panel-title">Semester — Syllabus & Lab Manuals</h2>
-          <button class="btn-primary" style="background:transparent; color:var(--text-dim); padding:0;" onclick="alert('Download All coming soon!')">
-            Download All &rarr;
-          </button>
-        </div>
-
-        <div id="resources-grid" class="resource-grid">
-          <div class="resource-card skeleton" style="height:60px;"></div>
-          <div class="resource-card skeleton" style="height:60px;"></div>
-        </div>
-      </div>
-
-      <!-- ADDITIONAL RESOURCES PANEL -->
-      <div class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h2 class="font-playfair" style="margin:0; font-size:20px;">Department Resources</h2>
-        </div>
-
-        <div id="additional-resources-grid" class="resource-grid">
-          <div class="resource-card skeleton" style="height:60px;"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+  </main>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
 <script>
-  let currentSemester = 1;
-
-  document.addEventListener("DOMContentLoaded", () => {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    
-    // Default to a semester, maybe based on backend logic usually, default to 1 here
-    currentSemester = 1;
-    renderTabs();
-    fetchResources(currentSemester);
-  });
-
-  function renderTabs() {
-    const tabsContainer = document.getElementById('tabs-container');
-    let html = '';
-    for(let i=1; i<=8; i++) {
-      const cls = (i === currentSemester) ? 'active' : 'inactive';
-      html += `<div class="tab-pill ${cls}" onclick="changeSemester(${i})">S${i}</div>`;
-    }
-    tabsContainer.innerHTML = html;
-  }
-
-  function changeSemester(sem) {
-    if(sem === currentSemester) return;
-    currentSemester = sem;
-    renderTabs();
-    fetchResources(currentSemester);
-  }
-
-  function formatCategory(cat) {
-    const categories = {
-      'syllabus': 'Syllabus',
-      'lab_manual': 'Lab Manual',
-      'question_bank': 'Question Bank',
-      'prev_papers': 'Previous Papers',
-      'department_general': 'General Resource'
-    };
-    return categories[cat] || cat;
-  }
-
-  function getIconForCategory(cat) {
-    if(cat === 'syllabus' || cat === 'lab_manual' || cat === 'department_general') return 'book-open';
-    if(cat === 'question_bank' || cat === 'prev_papers') return 'file-text';
-    return 'file';
-  }
-
-  async function fetchResources(sem) {
-    const resGrid = document.getElementById('resources-grid');
-    const addGrid = document.getElementById('additional-resources-grid');
-    
-    resGrid.innerHTML = '<div class="resource-card skeleton" style="height:60px;"></div><div class="resource-card skeleton" style="height:60px;"></div>';
-    
-    try {
-      const response = await fetch(`/api/academics/resources?semester=${sem}`);
-      if(!response.ok) throw new Error('Fetch failed');
-      const data = await response.json();
-      
-      // Update Title
-      document.getElementById('panel-title').innerHTML = `Semester ${sem} &mdash; Syllabus & Lab Manuals`;
-
-      renderCards(resGrid, data.semester_resources);
-      renderCards(addGrid, data.department_resources);
-      
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    } catch (e) {
-      console.error(e);
-      resGrid.innerHTML = `
-        <div class="error-banner" style="grid-column: 1 / -1;">
-          <div>
-            <div style="font-weight:600; margin-bottom:4px;">Failed to load resources</div>
-            <div style="font-size:12px; color:var(--text-dim)">Please try again later.</div>
-          </div>
-          <button class="btn-outline" style="color:var(--text-primary); border-color:var(--text-ghost);" onclick="fetchResources(${currentSemester})">Retry</button>
-        </div>
-      `;
-    }
-  }
-
-  function renderCards(container, list) {
-    if(!list || list.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1; padding: 40px 20px;">
-          <div style="display:flex; justify-content:center;"><i data-lucide="package-open" class="empty-icon" style="width:36px; height:36px; stroke-width:1.5;"></i></div>
-          <div style="color: #555; font-size: 14px;">No resources found.</div>
-        </div>
-      `;
-      return;
-    }
-
-    const html = list.map(item => {
-      const catName = formatCategory(item.category);
-      const iconName = getIconForCategory(item.category);
-      
-      return `
-        <div class="resource-card">
-          <div class="resource-icon">
-            <i data-lucide="${iconName}" style="width: 20px; height: 20px; stroke-width: 1.5; stroke-linecap: round;"></i>
-          </div>
-          <div class="resource-middle">
-            <div class="resource-name" title="${item.title}">${item.title}</div>
-            <div class="resource-meta">${catName} &middot; ${item.description || '2019 Scheme'}</div>
-          </div>
-          <div class="resource-right">
-            <div class="file-size">${item.file_size || '---'}</div>
-            <button class="btn-download" onclick="downloadResource(${item.id}, '${item.file_url}')">
-              <i data-lucide="download" style="width: 14px; height: 14px; stroke-width: 1.5;"></i> Download
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    container.innerHTML = html;
-  }
-
-  function downloadResource(id, url) {
-    // 1. Trigger the download dynamically
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '';
-    document.body.appendChild(a);
-    // Un-comment to actually start download if url works:
-    // a.click();
-    document.body.removeChild(a);
-    
-    // Simulate toast
-    alert('Download started (dummy url)!');
-
-    // 2. Log natively
-    fetch(`/api/resources/${id}/download`, {
-      method: 'POST'
-    }).then(r => r.json()).then(data => console.log('Download logged', data)).catch(e => console.error(e));
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
   }
 </script>
 {% endblock %}

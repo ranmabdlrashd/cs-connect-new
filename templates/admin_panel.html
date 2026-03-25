@@ -1,30 +1,85 @@
 {% extends "base.html" %}
-{% block title %}Admin Panel - CS Connect{% endblock %}
 
-{% block content %}
+{% block title %}Admin Control Panel - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
+  /* Hide global elements */
+  nav, .news-ticker { display: none !important; }
+  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+
+  /* Tab-specific styles for the panel */
+  .panel-tab-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .panel-tab-btn {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid var(--border-accent);
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-tab-btn.active {
+    background: var(--accent-crimson);
+    color: white;
+    border-color: var(--accent-crimson);
+    box-shadow: 0 4px 12px rgba(139, 29, 29, 0.2);
+  }
+  .panel-tab-btn i { width: 16px; height: 16px; }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Table overrides */
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-accent);
+    margin-bottom: 24px;
+  }
+  .admin-table th {
+    background: #F4F1EA;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-crimson);
+  }
+  .admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #F0EBE0;
+    font-size: 0.85rem;
+  }
+  
+  /* Form components */
+  .add-form {
+    background: #F8F7F2;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-accent);
+    margin-bottom: 32px;
+  }
+  .add-form h3 { margin: 0 0 20px; font-family: var(--font-heading); color: var(--accent-crimson); }
+
+  /* Original styles not replaced by dashboard_shared.css */
   :root {
     --red: #c0392b;
     --dark: #1a1a2e;
     --card: #ffffff;
-  }
-
-  .ap-header {
-    background: linear-gradient(135deg, #c0392b, #922b21);
-    color: #fff;
-    padding: 40px 30px 30px;
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 30px;
-  }
-
-  .ap-header h1 {
-    margin: 0;
-    font-size: 2rem;
-  }
-
-  .ap-header p {
-    margin: 6px 0 0;
-    opacity: .85;
   }
 
   .stats-row {
@@ -55,98 +110,8 @@
     font-size: .85rem;
   }
 
-  /* Tabs */
-  .tab-nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
-
-  .tab-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 16px 24px;
-    border: 2px solid #ddd;
-    border-radius: 12px;
-    background: #fff;
-    cursor: pointer;
-    font-weight: 700;
-    color: #555;
-    font-size: 1rem;
-    transition: all .2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
-    min-width: 110px;
-  }
-
-  .tab-btn .tab-icon {
-    font-size: 1.6rem;
-  }
-
-  .tab-btn.active {
-    background: #c0392b;
-    color: #fff;
-    border-color: #c0392b;
-    box-shadow: 0 4px 16px rgba(192, 57, 43, .35);
-  }
-
-  .tab-btn:hover:not(.active) {
-    border-color: #c0392b;
-    color: #c0392b;
-    background: #fff8f8;
-    transform: translateY(-2px);
-  }
-
-  .tab-pane {
-    display: none;
-  }
-
-  .tab-pane.active {
-    display: block;
-  }
-
-  /* Table */
-  .admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .07);
-    margin-bottom: 20px;
-  }
-
-  .admin-table thead {
-    background: var(--red);
-    color: #fff;
-  }
-
-  .admin-table th,
-  .admin-table td {
-    padding: 11px 13px;
-    text-align: left;
-    font-size: .9rem;
-  }
-
   .admin-table tbody tr:nth-child(even) {
     background: #fafafa;
-  }
-
-  /* Add form */
-  .add-form {
-    background: #fff;
-    border-radius: 12px;
-    padding: 22px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
-    margin-bottom: 24px;
-  }
-
-  .add-form h3 {
-    margin: 0 0 16px;
-    color: #c0392b;
-    font-size: 1.1rem;
   }
 
   .form-row {
@@ -316,17 +281,6 @@
     margin-bottom: 14px;
   }
 </style>
-
-<div style="max-width:1200px; margin:0 auto; padding:20px;">
-  <div class="ap-header">
-    <h1 style="display: none;">🛠️ Admin Control Panel</h1>
-    <p>Welcome, <strong>{{ session.get('name') }}</strong> — Manage all site content from here.</p>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <h2 style="color:#e74c3c">{{ all_users|length }}</h2>
       <p>Total Users</p>
     </div>
     <div class="stat-card">
@@ -587,11 +541,6 @@
       </form>
     </div>
 
-    <div style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
-      <input type="text" id="adminBookSearch" onkeyup="filterAdminBooks()"
-        placeholder="🔍 Search books by title or author..."
-        style="padding: 10px 15px; width: 100%; max-width: 400px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; outline: none;">
-    </div>
 
     <table class="admin-table" id="adminBooksTable">
       <thead>
@@ -804,183 +753,13 @@
 
   </div>
 
-  <!-- ─── PLACEMENTS TAB ─── -->
+  <!-- ─── PLACEMENTS TAB (Feature Removed) ─── -->
   <div id="tab-placements" class="tab-pane">
-
-    <!-- Placement Summary -->
-    <p class="section-title">📊 Placement Summary Stats</p>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Icon</th>
-          <th>Value</th>
-          <th>Label</th>
-          <th>Company</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for s in summary_list %}
-        <tr>
-          <td>{{ s['icon'] }}</td>
-          <td>{{ s['value'] }}</td>
-          <td>{{ s['label'] }}</td>
-          <td>{{ s['company'] or '—' }}</td>
-          <td>
-            <button class="btn-edit" data-id="{{ s['id'] }}" data-icon="{{ s['icon'] }}" data-value="{{ s['value'] }}"
-              data-label="{{ s['label'] }}" data-company="{{ s['company'] or '' }}"
-              onclick="handleSummaryEdit(this)">Edit</button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <!-- Companies -->
-    <p class="section-title">🏢 Placement Companies</p>
-    <div class="add-form">
-      <h3>➕ Add Company</h3>
-      <form method="POST" action="{{ url_for('admin_companies_add') }}">
-        <div class="form-row">
-          <div class="form-group"><label>Company Name *</label><input name="name" required placeholder="Google"></div>
-          <div class="form-group"><label>Logo URL</label><input name="url" placeholder="https://..."></div>
-          <div class="form-group">
-            <label>Sector</label>
-            <select name="sector">
-              <option value="IT">IT</option>
-              <option value="Core">Core</option>
-              <option value="Finance">Finance</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="btn-add">Add Company</button>
-      </form>
+    <div style="text-align: center; padding: 60px 20px; color: #999;">
+      <p style="font-size: 2rem;">🚫</p>
+      <h3 style="color: #555;">Placement Management Removed</h3>
+      <p>This feature has been retired from the platform. Contact IT support for data exports.</p>
     </div>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Sector</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for c in companies_list %}
-        <tr>
-          <td>{{ c['id'] }}</td>
-          <td>{{ c['name'] }}</td>
-          <td>{{ c['sector'] }}</td>
-          <td>
-            <form method="POST" action="{{ url_for('admin_companies_delete', cid=c['id']) }}"
-              onsubmit="return confirm('Delete?');" style="display:inline;">
-              <button type="submit" class="btn-del">Delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <!-- Alumni -->
-    <p class="section-title">🎓 Alumni Success</p>
-    <div class="add-form">
-      <h3>➕ Add Alumni</h3>
-      <form method="POST" action="{{ url_for('admin_alumni_add') }}">
-        <div class="form-row">
-          <div class="form-group"><label>Name *</label><input name="name" required placeholder="Arjun S"></div>
-          <div class="form-group"><label>Batch</label><input name="batch" placeholder="2020-2024"></div>
-          <div class="form-group"><label>Company</label><input name="company" placeholder="Google"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Package</label><input name="package" placeholder="₹8 LPA"></div>
-          <div class="form-group"><label>Photo URL</label><input name="photo" placeholder="https://..."></div>
-          <div class="form-group"><label>Testimonial</label><input name="testimonial"
-              placeholder="Short testimonial..."></div>
-        </div>
-        <button type="submit" class="btn-add">Add Alumni</button>
-      </form>
-    </div>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Batch</th>
-          <th>Company</th>
-          <th>Package</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in alumni_list %}
-        <tr>
-          <td>{{ a['id'] }}</td>
-          <td>{{ a['name'] }}</td>
-          <td>{{ a['batch'] }}</td>
-          <td>{{ a['company'] }}</td>
-          <td>{{ a['package'] }}</td>
-          <td>
-            <form method="POST" action="{{ url_for('admin_alumni_delete', aid=a['id']) }}"
-              onsubmit="return confirm('Delete?');" style="display:inline;">
-              <button type="submit" class="btn-del">Delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <!-- Internships -->
-    <p class="section-title">🧑‍💻 Internships</p>
-    <div class="add-form">
-      <h3>➕ Add Internship</h3>
-      <form method="POST" action="{{ url_for('admin_internships_add') }}">
-        <div class="form-row">
-          <div class="form-group"><label>Title *</label><input name="title" required placeholder="Software Dev Intern">
-          </div>
-          <div class="form-group"><label>Company *</label><input name="company" required placeholder="XYZ Corp"></div>
-          <div class="form-group"><label>Domain</label><input name="domain" placeholder="IT"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Location</label><input name="location" placeholder="Kochi / Remote"></div>
-          <div class="form-group"><label>Apply Link</label><input name="link" value="#" placeholder="https://..."></div>
-          <div class="form-group"><label>Description</label><input name="description"
-              placeholder="Short description..."></div>
-        </div>
-        <button type="submit" class="btn-add">Add Internship</button>
-      </form>
-    </div>
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Title</th>
-          <th>Company</th>
-          <th>Domain</th>
-          <th>Location</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in interns_list %}
-        <tr>
-          <td>{{ i['id'] }}</td>
-          <td>{{ i['title'] }}</td>
-          <td>{{ i['company'] }}</td>
-          <td>{{ i['domain'] }}</td>
-          <td>{{ i['location'] }}</td>
-          <td>
-            <form method="POST" action="{{ url_for('admin_internships_delete', iid=i['id']) }}"
-              onsubmit="return confirm('Delete?');" style="display:inline;">
-              <button type="submit" class="btn-del">Delete</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
 
 </div>
@@ -1102,24 +881,7 @@
   </div>
 </div>
 
-<!-- Placement Summary Edit Modal -->
-<div class="modal-bg" id="modal-summary">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-summary')">✕</button>
-    <h3>✏️ Edit Placement Summary</h3>
-    <form method="POST" id="summary-edit-form" action="">
-      <div class="form-row">
-        <div class="form-group"><label>Icon (emoji)</label><input id="se-icon" name="icon"></div>
-        <div class="form-group"><label>Value</label><input id="se-value" name="value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Label</label><input id="se-label" name="label"></div>
-        <div class="form-group"><label>Company (optional)</label><input id="se-company" name="company"></div>
-      </div>
-      <button type="submit" class="btn-add" style="margin-top:16px;">Save Changes</button>
-    </form>
-  </div>
-</div>
+
 
 <script>
   // Tab switching — read hash on load
@@ -1222,31 +984,27 @@
     document.getElementById('se-value').value = value;
     document.getElementById('se-label').value = label;
     document.getElementById('se-company').value = company;
-    document.getElementById('modal-summary').classList.add('open');
+    document.querySelectorAll('.panel-tab-btn').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById('tab-' + tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+    
+    // Refresh icons if needed
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
-  // Close on bg click
-  document.querySelectorAll('.modal-bg').forEach(m => {
-    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-  });
-
-  // Circulation History Filter
+  // --- Search & Filters ---
   function filterHistory(status) {
-    // Update active button styling
-    const buttons = document.querySelectorAll('.filter-btn');
-    buttons.forEach(btn => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.style.background = 'white';
       btn.style.color = '#555';
+      btn.classList.remove('active');
     });
-    const clickedBtn = Array.from(buttons).find(b => b.textContent.toLowerCase() === status);
-    if (clickedBtn) {
-      clickedBtn.style.background = '#667eea';
-      clickedBtn.style.color = 'white';
-    }
+    event.target.style.background = 'var(--accent-crimson)';
+    event.target.style.color = 'white';
+    event.target.classList.add('active');
 
-    // Filter table rows
-    const rows = document.querySelectorAll('.history-row');
-    rows.forEach(row => {
+    document.querySelectorAll('.history-row').forEach(row => {
       if (status === 'all' || row.dataset.status === status) {
         row.style.display = '';
       } else {
@@ -1255,25 +1013,20 @@
     });
   }
 
-  // Search Filter for Books in Admin Panel
   function filterAdminBooks() {
     let input = document.getElementById('adminBookSearch');
+    if (!input) return;
     let filter = input.value.toLowerCase();
     let table = document.getElementById('adminBooksTable');
     let tr = table.getElementsByTagName('tr');
 
-    // Loop through all table rows, starting from index 1 (skip header)
     for (let i = 1; i < tr.length; i++) {
-      let titleTd = tr[i].getElementsByTagName('td')[1]; // Title column
-      let authorTd = tr[i].getElementsByTagName('td')[2]; // Author column
+      let titleTd = tr[i].getElementsByTagName('td')[1];
+      let authorTd = tr[i].getElementsByTagName('td')[2];
       if (titleTd || authorTd) {
         let titleVal = titleTd.textContent || titleTd.innerText;
         let authorVal = authorTd.textContent || authorTd.innerText;
-        if (titleVal.toLowerCase().indexOf(filter) > -1 || authorVal.toLowerCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
+        tr[i].style.display = (titleVal.toLowerCase().indexOf(filter) > -1 || authorVal.toLowerCase().indexOf(filter) > -1) ? "" : "none";
       }
     }
   }

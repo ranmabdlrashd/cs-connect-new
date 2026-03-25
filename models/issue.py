@@ -9,10 +9,11 @@ class Issue:
     def create_issue(book_id, user_id):
         conn = get_db()
         from datetime import datetime, timedelta
-        due_date = datetime.now() + timedelta(days=14)
+        issue_date = datetime.now()
+        due_date = issue_date + timedelta(days=14)
         conn.execute(
-            "INSERT INTO issues (book_id, user_id, status, due_date) VALUES (%s, %s, 'issued', %s)",
-            (book_id, user_id, due_date),
+            "INSERT INTO issues (book_id, user_id, status, due_date, issue_date) VALUES (%s, %s, 'issued', %s, %s)",
+            (book_id, user_id, due_date, issue_date),
         )
         conn.commit()
         conn.close()
@@ -36,6 +37,26 @@ class Issue:
         ).fetchone()
         conn.close()
         return issue is not None
+
+    @staticmethod
+    def get_user_active_issued_count(user_id):
+        conn = get_db()
+        count = conn.execute(
+            "SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'",
+            (user_id,),
+        ).fetchone()[0]
+        conn.close()
+        return count
+
+    @staticmethod
+    def has_outstanding_fines(user_id):
+        conn = get_db()
+        fine = conn.execute(
+            "SELECT id FROM library_fines WHERE student_id = %s AND paid = false",
+            (user_id,),
+        ).fetchone()
+        conn.close()
+        return fine is not None
 
     @staticmethod
     def is_user_issuer(user_id, book_id):
@@ -93,6 +114,53 @@ class Issue:
         """).fetchall()
         conn.close()
         return [dict(i) for i in issues]
+
+    @staticmethod
+    def update_fines():
+        conn = get_db()
+        from datetime import datetime
+        now = datetime.now()
+        
+        # Get all overdue issued books
+        overdue_issues = conn.execute("""
+            SELECT id, user_id, due_date 
+            FROM issues 
+            WHERE status = 'issued' AND due_date < %s
+        """, (now,)).fetchall()
+        
+        for issue in overdue_issues:
+            issue_id = issue['id']
+            student_id = issue['user_id']
+            due_date = issue['due_date']
+            
+            # Ensure due_date is offset-aware or naive as per DB
+            # For simplicity, calculating days diff
+            delta = now - due_date
+            days_overdue = max(0, delta.days)
+            
+            if days_overdue > 0:
+                rate_per_day = 10.00 # Default rate
+                amount = days_overdue * rate_per_day
+                
+                # Check if fine exists
+                existing_fine = conn.execute(
+                    "SELECT id FROM library_fines WHERE issue_id = %s AND paid = false",
+                    (issue_id,)
+                ).fetchone()
+                
+                if existing_fine:
+                    conn.execute(
+                        "UPDATE library_fines SET amount = %s WHERE id = %s",
+                        (amount, existing_fine['id'])
+                    )
+                else:
+                    conn.execute("""
+                        INSERT INTO library_fines (student_id, issue_id, amount, reason, rate_per_day, status)
+                        VALUES (%s, %s, %s, %s, %s, 'Pending')
+                    """, (student_id, issue_id, amount, f"Overdue for {days_overdue} days", rate_per_day))
+        
+        conn.commit()
+        conn.close()
 
     @staticmethod
     def get_history_by_book(book_id):

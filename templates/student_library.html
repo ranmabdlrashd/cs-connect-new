@@ -3,806 +3,110 @@
 {% block title %}AISAT Central Library - CS Connect{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-  /* DESIGN SYSTEM — apply strictly to every element */
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+  /* Page-specific overrides */
+  nav, .news-ticker { display: none !important; }
+  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
-  :root {
-    --bg-primary:    #0A0A0A;
-    --bg-secondary:  #121212;
-    --bg-card:       #0e0e0e;
-    --bg-hover:      #160808;
-    --accent:        #8B1D1D;
-    --accent-hover:  #a82222;
-    --accent-dark:   #6B1010;
-    --cream:         #F5E6BE;
-    --text-primary:  #e0d6c8;
-    --text-muted:    #A0A0A0;
-    --text-dim:      #666666;
-    --text-ghost:    #555555;
-    --text-dead:     #444444;
-    --border:        rgba(245,230,190,0.06);
-    --border-accent: rgba(139,29,29,0.3);
-    --border-focus:  rgba(139,29,29,0.4);
-    --green:         #3a8834;
-    --amber:         #b85a00;
-    --red:           #8B1D1D;
-  }
+  .lib-header { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 32px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .lib-header h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 2.2rem; }
+  .lib-header p { margin: 8px 0 0; color: var(--text-secondary); font-size: 0.95rem; }
 
-  body {
-    margin: 0; padding: 0; overflow: hidden; background: var(--bg-primary);
-    font-family: 'Inter', sans-serif;
-    color: var(--text-primary);
-  }
+  .lib-search { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; margin-bottom: 32px; display: flex; gap: 16px; }
+  .search-input { flex: 1; padding: 12px 16px; border: 1px solid #EAE5D8; border-radius: 10px; background: #FDFCF8; font-size: 0.9rem; outline: none; }
+  .search-input:focus { border-color: var(--accent-crimson); background: white; }
 
-  h1, h2, h3, .font-playfair, .metric-value {
-    font-family: 'Playfair Display', serif;
-  }
-
-  .custom-nav, .news-ticker { display: none !important; }
-
-  /* Generic UI */
-  a { text-decoration: none; transition: all 0.2s; }
-  button { font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s ease; border: none; }
-  
-  /* Sidebar */
-  .dash-sidebar-item {
-    width: 40px; height: 40px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    transition: all 0.2s ease; margin-bottom: 8px;
-  }
-  .dash-sidebar-item.active { background: rgba(139,29,29,0.2); }
-  .dash-sidebar-item:hover { background: rgba(139,29,29,0.1); }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: #333; }
-
-  /* PAGE COMPONENTS */
-  .top-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 28px; border-bottom: 1px solid var(--border);
-    background: var(--bg-primary); flex-shrink: 0; z-index: 100;
-  }
-
-  .breadcrumb { font-size: 11px; color: var(--text-ghost); letter-spacing: 1px; text-transform: uppercase; }
-
-  .user-chip {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 8px;
-    font-size: 11px; color: var(--text-muted);
-  }
-
-  .fine-badge {
-    background: rgba(139,29,29,0.1); color: var(--accent);
-    border: 1px solid rgba(139,29,29,0.2); border-radius: 12px;
-    padding: 3px 10px; font-size: 10px; font-weight: 500;
-  }
-
-  .notif-bell {
-    width: 32px; height: 32px; background: rgba(139,29,29,0.1); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; border: 1px solid rgba(139,29,29,0.2);
-    position: relative; cursor: pointer;
-  }
-
-  .metrics-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;
-  }
-
-  .metric-card {
-    background: var(--bg-secondary); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
-  }
-  .metric-card::after {
-    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
-    background: var(--accent);
-  }
-  .metric-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .metric-value { font-size: 26px; color: var(--cream); font-weight: 700; }
-  .metric-sub { font-size: 11px; color: var(--text-ghost); margin-top: 4px; }
-  
-  .metric-icon-badge {
-    position: absolute; top: 20px; right: 20px; width: 28px; height: 28px;
-    background: rgba(255,255,255,0.03); border-radius: 6px;
-    display: flex; align-items: center; justify-content: center; color: var(--text-ghost);
-  }
-
-  .progress-track { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-top: 12px; position: relative; }
-  .progress-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-
-  /* FINE BANNER */
-  .fine-banner {
-    background: rgba(139,29,29,0.08); border: 1px solid rgba(139,29,29,0.25);
-    border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-
-  /* SEARCH BAR */
-  .search-container {
-    display: flex; gap: 12px; margin-bottom: 24px;
-  }
-  .search-input-wrap {
-    flex: 1; position: relative;
-  }
-  .search-input-wrap i {
-    position: absolute; left: 14px; top: 12px; color: var(--text-ghost); pointer-events: none;
-  }
-  .search-input {
-    width: 100%; background: var(--bg-secondary); border: 1px solid rgba(245,230,190,0.08);
-    border-radius: 8px; padding: 11px 14px 11px 38px; font-size: 13px; color: var(--text-muted);
-    outline: none; transition: all 0.2s;
-  }
-  .search-input:focus { border-color: var(--border-focus); background: var(--bg-hover); }
-  
-  .search-select {
-    background: var(--bg-secondary); border: 1px solid rgba(245,230,190,0.08);
-    border-radius: 8px; padding: 11px 14px; font-size: 12px; color: #888; outline: none; cursor: pointer;
-  }
-
-  .btn-search {
-    background: var(--accent); color: var(--cream);
-    padding: 11px 22px; border-radius: 8px; font-size: 12px; font-weight: 500;
-  }
-  .btn-search:hover { background: var(--accent-hover); }
-
-  /* MAIN LAYOUT */
-  .main-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-
-  .panel {
-    background: var(--bg-secondary); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px; margin-bottom: 20px;
-  }
-  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .panel-title { font-size: 15px; color: var(--cream); font-weight: 600; margin: 0; }
-
-  .action-link { font-size: 10px; color: var(--accent); font-weight: 500; }
-
-  /* TABLE */
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th {
-    text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 2px;
-    color: var(--text-dead); padding-bottom: 12px; border-bottom: 1px solid rgba(245,230,190,0.04);
-  }
-  .data-table td {
-    padding: 12px 0; font-size: 11px; border-bottom: 1px solid rgba(245,230,190,0.03);
-    color: var(--text-muted);
-  }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tr:hover { background: rgba(255,255,255,0.01); }
-
-  .book-title-cell { color: #C0A88A; font-weight: 500; }
-
-  /* PILLS */
-  .pill {
-    padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 600; text-transform: uppercase;
-  }
-  .pill-green { background: rgba(60,180,100,0.1); color: #5c5; border: 1px solid rgba(60,180,100,0.2); }
-  .pill-amber { background: rgba(180,130,40,0.1); color: #b85; border: 1px solid rgba(180,130,40,0.2); }
-  .pill-red { background: rgba(139,29,29,0.1); color: var(--accent); border: 1px solid rgba(139,29,29,0.2); }
-  .pill-grey { background: rgba(255,255,255,0.04); color: #555; border: 1px solid rgba(255,255,255,0.07); }
-
-  .btn-renew {
-    background: transparent; border: 1px solid var(--border-accent);
-    color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 10px;
-  }
-
-  /* BOOK GRID */
-  .book-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-  }
+  .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
   .book-card {
-    background: var(--bg-card); border: 1px solid rgba(245,230,190,0.05);
-    border-radius: 9px; overflow: hidden; cursor: pointer; transition: transform 0.2s;
+    background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; gap: 12px; transition: all 0.2s;
   }
-  .book-card:hover { transform: translateY(-3px); }
+  .book-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
   
-  .book-top { height: 96px; display: flex; align-items: center; justify-content: center; position: relative; }
-  .book-spine {
-    width: 56px; height: 76px; border-radius: 4px; padding: 8px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  }
+  .book-cover { height: 180px; background: #FDFCF8; border: 1px solid #F0EBE0; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .book-title { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); font-family: 'Playfair Display', serif; }
+  .book-author { font-size: 0.8rem; color: var(--text-secondary); }
   
-  .book-bottom { padding: 10px 12px; }
-  .grid-book-title { font-size: 11px; color: var(--cream); font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .grid-book-author { font-size: 10px; color: var(--text-dim); margin-bottom: 6px; }
-
-  /* RIGHT COL PANELS */
-  .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; }
-  .info-label { color: var(--text-dim); }
-  .info-val { color: var(--text-primary); }
-
-  .fine-box {
-    background: rgba(139,29,29,0.08); border: 1px solid rgba(139,29,29,0.25);
-    border-radius: 8px; padding: 14px; margin-top: 16px;
-  }
-
-  .reservation-card {
-    background: rgba(255,255,255,0.02); border-radius: 8px; padding: 12px; margin-bottom: 10px;
-  }
-
-  .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .category-item {
-    background: rgba(139,29,29,0.06); border: 1px solid rgba(139,29,29,0.15);
-    border-radius: 7px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .category-item:hover { background: rgba(139,29,29,0.1); }
-  .cat-icon-box {
-    width: 28px; height: 28px; background: rgba(139,29,29,0.12); border-radius: 6px;
-    display: flex; align-items: center; justify-content: center; color: var(--accent);
-  }
-
-  .notice-item { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(245,230,190,0.04); }
-  .notice-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
-
-  .skeleton {
-    background: linear-gradient(90deg, #121212 25%, #1a1a1a 50%, #121212 75%);
-    background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite;
-    border-radius: 4px;
-  }
-  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-    color: var(--cream); border: none; border-radius: 8px;
-    padding: 10px 16px; font-size: 13px; font-weight: 500;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
+  .status-pill { font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; align-self: flex-start; }
+  .status-available { background: #E8F5E9; color: #2E7D32; }
+  .status-issued { background: #FFF3E0; color: #E65100; }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<div style="display:flex; height:100vh; background:var(--bg-primary); overflow:hidden;">
-
-  <!-- ── SIDEBAR ── -->
-  <aside style="width:64px; min-width:64px; background:#0d0d0d; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding:20px 0; gap:4px; z-index: 100;">
-    <div style="width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
-      <i data-lucide="library" style="stroke: var(--cream); width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-
-    <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
-      <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Attendance">
-      <i data-lucide="clipboard-check" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Results">
-      <i data-lucide="award" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Assignments">
-      <i data-lucide="file-text" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    <div class="dash-sidebar-item active" title="Library">
-      <i data-lucide="book-open" style="stroke: var(--accent); width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-    <div class="dash-sidebar-item" title="Timetable">
-      <i data-lucide="calendar" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
-
-    <div style="margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:8px;">
-      <div class="dash-sidebar-item" title="Settings" onclick="location.href='/dashboard/settings'">
-        <i data-lucide="settings" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-      </div>
-      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--cream);">
-        {{ session.get('name', 'S')[:2].upper() }}
-      </div>
-    </div>
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="library" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item active" title="Library"><i data-lucide="book-open"></i></div>
+    </nav>
   </aside>
 
-  <!-- ── MAIN CONTENT ── -->
-  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-    
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="breadcrumb">
-        CS Connect &middot; <span style="color:var(--text-muted)">Library</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:16px;">
-        <div id="fine-badge-container"></div>
-        <div class="user-chip">
-          <div style="width:16px; height:16px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-dark));"></div>
-          {{ session.get('name') }}
-        </div>
-        <div class="notif-bell" onclick="location.href='/dashboard/notifications'">
-          <i data-lucide="bell" style="stroke: var(--accent); width: 15px; height: 15px; stroke-width: 1.5;"></i>
-        </div>
-      </div>
-    </div>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Resources &middot; <b>Central Library</b></div>
+    </header>
 
-    <!-- Scrollable Area -->
-    <div style="flex:1; overflow-y:auto; padding:32px 40px; padding-bottom: 80px;">
-      
-      <!-- Header -->
-      <div style="margin-bottom: 32px">
-        <h1 class="font-playfair" style="margin: 0 0 4px 0; font-size: 22px; color: var(--cream); font-weight: 700;">AISAT Central Library</h1>
-        <div style="color: var(--text-ghost); font-size: 12px;">Search, borrow, renew and manage your library account</div>
-      </div>
-
-      <!-- Metrics -->
-      <div class="metrics-grid" id="metrics-container">
-        <!-- Card 1 -->
-        <div class="metric-card">
-          <div class="metric-label">Books Borrowed</div>
-          <div class="metric-value"><span id="metric-active-loans">...</span> / 4</div>
-          <div class="metric-sub" id="metric-slots-sub">... slots remaining</div>
-          <div class="progress-track">
-            <div class="progress-fill" id="metric-progress-fill" style="background: var(--accent); width: 0%;"></div>
-          </div>
-          <div class="metric-icon-badge"><i data-lucide="book-open" style="width:15px; height:15px; stroke-width:1.5;"></i></div>
+    <div class="dash-content">
+      <div class="lib-header">
+        <div>
+          <h1>Search the Library</h1>
+          <p>Access over 15,000+ academic books, journals, and digital resources.</p>
         </div>
-        <!-- Card 2 -->
-        <div class="metric-card" id="metric-card-due">
-          <div class="metric-label">Due In</div>
-          <div class="metric-value" id="metric-due-val">... days</div>
-          <div class="metric-sub" id="metric-due-sub">Next due date</div>
-          <div class="metric-icon-badge"><i data-lucide="calendar" style="width:15px; height:15px; stroke-width:1.5;"></i></div>
-        </div>
-        <!-- Card 3 -->
-        <div class="metric-card" style="border-bottom-color: #3a8834;">
-          <div class="metric-label">Total Borrowed</div>
-          <div class="metric-value" id="metric-lifetime">...</div>
-          <div class="metric-sub">Since enrollment</div>
-          <div class="metric-icon-badge"><i data-lucide="book-marked" style="width:15px; height:15px; stroke-width:1.5;"></i></div>
-        </div>
-        <!-- Card 4 -->
-        <div class="metric-card" style="border-bottom-color: #6aacff;">
-          <div class="metric-label">Total Catalogue</div>
-          <div class="metric-value"><span id="metric-catalogue">...</span>+</div>
-          <div class="metric-sub">Books & journals</div>
-          <div class="metric-icon-badge"><i data-lucide="library" style="width:15px; height:15px; stroke-width:1.5;"></i></div>
+        <div style="text-align:right;">
+          <div style="font-size:0.7rem; color:var(--text-muted); font-weight:800; text-transform:uppercase;">BOOKS ISSUED</div>
+          <div style="font-size:1.8rem; font-weight:800; color:var(--accent-crimson); font-family:'Playfair Display', serif;">02 / 04</div>
         </div>
       </div>
 
-      <!-- Fine Banner (Conditional) -->
-      <div id="fine-banner-container"></div>
-
-      <!-- Search Bar -->
-      <div class="search-container">
-        <div class="search-input-wrap">
-          <i data-lucide="search" style="width:15px; height:15px;"></i>
-          <input type="text" id="search-q" class="search-input" placeholder="Search by title, author, ISBN or subject...">
-        </div>
-        <select id="search-cat" class="search-select">
-          <option>All Categories</option>
-          <option>Computer Science</option>
-          <option>Mathematics</option>
-          <option>Electronics</option>
-          <option>Journals</option>
-          <option>Reference</option>
-          <option>Research</option>
-        </select>
-        <select id="search-avail" class="search-select">
-          <option>All Books</option>
-          <option>Available Now</option>
-          <option>Issued</option>
-        </select>
-        <button class="btn-search" onclick="handleSearch()">Search</button>
+      <div class="lib-search">
+        <input type="text" class="search-input" placeholder="Search by title, author, or ISBN...">
+        <button class="dash-btn-primary" style="padding:10px 24px;">Search Catalogue</button>
       </div>
 
-      <!-- Main Columns -->
-      <div class="main-layout">
-        <!-- LEFT COLUMN -->
-        <div class="left-col">
-          <!-- Borrowed Panel -->
-          <div class="panel">
-            <div class="panel-header">
-              <h3 class="panel-title font-playfair">My Borrowed Books</h3>
-              <a href="#" class="action-link">Full History &rarr;</a>
-            </div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Book Title</th>
-                  <th>Author</th>
-                  <th>Issued</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="loans-tbody">
-                <tr><td colspan="6" style="text-align:center; padding:40px;"><div class="skeleton" style="height:20px; width:100%;"></div></td></tr>
-              </tbody>
-            </table>
+      <div class="book-grid">
+        <div class="book-card">
+          <div class="book-cover">
+             <i data-lucide="book" style="width:48px; height:48px; color:rgba(139, 29, 29, 0.1);"></i>
+             <span class="status-pill status-available" style="position:absolute; top:12px; right:12px;">Available</span>
           </div>
-
-          <!-- Recommended Grid -->
-          <div class="panel">
-            <div class="panel-header">
-              <h3 class="panel-title font-playfair">Recommended for You</h3>
-              <a href="/student-dashboard/library/catalogue" class="action-link">View Catalogue &rarr;</a>
-            </div>
-            <div class="book-grid" id="recommended-grid">
-              <!-- Cards via js -->
-            </div>
+          <div>
+            <div class="book-title">Data Structures & Algorithms</div>
+            <div class="book-author">Narasimha Karumanchi</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
+             <span style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">CSE / CORE</span>
+             <button class="dash-btn-secondary" style="font-size:0.7rem; padding:6px 12px;">Request Book</button>
           </div>
         </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="right-col">
-          <!-- Fine Panel -->
-          <div class="panel">
-            <h3 class="panel-title font-playfair" style="font-size:13px; margin-bottom:16px;">Fine & Account Status</h3>
-            <div class="info-row">
-              <span class="info-label">Account Status</span>
-              <span id="account-status-badge">...</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Library ID</span>
-              <span class="info-val">{{ session.get('user_id', 'AIS20CS001') }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Borrow Limit</span>
-              <span class="info-val">4 books at a time</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Max Loan Period</span>
-              <span class="info-val">14 days &middot; 1 renewal</span>
-            </div>
-            <div id="fine-box-container"></div>
+        <div class="book-card">
+          <div class="book-cover">
+             <i data-lucide="book" style="width:48px; height:48px; color:rgba(139, 29, 29, 0.1);"></i>
+             <span class="status-pill status-issued" style="position:absolute; top:12px; right:12px;">Issued</span>
           </div>
-
-          <!-- Reservations -->
-          <div class="panel">
-            <div class="panel-header">
-              <h3 class="panel-title font-playfair" style="font-size:13px;">Book Reservations</h3>
-              <a href="#" class="action-link">+ Request</a>
-            </div>
-            <div id="reservations-container">
-              <!-- items via js -->
-            </div>
+          <div>
+            <div class="book-title">Compiler Design</div>
+            <div class="book-author">Alfred V. Aho</div>
           </div>
-
-          <!-- Categories -->
-          <div class="panel">
-            <h3 class="panel-title font-playfair" style="font-size:13px; margin-bottom:16px;">Browse by Category</h3>
-            <div class="category-grid" id="category-grid">
-              <!-- Category items via js -->
-            </div>
-          </div>
-
-          <!-- Hours -->
-          <div class="panel">
-            <h3 class="panel-title font-playfair" style="font-size:13px; margin-bottom:16px;">Library Hours</h3>
-            <div style="font-size:11px; display:grid; gap:10px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--text-dim)">Monday &ndash; Friday</span>
-                <span style="color:var(--text-primary)">8:00 AM &ndash; 8:00 PM</span>
-                <span class="pill pill-green">Open</span>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--text-dim)">Saturday</span>
-                <span style="color:var(--text-primary)">9:00 AM &ndash; 5:00 PM</span>
-                <span class="pill pill-green">Open</span>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--text-dim)">Sunday</span>
-                <span style="color:var(--text-primary)">Closed</span>
-                <span class="pill pill-grey">Closed</span>
-              </div>
-            </div>
-            <div id="library-status-box" style="margin-top:20px; padding:12px; border-radius:8px; border:1px solid transparent;">
-               <!-- dynamic status -->
-            </div>
-          </div>
-
-          <!-- Notices -->
-          <div class="panel">
-            <h3 class="panel-title font-playfair" style="font-size:13px; margin-bottom:4px;">Library Notices</h3>
-            <div id="notices-list">
-              <!-- items via js -->
-              <div class="empty-state" style="padding:20px 0; font-size:11px; color:var(--text-ghost); text-align:center;">No recent notices</div>
-            </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
+             <span style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">CSE / SEM 6</span>
+             <button class="dash-btn-secondary" style="font-size:0.7rem; padding:6px 12px;" disabled>Join Queue</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    initLibrary();
-  });
-
-  async function initLibrary() {
-    fetchDashboard();
-    fetchMyBooks();
-    fetchReservations();
-    fetchCatalogue();
-    setLibraryStatus();
-    fetchRecommended();
-  }
-
-  async function fetchDashboard() {
-    try {
-      const res = await fetch('/api/library/dashboard');
-      const data = await res.json();
-      
-      document.getElementById('metric-active-loans').innerText = data.active_loans_count;
-      document.getElementById('metric-slots-sub').innerText = (4 - data.active_loans_count) + ' slots remaining';
-      document.getElementById('metric-progress-fill').style.width = (data.active_loans_count / 4 * 100) + '%';
-      
-      const dueValEl = document.getElementById('metric-due-val');
-      const dueCard = document.getElementById('metric-card-due');
-      if (data.nearest_due_days !== null) {
-        dueValEl.innerText = data.nearest_due_days + ' days';
-        if (data.nearest_due_days < 0) {
-          dueValEl.style.color = '#8B1D1D';
-          dueCard.style.borderBottomColor = '#8B1D1D';
-        } else if (data.nearest_due_days <= 5) {
-          dueValEl.style.color = '#b85';
-          dueCard.style.borderBottomColor = '#b85';
-        } else {
-          dueValEl.style.color = '#F5E6BE';
-          dueCard.style.borderBottomColor = '#F5E6BE';
-        }
-      } else {
-        dueValEl.innerText = '--';
-      }
-
-      document.getElementById('metric-lifetime').innerText = data.lifetime_count;
-      document.getElementById('metric-catalogue').innerText = data.catalogue_count;
-
-      // Fine Badge in Top Bar
-      if (data.outstanding_fine > 0) {
-        document.getElementById('fine-badge-container').innerHTML = `
-          <div class="fine-badge">Fine: ₹${data.outstanding_fine} Pending</div>
-        `;
-        document.getElementById('account-status-badge').innerHTML = '<span class="pill pill-red">Fine Pending</span>';
-        
-        // Fine Banner
-        // We'd need specific fine details for the banner. For now, fetch fines separately or use this.
-        fetchFines(); 
-      } else {
-        document.getElementById('account-status-badge').innerHTML = '<span class="pill pill-green">All Clear</span>';
-      }
-
-    } catch(e) { console.error(e); }
-  }
-
-  async function fetchFines() {
-    try {
-      const res = await fetch('/api/library/fines');
-      const data = await res.json();
-      if (data.length > 0) {
-        const fine = data[0];
-        const banner = document.getElementById('fine-banner-container');
-        banner.innerHTML = `
-          <div class="fine-banner">
-            <div>
-              <div style="font-size:9px; color:#8B1D1D; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">Outstanding Fine</div>
-              <div class="font-playfair" style="font-size:22px; color:#F5E6BE; font-weight:700;">₹${fine.amount}</div>
-              <div style="font-size:10px; color:#555; margin-top:2px;">${fine.book_title} &middot; ${fine.days_overdue} days overdue &middot; ₹${fine.rate_per_day}/day</div>
-            </div>
-            <button class="btn-primary" onclick="alert('Proceeding to Payment...')">Pay Fine Online &rarr;</button>
-          </div>
-        `;
-
-        // Also update Right panel fine box
-        document.getElementById('fine-box-container').innerHTML = `
-          <div class="fine-box">
-             <div style="font-size:9px; color:#8B1D1D; text-transform:uppercase; margin-bottom:4px;">Outstanding Fine</div>
-             <div class="font-playfair" style="font-size:24px; color:#F5E6BE;">₹${fine.amount}</div>
-             <div style="font-size:10px; color:#555; margin-bottom:12px;">${fine.book_title} +${fine.days_overdue} days</div>
-             <button class="btn-primary" style="width:100%; justify-content:center;" onclick="alert('Proceeding...')">Pay Fine Online &rarr;</button>
-          </div>
-        `;
-      }
-    } catch(e) { console.error(e); }
-  }
-
-  async function fetchMyBooks() {
-    const tbody = document.getElementById('loans-tbody');
-    try {
-      const res = await fetch('/api/library/my-books');
-      const data = await res.json();
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#555;">No books currently borrowed.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = data.map(loan => {
-        let statusPill = '';
-        if (loan.status === 'returned') statusPill = '<span class="pill pill-grey">Returned</span>';
-        else if (loan.days_remaining < 0) statusPill = '<span class="pill pill-red">Overdue</span>';
-        else if (loan.days_remaining <= 5) statusPill = '<span class="pill pill-amber">Due Soon</span>';
-        else statusPill = '<span class="pill pill-green">Active</span>';
-
-        let dueColor = '#888';
-        if (loan.status === 'issued') {
-          if (loan.days_remaining < 0) dueColor = '#8B1D1D';
-          else if (loan.days_remaining <= 5) dueColor = '#b85';
-        }
-
-        let actionHtml = '—';
-        if (loan.status === 'issued') {
-          if (loan.days_remaining < 0) {
-             actionHtml = '<button class="btn-renew" style="opacity:0.5; cursor:not-allowed;" disabled>Pay Fine</button>';
-          } else {
-             actionHtml = `<button class="btn-renew" onclick="renewBook(${loan.id})">Renew</button>`;
-          }
-        }
-
-        return `
-          <tr>
-            <td class="book-title-cell">${loan.title}</td>
-            <td>${loan.author}</td>
-            <td>${new Date(loan.issue_date).toLocaleDateString()}</td>
-            <td style="color:${dueColor}">${new Date(loan.due_date).toLocaleDateString()}</td>
-            <td>${statusPill}</td>
-            <td>${actionHtml}</td>
-          </tr>
-        `;
-      }).join('');
-    } catch(e) { console.error(e); }
-  }
-
-  async function fetchReservations() {
-    const container = document.getElementById('reservations-container');
-    try {
-      const res = await fetch('/api/library/reservations');
-      const data = await res.json();
-      if (data.length === 0) {
-        container.innerHTML = '<div style="font-size:11px; color:#444; text-align:center; padding:10px;">No active reservations.</div>';
-        return;
-      }
-
-      container.innerHTML = data.map(reser => {
-        const progress = (1 - (reser.queue_position / reser.total_queue)) * 100;
-        const statusText = reser.queue_position === 1 
-          ? '<span style="color:#5c5">You are next!</span>' 
-          : `<span style="color:#555">Est. availability: ~${reser.queue_position * 7} days</span>`;
-
-        return `
-          <div class="reservation-card">
-            <div style="font-size:12px; color:#C0A88A; font-weight:500;">${reser.title}</div>
-            <div style="font-size:10px; color:#555; margin:4px 0 8px 0;">Requested ${new Date(reser.created_at).toLocaleDateString()} &middot; Position: ${reser.queue_position}</div>
-            <div class="progress-track" style="margin: 0 0 8px 0;">
-              <div class="progress-fill" style="background:#8B1D1D; width:${progress}%"></div>
-            </div>
-            <div style="font-size:10px;">${statusText}</div>
-          </div>
-        `;
-      }).join('');
-    } catch(e) { console.error(e); }
-  }
-
-  async function fetchCatalogue() {
-    const container = document.getElementById('category-grid');
-    try {
-      const res = await fetch('/api/library/categories');
-      const data = await res.json();
-      
-      const iconMap = {
-        'Computer Science': 'code',
-        'Mathematics': 'calculator',
-        'Electronics': 'cpu',
-        'Journals': 'newspaper',
-        'Reference': 'book-marked',
-        'Research': 'flask-conical'
-      };
-
-      container.innerHTML = data.map(cat => {
-        const icon = iconMap[cat.category] || 'book';
-        return `
-          <div class="category-item" onclick="location.href='/student-dashboard/library/catalogue?category=${cat.category}'">
-            <div class="cat-icon-box"><i data-lucide="${icon}" style="width:13px; height:13px; stroke-width:1.5;"></i></div>
-            <div>
-              <div style="font-size:11px; color:#A0A0A0;">${cat.category}</div>
-              <div style="font-size:9px; color:#555;">${cat.count} books</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    } catch(e) { console.error(e); }
-  }
-
-  async function fetchRecommended() {
-    const container = document.getElementById('recommended-grid');
-    try {
-      // Mock random books or fetch from server
-      const res = await fetch('/api/library/search?q=');
-      let data = await res.json();
-      let books = data.results || [];
-      books = books.sort(() => 0.5 - Math.random()).slice(0, 6);
-
-      const gradients = {
-        'CS': 'linear-gradient(135deg,rgba(139,29,29,0.15),#0a0a0a)',
-        'Math': 'linear-gradient(135deg,rgba(29,58,139,0.15),#0a0a0a)',
-        'Networks': 'linear-gradient(135deg,rgba(29,100,29,0.15),#0a0a0a)',
-        'DB': 'linear-gradient(135deg,rgba(100,29,139,0.15),#0a0a0a)'
-      };
-
-      container.innerHTML = books.map(book => {
-        const grad = gradients[book.category] || gradients['CS'];
-        const availPill = book.availability ? '<span class="pill pill-green">Available</span>' : '<span class="pill pill-red">Issued</span>';
-        const actionText = book.availability ? 'Borrow &rarr;' : 'Reserve &rarr;';
-
-        return `
-          <div class="book-card" onclick="location.href='/book/${book.id}'">
-            <div class="book-top" style="background:${grad}">
-               <div class="book-spine" style="background:${grad.split(',')[1]}">
-                 <div style="font-size:7px; color:#F5E6BE; font-weight:600; text-align:center;">${book.title}</div>
-                 <div style="font-size:6px; color:rgba(245,230,190,0.5); text-align:center; margin-top:4px;">${book.author}</div>
-               </div>
-            </div>
-            <div class="book-bottom">
-              <div class="grid-book-title">${book.title}</div>
-              <div class="grid-book-author">${book.author}</div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                ${availPill}
-                <span style="font-size:10px; color:#8B1D1D;">${actionText}</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } catch(e) { console.error(e); }
-  }
-
-  function setLibraryStatus() {
-    const box = document.getElementById('library-status-box');
-    const now = new Date();
-    const day = now.getDay(); // 0 is Sunday
-    const hour = now.getHours();
-
-    let isOpen = false;
-    if (day >= 1 && day <= 5) { // Mon-Fri
-      if (hour >= 8 && hour < 20) isOpen = true;
-    } else if (day === 6) { // Sat
-      if (hour >= 9 && hour < 17) isOpen = true;
-    }
-
-    if (isOpen) {
-      box.style.background = 'rgba(60,180,100,0.06)';
-      box.style.borderColor = 'rgba(60,180,100,0.15)';
-      box.innerHTML = `
-        <div style="font-size:10px; color:#5c5; font-weight:600;">Library is currently open</div>
-        <div style="font-size:9px; color:#555; margin-top:2px;">Closes at ${day === 6 ? '5:00 PM' : '8:00 PM'} today &middot; Reading rooms available</div>
-      `;
-    } else {
-      box.style.background = 'rgba(139,29,29,0.06)';
-      box.style.borderColor = 'rgba(139,29,29,0.15)';
-      box.innerHTML = `
-        <div style="font-size:10px; color:#8B1D1D; font-weight:600;">Library is currently closed</div>
-        <div style="font-size:9px; color:#555; margin-top:2px;">Opens tomorrow at 8:00 AM</div>
-      `;
-    }
-  }
-
-  async function renewBook(id) {
-    if (!confirm('Renew this book for another 14 days?')) return;
-    try {
-       const res = await fetch('/api/library/renew', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ loan_id: id })
-       });
-       const data = await res.json();
-       if (data.status === 'ok') {
-         alert('Book renewed successfully! New due date: ' + new Date(data.new_due_date).toLocaleDateString());
-         initLibrary();
-       } else {
-         alert('Renewal failed: ' + data.error);
-       }
-    } catch(e) { console.error(e); }
-  }
-
-  function handleSearch() {
-    const q = document.getElementById('search-q').value;
-    const cat = document.getElementById('search-cat').value;
-    const avail = document.getElementById('search-avail').value;
-    window.location.href = `/student-dashboard/library/search?q=${encodeURIComponent(q)}&category=${encodeURIComponent(cat)}&availability=${encodeURIComponent(avail)}`;
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
   }
 </script>
 {% endblock %}

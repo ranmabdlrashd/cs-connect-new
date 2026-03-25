@@ -1,253 +1,164 @@
 {% extends "base.html" %}
 
-{% block title %}Library Admin Dashboard | CS CONNECT{% endblock %}
+{% block title %}Library Admin Console | CS CONNECT{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-    .admin-container {
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
-    }
+    /* Page-specific overrides */
+
+    body { margin: 0; padding: 0; background: var(--bg-color); }
+
+    .lib-hero { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+    .lib-hero h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 1.8rem; }
     
-    .tracking-panel {
-        background: #121212;
-        border: 1px solid rgba(245,230,190,0.06);
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 30px;
-    }
+    .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    .tracking-panel { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #F0EBE0; padding-bottom: 12px; }
+    .panel-header h2 { font-size: 1rem; color: var(--text-primary); font-family: 'Playfair Display', serif; margin: 0; }
+    
+    .admin-table { width: 100%; border-collapse: collapse; }
+    
+    .badge { font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+    .badge-info { background: #E3F2FD; color: #1976D2; }
+    .badge-warning { background: #FFF3E0; color: #E65100; }
+    .badge-success { background: #E8F5E9; color: #2E7D32; }
 
-    .panel-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        border-bottom: 1px solid rgba(245,230,190,0.1);
-        padding-bottom: 12px;
-    }
-
-    .panel-header h2 {
-        font-family: 'Playfair Display', serif;
-        color: #F5E6BE;
-        margin: 0;
-        font-size: 1.5rem;
-    }
-
-    .admin-table {
-        width: 100%;
-        border-collapse: collapse;
-        color: #E0E0E0;
-    }
-
-    .admin-table th, .admin-table td {
-        padding: 12px 16px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .admin-table th {
-        color: #A0A0A0;
-        font-weight: 500;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .admin-table tr:hover {
-        background: rgba(255,255,255,0.02);
-    }
-
-    .badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .badge-success { background: rgba(40,167,69,0.15); color: #4ade80; border: 1px solid rgba(40,167,69,0.3); }
-    .badge-warning { background: rgba(255,193,7,0.15); color: #facc15; border: 1px solid rgba(255,193,7,0.3); }
-    .badge-danger { background: rgba(220,53,69,0.15); color: #f87171; border: 1px solid rgba(220,53,69,0.3); }
-    .badge-info { background: rgba(23,162,184,0.15); color: #38bdf8; border: 1px solid rgba(23,162,184,0.3); }
-    .badge-secondary { background: rgba(108,117,125,0.15); color: #94a3b8; border: 1px solid rgba(108,117,125,0.3); }
-
-    .btn-action {
-        background: transparent;
-        border: 1px solid #8B1D1D;
-        color: #8B1D1D;
-        padding: 6px 14px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-action:hover {
-        background: #8B1D1D;
-        color: #fff;
-    }
-
-    .fine-panel input {
-        background: #1A1A1A;
-        border: 1px solid rgba(255,255,255,0.1);
-        color: white;
-        padding: 10px 14px;
-        border-radius: 6px;
-        width: 250px;
-    }
-
-    .fine-panel button {
-        background: #8B1D1D;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .fine-panel button:hover {
-        background: #a32222;
-    }
+    .btn-action { background: white; border: 1px solid var(--border-accent); color: var(--accent-crimson); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-action:hover { background: var(--accent-crimson); color: white; }
+    
+    .admin-table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .admin-table th { text-align: left; padding: 12px; background: #FDFCF8; color: var(--accent-crimson); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-accent); }
+    .admin-table td { padding: 12px; border-bottom: 1px solid var(--border-accent); color: var(--text-primary); }
 </style>
+<script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<section class="page-header" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-    <div class="header-overlay" style="width: 100%; text-align: center;">
-        <div class="header-content">
-            <h1>Library Admin Console</h1>
-            <p>Circulation Tracking & Fine Management</p>
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="book-open" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
+      <div class="dash-sidebar-item active" title="Library Console"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Library &middot; <b>Circulation Master</b></div>
+      <div style="display:flex; gap:12px;">
+         <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;" onclick="location.href='/admin-dashboard/library'">Catalog Manager</button>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      <div class="lib-hero">
+        <h1>Library Operations</h1>
+        <div style="text-align:right;">
+           <div style="font-size:0.65rem; color:var(--text-muted); font-weight:800;">PENDING</div>
+           <div style="font-size:1.4rem; font-weight:800; color:var(--accent-crimson); font-family:'Playfair Display', serif;">{{ requests|length }} Requests</div>
         </div>
-    </div>
-</section>
+      </div>
 
-<div class="admin-container">
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div style="background: rgba(139,29,29,0.1); border: 1px solid #8B1D1D; color: #f87171; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    <!-- Pending Requests Panel -->
-    <div class="tracking-panel">
-        <div class="panel-header">
+      <div class="panel-grid">
+        <!-- Pending Requests -->
+        <div class="tracking-panel">
+          <div class="panel-header">
             <h2>Pending Requests</h2>
             <span class="badge badge-info">{{ requests|length }} Open</span>
-        </div>
-        {% if requests %}
-        <table class="admin-table">
+          </div>
+          <table class="admin-table">
             <thead>
-                <tr>
-                    <th>Book</th>
-                    <th>Requester</th>
-                    <th>Date Requested</th>
-                    <th>Actions</th>
-                </tr>
+              <tr>
+                <th>Type</th>
+                <th>Book</th>
+                <th>User</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody>
-                {% for req in requests %}
-                <tr>
-                    <td><strong>{{ req.book_title }}</strong></td>
-                    <td>{{ req.user_name }}</td>
-                    <td>{{ req.request_date.strftime('%Y-%m-%d %H:%M') if req.request_date else '-' }}</td>
-                    <td>
-                        <form action="{{ url_for('admin_bp.send_request_message', request_id=req.id) }}" method="POST" style="display:inline;">
-                            <button class="btn-action" type="submit">Notify Holder</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
+              {% for req in requests %}
+              <tr>
+                <td><span class="badge badge-info">{{ req.request_type }}</span></td>
+                <td><b>{{ req.book_title }}</b></td>
+                <td>{{ req.user_name }}</td>
+                <td>
+                  <form action="{{ url_for('admin_bp.approve_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                    <button class="btn-action">Approve</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
             </tbody>
-        </table>
-        {% else %}
-        <p style="color: #666; font-style: italic;">No pending book requests.</p>
-        {% endif %}
-    </div>
-
-    <!-- Active Issues Panel -->
-    <div class="tracking-panel">
-        <div class="panel-header">
-            <h2>Active Issued Books</h2>
-            <span class="badge badge-warning">{{ issues|length }} Circulating</span>
+          </table>
         </div>
-        {% if issues %}
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Book</th>
-                    <th>Holder</th>
-                    <th>Issue Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for issue in issues %}
-                <tr>
-                    <td><strong>{{ issue.book_title }}</strong></td>
-                    <td>{{ issue.user_name }} <span style="color:#666; font-size: 0.8em;">({{ issue.admission_num }})</span></td>
-                    <td>{{ issue.issue_date.strftime('%Y-%m-%d %H:%M') if issue.issue_date else '-' }}</td>
-                    <td><span class="badge badge-warning">Issued</span></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p style="color: #666; font-style: italic;">No active issues right now.</p>
-        {% endif %}
-    </div>
 
-    <!-- Fine Payment UI -->
-    <div class="tracking-panel fine-panel">
-        <div class="panel-header">
-            <h2>Overdue Fine Management</h2>
+        <!-- Active Issues -->
+        <div class="tracking-panel">
+           <div class="panel-header">
+             <h2>Active Circulation</h2>
+             <span class="badge badge-warning">{{ issues|length }} Active</span>
+           </div>
+           <table class="admin-table">
+             <thead>
+               <tr>
+                 <th>Book Title</th>
+                 <th>Student</th>
+                 <th>Due Date</th>
+               </tr>
+             </thead>
+             <tbody>
+               {% for issue in issues %}
+               <tr>
+                 <td><b>{{ issue.book_title }}</b></td>
+                 <td>{{ issue.user_name }}</td>
+                 <td><span style="color:var(--accent-crimson); font-weight:700;">{{ issue.due_date.strftime('%b %d') if issue.due_date else '-' }}</span></td>
+               </tr>
+               {% endfor %}
+             </tbody>
+           </table>
         </div>
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px;">
-            <input type="text" placeholder="Enter Registration No (e.g. AIS-CS-1011)">
-            <input type="number" placeholder="Fine Amount (₹)" style="width: 150px;">
-            <button onclick="alert('Fine Payment Recorded successfully. Receipt sent to student email.')">Process Payment</button>
-        </div>
-        <p style="color: #888; font-size: 0.85rem;"><i class="fas fa-info-circle"></i> Payments are synced with the centralized college fee management portal.</p>
-    </div>
+      </div>
 
-    <!-- Transaction History Panel -->
-    <div class="tracking-panel">
-        <div class="panel-header">
-            <h2>Circulation Ledger</h2>
-        </div>
-        {% if transactions %}
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Book Title</th>
-                    <th>Student</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tx in transactions[:15] %} <!-- limit 15 -->
-                <tr>
-                    <td><span class="badge badge-{{ tx.badge_class }}">{{ tx.type|capitalize }}</span></td>
-                    <td>{{ tx.book_title }}</td>
-                    <td>{{ tx.user_name }}</td>
-                    <td>{{ tx.date.strftime('%Y-%m-%d %H:%M') if hasattr(tx.date, 'strftime') else tx.date }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p style="color: #666; font-style: italic;">Ledger is empty.</p>
-        {% endif %}
+      <!-- Ledger -->
+      <div class="tracking-panel">
+         <div class="panel-header">
+           <h2>Circulation Ledger</h2>
+         </div>
+         <table class="admin-table">
+           <thead>
+             <tr>
+               <th>Action</th>
+               <th>Book</th>
+               <th>Student</th>
+               <th>Date</th>
+             </tr>
+           </thead>
+           <tbody>
+             {% for tx in transactions[:10] %}
+             <tr>
+               <td><span class="badge badge-{{ tx.badge_class }}">{{ tx.type }}</span></td>
+               <td>{{ tx.book_title }}</td>
+               <td>{{ tx.user_name }}</td>
+               <td>{{ tx.date.strftime('%Y-%m-%d') if tx.date.strftime is defined else tx.date }}</td>
+             </tr>
+             {% endfor %}
+           </tbody>
+         </table>
+      </div>
     </div>
-
+  </main>
 </div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
 {% endblock %}

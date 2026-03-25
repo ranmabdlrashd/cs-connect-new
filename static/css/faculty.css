@@ -5,22 +5,22 @@
 
 /* --- 1. BASE LAYOUT & BREADCRUMBS --- */
 .faculty-page {
-  background: #0A0A0A;
-  color: #F5E6BE;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 }
 
 .faculty-breadcrumb {
   padding: 12px 48px;
-  border-bottom: 1px solid rgba(245,230,190,0.04);
+  border-bottom: 1px solid var(--border);
   font-size: 10px;
-  color: #444;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.faculty-breadcrumb a { color: #444; text-decoration: none; transition: 0.2s; }
+.faculty-breadcrumb a { color: var(--text-muted); text-decoration: none; transition: 0.2s; }
 .faculty-breadcrumb a:hover { color: #8B1D1D; }
 .bc-sep { color: #8B1D1D; font-size: 12px; }
 .bc-active { color: #8B1D1D; }
@@ -29,8 +29,8 @@
 .faculty-hero {
   position: relative;
   padding: 64px 48px 48px;
-  background: linear-gradient(180deg, #0d0d0d 0%, #0A0A0A 100%);
-  border-bottom: 1px solid rgba(245,230,190,0.05);
+  background: linear-gradient(180deg, #F4F1EA 0%, var(--bg-primary) 100%);
+  border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
 .hero-glow {
@@ -54,13 +54,13 @@
   font-family: 'Playfair Display', serif;
   font-size: 44px;
   font-weight: 900;
-  color: #F5E6BE;
+  color: var(--text-primary);
   line-height: 1.1;
   margin-bottom: 20px;
 }
 .hero-subtitle {
   font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
   max-width: 620px;
   line-height: 1.8;
 }
@@ -70,9 +70,9 @@
   position: sticky;
   top: 64px; /* Adjust for navbar height */
   z-index: 900;
-  background: rgba(18, 18, 18, 0.95);
+  background: rgba(253, 252, 248, 0.95);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(245,230,190,0.06);
+  border-bottom: 1px solid var(--border);
   padding: 16px 48px;
   display: flex;
   justify-content: space-between;
@@ -90,8 +90,8 @@
 
 .tab-btn {
   background: transparent;
-  border: 1px solid rgba(245,230,190,0.1);
-  color: #A0A0A0;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   padding: 8px 20px;
   border-radius: 50px;
   font-size: 11px;
@@ -100,8 +100,8 @@
   white-space: nowrap;
   transition: 0.3s;
 }
-.tab-btn:hover { border-color: #8B1D1D; color: #F5E6BE; }
-.tab-btn.active { background: #8B1D1D; border-color: #8B1D1D; color: #F5E6BE; }
+.tab-btn:hover { border-color: #8B1D1D; color: var(--text-primary); }
+.tab-btn.active { background: #8B1D1D; border-color: #8B1D1D; color: #FFFFFF; }
 
 .search-wrapper {
   position: relative;
@@ -116,23 +116,23 @@
 }
 .search-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(245,230,190,0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 50px;
   padding: 10px 16px 10px 42px;
-  color: #F5E6BE;
+  color: var(--text-primary);
   font-size: 12px;
   outline: none;
   transition: 0.3s;
 }
-.search-input:focus { border-color: #8B1D1D; box-shadow: 0 0 15px rgba(139,29,29,0.1); }
+.search-input:focus { border-color: #8B1D1D; box-shadow: 0 0 15px rgba(139,29,29,0.05); }
 
 /* --- 4. HOD FEATURE CARD --- */
 .faculty-spotlight {
   padding: 40px 48px 20px;
 }
 .hod-card {
-  background: linear-gradient(to right, #160808, #121212);
+  background: linear-gradient(to right, #F4F1EA, var(--bg-secondary));
   border: 2px solid #8B1D1D;
   border-radius: 16px;
   display: flex;
@@ -173,7 +173,7 @@
   justify-content: center;
   font-family: 'Playfair Display', serif;
   font-size: 64px;
-  color: #F5E6BE;
+  color: #FFFFFF;
 }
 
 .hod-content { flex: 1; }
@@ -190,7 +190,7 @@
   font-size: 32px;
   margin-bottom: 12px;
 }
-.hod-qual { color: #A0A0A0; font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
+.hod-qual { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
 .hod-btn {
   display: inline-flex;
   align-items: center;
@@ -201,7 +201,7 @@
   font-weight: 600;
   transition: 0.3s;
 }
-.hod-btn:hover { color: #F5E6BE; gap: 15px; }
+.hod-btn:hover { color: var(--text-primary); gap: 15px; }
 
 /* --- 5. FACULTY GRID --- */
 .faculty-container {
@@ -214,8 +214,8 @@
 }
 
 .faculty-card {
-  background: #121212;
-  border: 1px solid rgba(245,230,190,0.06);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 24px;
   transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -235,7 +235,7 @@
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 20px;
-  background: #0d0d0d;
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +244,7 @@
 .card-initials {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+  background: linear-gradient(135deg, #1a1a1a, var(--bg-secondary));
   color: #8B1D1D;
   display: flex;
   align-items: center;
@@ -257,7 +257,7 @@
 .card-name {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: #F5E6BE;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 .card-designation {
@@ -269,7 +269,7 @@
   margin-bottom: 12px;
 }
 .card-qual {
-  color: #666;
+  color: var(--text-muted);
   font-size: 11px;
   margin-bottom: 16px;
   min-height: 32px;
@@ -282,12 +282,12 @@
   margin-top: auto;
 }
 .tag {
-  background: rgba(245,230,190,0.03);
-  color: #A0A0A0;
+  background: var(--border);
+  color: var(--text-muted);
   font-size: 9px;
   padding: 4px 10px;
   border-radius: 4px;
-  border: 1px solid rgba(245,230,190,0.05);
+  border: 1px solid var(--border);
 }
 
 /* --- 6. UTILS & LOADING --- */
@@ -298,7 +298,7 @@
   display: none;
 }
 .no-results svg { color: #8B1D1D; margin-bottom: 16px; opacity: 0.5; }
-.no-results p { color: #666; font-size: 14px; }
+.no-results p { color: var(--text-muted); font-size: 14px; }
 
 /* --- 7. RESPONSIVE --- */
 @media (max-width: 1024px) {

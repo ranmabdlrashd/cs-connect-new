@@ -1,128 +1,128 @@
 {% extends "base.html" %}
 
-{% block title %}Fee Management - CS Connect Admin{% endblock %}
+{% block title %}Fee Management | Admin - CS CONNECT{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-    .fm-page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-    .fm-header { margin-bottom: 30px; border-bottom: 1px solid rgba(245,230,190,0.1); padding-bottom: 20px; }
-    .fm-header h2 { font-family: 'Playfair Display', serif; color: #F5E6BE; margin: 0; font-size: 28px; }
-    .fm-header p { color: #A0A0A0; margin: 8px 0 0; font-size: 14px; }
-    
-    .fm-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
-    .fm-stat-card { background: #121212; padding: 24px; border-radius: 12px; border: 1px solid rgba(40,167,69,0.2); border-left: 4px solid #28a745; }
-    .fm-stat-card.warning { border-color: rgba(255,193,7,0.2); border-left-color: #ffc107; }
-    .fm-stat-card.danger { border-color: rgba(220,53,69,0.2); border-left-color: #dc3545; }
-    .fm-stat-val { font-size: 32px; color: #fff; font-family: 'Playfair Display', serif; font-weight: 700; margin-bottom: 4px; }
-    .fm-stat-lbl { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    /* Page-specific overrides */
+    nav, .news-ticker { display: none !important; }
+    body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
-    .fm-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
+    .fee-hero { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+    .fee-hero h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 1.8rem; }
     
-    .fm-panel { background: #121212; border-radius: 12px; border: 1px solid rgba(245,230,190,0.05); padding: 24px; }
-    .fm-panel h3 { color: #F5E6BE; margin: 0 0 20px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background: white; border: 1px solid var(--border-accent); border-radius: 12px; padding: 20px; text-align: center; }
     
-    .fm-table { width: 100%; border-collapse: collapse; }
-    .fm-table th { color: #A0A0A0; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .fm-table td { padding: 12px; color: #D0D0D0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+    .fee-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+    .table-panel { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; }
+    .form-panel { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; }
     
-    .fm-form-group { margin-bottom: 16px; }
-    .fm-form-group label { display: block; color: #A0A0A0; font-size: 13px; margin-bottom: 8px; }
-    .fm-form-group input, .fm-form-group select { width: 100%; background: #1A1A1A; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 6px; outline: none; }
-    .fm-btn { width: 100%; background: #8B1D1D; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 8px; }
-    .fm-btn:hover { background: #a32222; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; font-size: 0.65rem; color: var(--accent-crimson); text-transform: uppercase; padding: 12px; border-bottom: 2px solid #F0EBE0; }
+    .data-table td { padding: 12px; font-size: 0.8rem; color: var(--text-primary); border-bottom: 1px solid #F0EBE0; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 0.65rem; color: var(--accent-crimson); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .form-input { width: 100%; padding: 10px; border: 1px solid #EAE5D8; border-radius: 8px; font-size: 0.8rem; background: #FDFCF8; }
 </style>
+<script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<div class="fm-page">
-    <div class="fm-header">
-        <h2>Fee Management Platform</h2>
-        <p>Monitor semester fee collections, dues, and record manual payments.</p>
-    </div>
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="credit-card" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item active" title="Fee Management"><i data-lucide="credit-card"></i></div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
+    </nav>
+  </aside>
 
-    <div class="fm-stats">
-        <div class="fm-stat-card">
-            <div class="fm-stat-val">₹42.5 L</div>
-            <div class="fm-stat-lbl">Total Collected (S6)</div>
-        </div>
-        <div class="fm-stat-card warning">
-            <div class="fm-stat-val">64</div>
-            <div class="fm-stat-lbl">Pending Students</div>
-        </div>
-        <div class="fm-stat-card danger">
-            <div class="fm-stat-val">₹3.2 L</div>
-            <div class="fm-stat-lbl">Total Overdue</div>
-        </div>
-    </div>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Accounts &middot; <b>Fee Management</b></div>
+    </header>
 
-    <div class="fm-grid">
-        <div class="fm-panel">
-            <h3>Recent Transactions</h3>
-            <table class="fm-table">
-                <thead>
-                    <tr>
-                        <th>Txn ID</th>
-                        <th>Student</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>#TXN-8821</td>
-                        <td>Arjun Kumar (S6)</td>
-                        <td>₹35,000</td>
-                        <td>Today, 10:45 AM</td>
-                        <td style="color:#4ade80;">Success</td>
-                    </tr>
-                    <tr>
-                        <td>#TXN-8820</td>
-                        <td>Meera Prasad (S6)</td>
-                        <td>₹35,000</td>
-                        <td>Yesterday</td>
-                        <td style="color:#4ade80;">Success</td>
-                    </tr>
-                    <tr>
-                        <td>#TXN-8819</td>
-                        <td>Varun J (S8)</td>
-                        <td>₹1,500</td>
-                        <td>2 Days Ago</td>
-                        <td style="color:#facc15;">Processing</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="dash-content">
+      <div class="fee-hero">
+        <h1>Institutional Finance</h1>
+        <div style="text-align:right;">
+           <div style="font-size:0.65rem; color:var(--text-muted); font-weight:800;">TOTAL COLLECTION</div>
+           <div style="font-size:1.4rem; font-weight:800; color:var(--accent-crimson); font-family:'Playfair Display', serif;">₹42.5 Lakhs</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+           <div style="font-size:0.65rem; color:var(--text-muted); font-weight:800;">PENDING STUDENTS</div>
+           <div style="font-size:1.5rem; font-weight:800; font-family:'Playfair Display', serif;">64</div>
+        </div>
+        <div class="stat-card">
+           <div style="font-size:0.65rem; color:var(--accent-crimson); font-weight:800;">OVERDUE AMOUNT</div>
+           <div style="font-size:1.5rem; font-weight:800; font-family:'Playfair Display', serif; color:var(--accent-crimson);">₹3.2 L</div>
+        </div>
+        <div class="stat-card">
+           <div style="font-size:0.65rem; color:#2E7D32; font-weight:800;">VERIFIED TODAY</div>
+           <div style="font-size:1.5rem; font-weight:800; font-family:'Playfair Display', serif; color:#2E7D32;">12</div>
+        </div>
+      </div>
+
+      <div class="fee-layout">
+        <div class="table-panel">
+          <h3 style="font-family:'Playfair Display', serif; margin:0 0 16px 0; font-size:1rem;">Recent Transactions</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Arjun Kumar</b> <span style="font-size:0.75rem; color:var(--text-muted);">(S6 CSE)</span></td>
+                <td>₹35,000</td>
+                <td>Tuition</td>
+                <td style="color:#2E7D32; font-weight:800;">Success</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div class="fm-panel">
-            <h3>Record Manual Payment</h3>
-            <div class="fm-form-group">
-                <label>Student Roll Number</label>
-                <input type="text" placeholder="e.g. AIS-CS-...">
-            </div>
-            <div class="fm-form-group">
-                <label>Fee Category</label>
-                <select>
-                    <option>Semester Tuition Fee</option>
-                    <option>Exam Registration Fee</option>
-                    <option>Library Fine</option>
-                    <option>Other Dues</option>
-                </select>
-            </div>
-            <div class="fm-form-group">
-                <label>Amount (₹)</label>
-                <input type="number" placeholder="0.00">
-            </div>
-            <div class="fm-form-group">
-                <label>Payment Method</label>
-                <select>
-                    <option>Cash (Office)</option>
-                    <option>Demand Draft</option>
-                    <option>Bank Transfer (NEFT/RTGS)</option>
-                </select>
-            </div>
-            <button class="fm-btn" onclick="alert('Payment Recorded Successfully.')">Submit Record</button>
+        <div class="form-panel">
+          <h3 style="font-family:'Playfair Display', serif; margin:0 0 16px 0; font-size:1rem;">Record Payment</h3>
+          <div class="form-group">
+            <label class="form-label">Roll Number</label>
+            <input type="text" class="form-input" placeholder="AIS-CS-...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-input">
+              <option>Tuition Fee</option>
+              <option>Library Fine</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" class="form-input" placeholder="0.00">
+          </div>
+          <button class="dash-btn-primary" style="width:100%; margin-top:12px;">Process Record</button>
         </div>
+      </div>
     </div>
+  </main>
 </div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
 {% endblock %}

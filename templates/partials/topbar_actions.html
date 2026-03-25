@@ -1,0 +1,73 @@
+<div class="notif-wrapper" style="position: relative; display: inline-block; z-index: 9999;">
+  <div id="notificationBell" onclick="toggleNotifications(event)" style="width:36px; height:36px; background:var(--dash-active-bg, #F4F1EA); border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border-accent, #E0DBCF); cursor:pointer; color: var(--accent-crimson);">
+    <i data-lucide="bell" style="width:16px; height:16px;"></i>
+    {% if notif_count and notif_count > 0 %}
+    <span class="bell-badge" style="position:absolute; top:-4px; right:-4px; background:var(--accent-crimson); color:white; font-size:10px; font-weight:bold; border-radius:50%; padding:2px 6px;">{{ notif_count }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Notification Dropdown -->
+  <div id="notificationDropdown" class="notification-dropdown" style="display: none; position: absolute; top: 46px; right: 0; width: 320px; background: white; border: 1px solid var(--border-accent, #E0DBCF); border-radius: 12px; box-shadow: 0 8px 24px rgba(139,29,29,0.1); z-index: 10000; overflow: hidden; text-align: left;">
+    <div style="padding: 16px; border-bottom: 1px solid var(--border-accent, #E0DBCF); display: flex; justify-content: space-between; align-items: center; background: #FDFCF8;">
+      <span style="font-weight: 700; color: var(--text-primary, #1A1A1A); font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0;">Notifications</span>
+      <a href="#" onclick="markAllRead(event)" style="font-size: 0.8rem; color: var(--accent-crimson); text-decoration: none; font-weight: 600;">Mark all read</a>
+    </div>
+    <div style="max-height: 300px; overflow-y: auto; padding: 0;">
+      {% if nav_notifs %}
+        {% for notif in nav_notifs[:5] %}
+        <div class="notif-item" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; {% if not notif.read_status %}background: rgba(139,29,29,0.03);{% endif %}">
+          <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary, #1A1A1A); margin-bottom: 4px;">{{ notif.title }}</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary, #595959); line-height: 1.4;">{{ notif.message|safe }}</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted, #A0A0A0); margin-top: 6px;">{{ notif.created_at_iso[:10] if notif.created_at_iso else 'Recently' }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="padding: 24px 16px; text-align: center; color: var(--text-muted, #A0A0A0); font-size: 0.9rem;">
+          No new notifications
+        </div>
+      {% endif %}
+    </div>
+    <a href="/student-dashboard/notifications" style="display: block; padding: 12px; text-align: center; background: #FDFCF8; color: var(--accent-crimson); text-decoration: none; font-size: 0.85rem; font-weight: 600; border-top: 1px solid var(--border-accent, #E0DBCF);">View All</a>
+  </div>
+</div>
+
+<script>
+  function toggleNotifications(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('notificationDropdown');
+    if (dropdown) {
+      const isVisible = dropdown.style.display === 'block';
+      dropdown.style.display = isVisible ? 'none' : 'block';
+      
+      // Automatic mark as read when opened
+      if (!isVisible) {
+        markAllRead(null);
+      }
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    const bellBtn = document.getElementById('notificationBell');
+    const dropdown = document.getElementById('notificationDropdown');
+    if (dropdown && bellBtn && !bellBtn.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  function markAllRead(e) {
+    if (e) e.preventDefault();
+    fetch('/api/notifications/read-all', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => {
+      if (res.ok) {
+        const badge = document.querySelector('.bell-badge');
+        if (badge) badge.style.display = 'none';
+        
+        document.querySelectorAll('.notif-item').forEach(item => {
+          item.style.background = 'transparent';
+        });
+      }
+    });
+  }
+</script>

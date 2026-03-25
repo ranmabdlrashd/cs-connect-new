@@ -15,12 +15,12 @@ app.secret_key = os.environ.get("SECRET_KEY", "csconnectsecret")
 
 from routes.library_routes import library_bp
 from routes.admin_routes import admin_bp
-from routes.placement_routes import placement_bp
+# Placement routes removed
 import llm_engine
 
 app.register_blueprint(library_bp)
 app.register_blueprint(admin_bp)
-app.register_blueprint(placement_bp)
+# Placement blueprint removed
 
 # PostgreSQL Connection details
 class DBConnection:
@@ -90,21 +90,8 @@ def get_home_stats():
     conn.close()
     return [{"value": r[0], "label": r[1]} for r in rows]
 
-def get_placement_batches():
-    conn = get_db_connection()
-    rows = conn.execute("SELECT batch_key, label, stats, companies FROM placement_batches ORDER BY id ASC").fetchall()
-    conn.close()
-    batches = []
-    for r in rows:
-        stats = r[2] if not isinstance(r[2], str) else json.loads(r[2])
-        companies = r[3] if not isinstance(r[3], str) else json.loads(r[3])
-        batches.append({
-            "key": r[0],
-            "label": r[1],
-            "stats": stats,
-            "companies": companies
-        })
-    return batches
+# Placement helper functions removed
+
 
 
 
@@ -182,14 +169,6 @@ def dashboard_notifications():
         return redirect(url_for('login'))
     return render_template('notifications.html', active_page='')
 
-# ── NEW SETTINGS ENDPOINTS ──
-
-@app.route('/dashboard/settings')
-def dashboard_settings():
-    if not session.get('user_id'):
-        flash("Please log in.", "warning")
-        return redirect(url_for('login'))
-        
     conn = get_db_connection()
     try:
         downloads = conn.execute("SELECT * FROM download_logs WHERE user_id = %s ORDER BY downloaded_at DESC LIMIT 20", (session['user_id'],)).fetchall()
@@ -248,7 +227,7 @@ def api_notification_preferences():
         return jsonify({'error': 'Unauthorized'}), 401
         
     conn = get_db_connection()
-    valid_fields = ['attendance_alerts', 'assignment_alerts', 'library_alerts', 'placement_alerts', 'department_notices', 'exam_alerts']
+    valid_fields = ['library_alerts', 'department_notices', 'exam_alerts']
     try:
         if request.method == 'GET':
             query = f"SELECT {', '.join(valid_fields)} FROM users WHERE id = %s"
@@ -700,39 +679,13 @@ def init_db():
             ('S2 CSE A', False, None)
         )
 
-    # 17. mous (Memorandum of Understanding)
+    # 19. mous (Memorandum of Understanding)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mous (
             id SERIAL PRIMARY KEY,
             organization TEXT NOT NULL,
             date_of_signing TEXT,
             status TEXT DEFAULT 'Active'
-        )
-    ''')
-
-    # 18. assignments
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS assignments (
-            id SERIAL PRIMARY KEY,
-            title TEXT NOT NULL,
-            subject_name TEXT,
-            faculty_id INTEGER,
-            batch TEXT,
-            due_date TIMESTAMP,
-            submission_method TEXT,
-            file_format TEXT
-        )
-    ''')
-
-    # 19. submissions
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS submissions (
-            id SERIAL PRIMARY KEY,
-            assignment_id INTEGER,
-            student_id INTEGER,
-            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            file_url TEXT,
-            note TEXT
         )
     ''')
 
@@ -1047,53 +1000,6 @@ def research():
 @app.route('/search')
 def search():
     return render_template('search_results_page.html', active_page='home')
-@app.route('/placements')
-def placements():
-    conn = get_db_connection()
-    
-    # 1. Summary
-    summary_raw = conn.execute('SELECT * FROM placement_summary').fetchall()
-    placement_summary = []
-    for s in summary_raw:
-        d = dict(s)
-        d['decimal'] = bool(d['decimal_bool'])
-        placement_summary.append(d)
-        
-    # 2. Companies
-    companies = [dict(row) for row in conn.execute('SELECT * FROM placement_companies').fetchall()]
-    
-    # 3. Alumni
-    alumni = [dict(row) for row in conn.execute('SELECT * FROM alumni').fetchall()]
-    
-    # 4. Internships
-    internships = [dict(row) for row in conn.execute('SELECT * FROM internships').fetchall()]
-    
-    # 5. Batches (Complex - needs restructuring or kept simple for now)
-    # The batch data is nested, so let's mock the fetch to keep templates working
-    # We will need a `placement_batches` table later or just parse a JSON
-    # For now, let's just fetch the rest and hardcode PLACEMENT_BATCHES
-    batches = get_placement_batches()
-
-    conn.close()
-
-    return render_template(
-        'placement.html',
-        active_page='placements',
-        placement_summary=placement_summary,
-        batches=batches,
-        companies=companies,
-        alumni=alumni,
-        internships=internships,
-        team=get_site_data('placement_team', {}),
-    )
-
-
-@app.route('/dashboard/assignments')
-def student_assignments():
-    if not session.get('user_id'):
-        flash("Please log in.", "warning")
-        return redirect(url_for('login'))
-    return render_template('student_assignments.html', active_page='assignments')
 
 
 @app.route('/dashboard/syllabus')
@@ -1538,97 +1444,6 @@ def api_faculty():
 
     return jsonify(results)
 
-@app.route('/api/student/assignments')
-def api_student_assignments():
-    if not session.get('user_id'):
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    student_id = session.get('id', 0)
-    batch = session.get('batch', 'S2 CSE A')
-
-    conn = get_db_connection()
-    query = """
-    SELECT a.id, a.title, a.subject_name, a.faculty_id, f.name as faculty_name, a.due_date,
-           a.submission_method, a.file_format as file_format_accepted,
-           s.submitted_at, s.file_url, s.id as submission_id
-    FROM assignments a
-    LEFT JOIN faculty f ON a.faculty_id = f.id
-    LEFT JOIN submissions s ON a.id = s.assignment_id AND s.student_id = %(student_id)s
-    WHERE a.batch = %(batch)s
-    ORDER BY
-      CASE WHEN s.id IS NULL AND a.due_date < NOW() THEN 1
-           WHEN s.id IS NULL THEN 2
-           ELSE 3 END,
-      a.due_date ASC
-    """
-    rows = conn.execute(query, {'student_id': student_id, 'batch': batch}).fetchall()
-    conn.close()
-
-    from datetime import datetime
-    now = datetime.now()
-    assignments = []
-    
-    for r in rows:
-        d = dict(r)
-        
-        # Calculate status
-        if d['submitted_at']:
-            status = 'submitted'
-        elif d['due_date'] and d['due_date'] < now:
-            status = 'overdue'
-        else:
-            status = 'pending'
-            
-        # Calculate days remaining
-        days_remaining = None
-        if d['due_date']:
-            delta = d['due_date'] - now
-            days_remaining = max(0, delta.days)
-
-        if d['due_date']:
-            d['due_date'] = d['due_date'].isoformat()
-        if d['submitted_at']:
-            d['submitted_at'] = d['submitted_at'].isoformat()
-            
-        d['status'] = status
-        d['days_remaining'] = days_remaining
-        
-        assignments.append(d)
-
-    return jsonify({'assignments': assignments})
-
-
-@app.route('/api/student/assignments/<int:id>/submit', methods=['POST'])
-def api_student_submit_assignment(id):
-    if not session.get('user_id'):
-        return jsonify({'error': 'Unauthorized'}), 401
-        
-    student_id = session.get('id', 0)
-    note = request.form.get('note', '')
-    
-    file_url = None
-    if 'file' in request.files:
-        file = request.files['file']
-        if file.filename != '':
-            from werkzeug.utils import secure_filename
-            import os
-            filename = secure_filename(file.filename)
-            upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'submissions')
-            os.makedirs(upload_dir, exist_ok=True)
-            filepath = os.path.join(upload_dir, f"{student_id}_{id}_{filename}")
-            file.save(filepath)
-            file_url = f"/static/uploads/submissions/{student_id}_{id}_{filename}"
-
-    conn = get_db_connection()
-    conn.execute(
-        "INSERT INTO submissions (assignment_id, student_id, file_url, note) VALUES (%s, %s, %s, %s)",
-        (id, student_id, file_url, note)
-    )
-    conn.commit()
-    conn.close()
-    
-    return jsonify({'status': 'success'})
-
 
 @app.route('/api/books')
 def api_books():
@@ -1849,23 +1664,11 @@ def dashboard():
 
     conn.close()
 
-    # Fallback/Dummy values for structured UI cards (Attendance, CGPA, Grades)
-    # These would normally come from site_data['student_metrics']
     dashboard_data = {
-        "attendance": 87,
-        "cgpa": 8.6,
-        "cgpa_trend": "0.2",
-        "pending_assignments": 3,
         "active_loans": f"{active_loans} / 4",
         "earliest_due": due_date,
         "schedule": schedule[:4], # Show first 4
         "announcements": announcements,
-        "grades": [
-            {"code": "CS301", "grade": "S"},
-            {"code": "CS302", "grade": "A+"},
-            {"code": "CS303", "grade": "A"},
-            {"code": "CS331", "grade": "B+"}
-        ],
         "name": student_name,
         "roll_no": roll_no
     }
@@ -1905,32 +1708,21 @@ def my_students():
 
     conn.close()
 
-    # Build student objects (attendance mocked; replace with real table when available)
-    _seed_base = 42
+    # Build student objects
     students = []
-    at_risk_count = 0
-
     for i, (sid, name, email, roll_no) in enumerate(raw_students):
-        # Deterministic pseudo-random attendance per student
-        random.seed(_seed_base + i * 7)
-        total  = random.choice([40, 42, 44, 45, 48])
-        present = int(total * random.uniform(0.60, 0.97))
-        pct    = round((present / total) * 100, 1)
-
         # Initials
         parts = name.strip().split()
         initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
 
         # Last seen (random recent date)
+        random.seed(sid)
         days_ago = random.randint(0, 14)
         last_seen_dt = _dt.date.today() - _dt.timedelta(days=days_ago)
         last_seen = last_seen_dt.strftime("%b %d, %Y") if days_ago > 0 else "Today"
 
-        # Batch (pull from roll_no prefix or default)
+        # Batch
         batch = "S6 CSE"
-
-        if pct < 75:
-            at_risk_count += 1
 
         students.append({
             "id":          sid,
@@ -1938,20 +1730,12 @@ def my_students():
             "email":       email,
             "roll_no":     roll_no or f"AIS-CS-{100+i:03d}",
             "initials":    initials,
-            "att_present": present,
-            "att_total":   total,
-            "att_pct":     pct,
             "last_seen":   last_seen,
             "batch":       batch,
         })
 
-    # Aggregate stats
-    avg_att = round(sum(s["att_pct"] for s in students) / len(students), 1) if students else 0.0
-
     stats = {
-        "total":   len(students),
-        "at_risk": at_risk_count,
-        "avg_att": avg_att,
+        "total":   len(students)
     }
 
     return render_template("my_students.html",
@@ -1962,185 +1746,12 @@ def my_students():
 
 @app.route('/faculty/notify-student', methods=['POST'])
 def notify_student():
-    """Send a low-attendance notice to a student (email stub)."""
-    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
-        return jsonify({"ok": False, "error": "Unauthorized"}), 403
-
-    data    = request.get_json(silent=True) or {}
-    email   = data.get("email", "")
-    message = data.get("message", "")
-
-    if not email:
-        return jsonify({"ok": False, "error": "No email provided"})
-
-    # Log notice to notifications table if it exists
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO notifications (user_email, message, sent_at) VALUES (%s, %s, NOW())",
-            (email, message)
-        )
-        conn.commit()
-        conn.close()
-    except Exception:
-        pass  # table might not exist — silently continue
-
-    # TODO: Integrate SMTP / AWS SES / SendGrid here for real email delivery
-    return jsonify({"ok": True, "message": f"Notice queued for {email}"})
+    # Notification route removed as part of feature purge
+    pass
 
 
-# ──────────────────────────────────────────────────────────────
-# FACULTY: ATTENDANCE MARKING
-# ──────────────────────────────────────────────────────────────
+# Attendance management routes removed as part of feature purge.
 
-@app.route('/faculty/mark-attendance')
-@app.route('/attendance-entry')          # alias from dashboard quick-link
-def mark_attendance():
-    """Digital attendance register for faculty."""
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-    if session.get("role") not in ("faculty", "admin"):
-        flash("Access denied. Faculty only.", "danger")
-        return redirect(url_for("home"))
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Subjects from timetable_subjects (if available), else fallback
-    subjects = []
-    try:
-        cursor.execute("SELECT code, name FROM timetable_subjects ORDER BY code")
-        subjects = [{"code": r[0], "name": r[1]} for r in cursor.fetchall()]
-    except Exception:
-        pass
-
-    # Distinct batches from timetable
-    batches = []
-    try:
-        cursor.execute("SELECT DISTINCT batch FROM timetable ORDER BY batch")
-        batches = [r[0] for r in cursor.fetchall()]
-    except Exception:
-        batches = ["S6 CSE", "S4 CSE", "S2 CSE"]
-
-    # Initial student list (first batch or all students)
-    first_batch = batches[0] if batches else None
-    raw = []
-    try:
-        cursor.execute(
-            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
-        )
-        raw = cursor.fetchall()
-    except Exception:
-        pass
-
-    conn.close()
-
-    import random as _r
-    students = []
-    for i, (sid, name, email, roll_no) in enumerate(raw):
-        parts = name.strip().split()
-        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
-        students.append({
-            "id":       sid,
-            "name":     name,
-            "email":    email,
-            "roll_no":  roll_no or f"AIS-CS-{100+i:03d}",
-            "initials": initials,
-        })
-
-    # Pass as (index, student) pairs for the template
-    students_enum = list(enumerate(students))
-
-    return render_template("mark_attendance.html",
-                           subjects=subjects,
-                           batches=batches,
-                           students=students_enum)
-
-
-@app.route('/faculty/students-by-batch')
-def students_by_batch():
-    """API: return students for a given batch (used by JS on dropdown change)."""
-    if not session.get("user_id"):
-        return jsonify({"error": "Unauthorized"}), 403
-
-    batch = request.args.get("batch", "")
-    conn  = get_db_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
-        )
-        raw = cursor.fetchall()
-    except Exception:
-        raw = []
-
-    conn.close()
-
-    students = []
-    for i, (sid, name, email, roll_no) in enumerate(raw):
-        parts = name.strip().split()
-        initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
-        students.append({
-            "id":       sid,
-            "name":     name,
-            "roll_no":  roll_no or f"AIS-CS-{100+i:03d}",
-            "initials": initials,
-        })
-
-    return jsonify({"students": students, "batch": batch})
-
-
-@app.route('/faculty/submit-attendance', methods=['POST'])
-def submit_attendance():
-    """Receive and persist attendance records."""
-    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
-        return jsonify({"ok": False, "error": "Unauthorized"}), 403
-
-    data    = request.get_json(silent=True) or {}
-    records = data.get("records", [])
-
-    if not records:
-        return jsonify({"ok": False, "error": "No records provided"})
-
-    conn   = get_db_connection()
-    cursor = conn.cursor()
-    saved = 0
-    absent = 0
-
-    for r in records:
-        student_id = r.get("student_id")
-        status     = r.get("status", "P")
-        subject    = r.get("subject", "")
-        hour       = r.get("hour", "1")
-        date_str   = r.get("date", "")
-        late       = r.get("late", False)
-
-        if status == "A":
-            absent += 1
-
-        try:
-            cursor.execute("""
-                INSERT INTO attendance_logs
-                    (student_id, subject, hour, status, late, date, marked_by, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (student_id, subject, hour, date) DO UPDATE
-                    SET status = EXCLUDED.status, late = EXCLUDED.late
-            """, (student_id, subject, hour, status, late, date_str, session.get("user_id")))
-            saved += 1
-        except Exception:
-            # Table may not exist yet — gracefully continue
-            saved += 1
-
-    try:
-        conn.commit()
-    except Exception:
-        pass
-    conn.close()
-
-    present = saved - absent
-    return jsonify({"ok": True, "saved": present, "absent": absent, "total": saved})
 
 
 # ──────────────────────────────────────────────────────────────
@@ -2411,42 +2022,7 @@ def api_search_hub():
     return jsonify({"ok": True, "results": results})
 
 
-@app.route('/faculty/settings')
-def faculty_settings():
-    """Faculty Account Settings & Resource Uploads."""
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-    if session.get("role") not in ("faculty", "admin"):
-        flash("Access denied. Faculty only.", "danger")
-        return redirect(url_for("home"))
-
-    # Reuse the profile fetch logic for the Personal Information card
-    profile = {
-        "name": session.get("name", "Dr. Faculty Member"),
-        "initials": "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]]),
-        "designation": "Professor · Dept. of CSE",
-        "degree": "Ph.D. in Computer Science",
-        "institution": "IIT Bombay",
-        "email": session.get("email", "faculty@aisat.ac.in")
-    }
-
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name, department, designation, email FROM faculty WHERE email = %s", (session.get("email"),))
-        row = cursor.fetchone()
-        if row:
-            profile["name"] = row[0]
-            profile["initials"] = "".join([p[0].upper() for p in row[0].split()[:2]])
-            dept = row[1] or "CSE"
-            desig = row[2] or "Professor"
-            profile["designation"] = f"{desig} · Dept. of {dept}"
-            profile["email"] = row[3]
-        conn.close()
-    except Exception:
-        pass
-
-    return render_template("faculty_settings.html", profile=profile)
+# Faculty settings removed
 
 
 @app.route('/faculty/upload-resource', methods=['POST'])
@@ -2667,7 +2243,7 @@ def faculty_dashboard():
         dept=fdept,
         dept_code=(fdept[:3].upper() if fdept else "CSE"),
         total_students=124,
-        avg_attendance=84.2,
+        avg_cgpa=8.6,
         pending_evals=12,
         active_projects=3,
         courses=None,
@@ -2795,12 +2371,7 @@ def student_dashboard():
                            active_page='student_dashboard',
                            all_batches=all_batches)
 
-@app.route('/dashboard/attendance')
-def student_attendance():
-    if session.get("role") != "student":
-        flash("Access denied! Students only.", "danger")
-        return redirect(url_for("login"))
-    return render_template("student_attendance.html", active_page='attendance')
+# Attendance page removed
 
 @app.route('/dashboard/results')
 def student_results():
@@ -2808,34 +2379,42 @@ def student_results():
         flash("Access denied! Students only.", "danger")
         return redirect(url_for("login"))
         
-    # Mock data to match the React specs, passed directly to the template
-    mock_data = {
-        'overall_cgpa': 8.92,
-        'cgpa_improvement': '+0.15',
-        'prev_sem': 5,
-        'earned_credits': 105,
+    conn = get_db_connection()
+    user_id = session.get('user_id')
+    
+    # Fetch real internal marks
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT subject_code, subject_name, internal_1, internal_2, assignment, total 
+        FROM internal_marks 
+        WHERE user_id = %s
+    """, (user_id,))
+    rows = cursor.fetchall()
+    
+    # Fetch performance summary
+    cursor.execute("SELECT cgpa, cgpa_improvement, prev_sem, credits, rank_percentile FROM student_performance WHERE user_id = %s", (user_id,))
+    perf = cursor.fetchone()
+    
+    # Fetch semester GPAs
+    cursor.execute("SELECT semester, sgpa, credits FROM student_semester_gpas WHERE user_id = %s ORDER BY semester", (user_id,))
+    gpas = cursor.fetchall()
+    
+    conn.close()
+
+    # Format data for template
+    data = {
+        'overall_cgpa': float(perf['cgpa']) if perf else 0.0,
+        'cgpa_improvement': perf['cgpa_improvement'] if perf else '+0.0',
+        'prev_sem': perf['prev_sem'] if perf else 0,
+        'earned_credits': perf['credits'] if perf else 0,
         'total_credits': 160,
-        'rank_percentile': 12,
-        'semester_results': [
-            {'semester': 1, 'sgpa': 8.5, 'credits': 20, 'isCurrent': False},
-            {'semester': 2, 'sgpa': 8.7, 'credits': 20, 'isCurrent': False},
-            {'semester': 3, 'sgpa': 9.1, 'credits': 24, 'isCurrent': False},
-            {'semester': 4, 'sgpa': 8.8, 'credits': 24, 'isCurrent': False},
-            {'semester': 5, 'sgpa': 9.2, 'credits': 22, 'isCurrent': False},
-            {'semester': 6, 'sgpa': 0, 'credits': 20, 'isCurrent': True}
-        ],
-        'current_semester_marks': [
-            {'subject_name': "Database Management Systems", 'subject_code': "CS302", 'internal': 45, 'external': 0, 'total': 45, 'grade': "A+", 'points': 10, 'credits': 4},
-            {'subject_name': "Computer Networks", 'subject_code': "CS304", 'internal': 42, 'external': 0, 'total': 42, 'grade': "A", 'points': 9, 'credits': 4},
-            {'subject_name': "Operating Systems", 'subject_code': "CS306", 'internal': 38, 'external': 0, 'total': 38, 'grade': "B+", 'points': 8, 'credits': 3},
-            {'subject_name': "Theory of Computation", 'subject_code': "CS308", 'internal': 35, 'external': 0, 'total': 35, 'grade': "B", 'points': 7, 'credits': 4},
-            {'subject_name': "Software Engineering", 'subject_code': "CS310", 'internal': 46, 'external': 0, 'total': 46, 'grade': "A+", 'points': 10, 'credits': 3},
-            {'subject_name': "Mini Project", 'subject_code': "CS332", 'internal': 48, 'external': 0, 'total': 48, 'grade': "A+", 'points': 10, 'credits': 2}
-        ],
+        'rank_percentile': perf['rank_percentile'] if perf else 0,
+        'semester_results': [dict(g) for g in gpas],
+        'current_semester_marks': [dict(r) for r in rows],
         'grade_distribution': {'A+': 12, 'A': 15, 'B+': 8, 'B': 4, 'C': 1}
     }
     
-    return render_template("student_results.html", active_page='results', data=mock_data)
+    return render_template("student_results.html", active_page='results', data=data)
 
 
 # ─────────────────────────────────────────────────
@@ -3060,8 +2639,6 @@ def admin_panel():
     programs_raw = conn.execute("SELECT * FROM programs").fetchall()
     alumni_list  = conn.execute("SELECT * FROM alumni").fetchall()
     interns_list = conn.execute("SELECT * FROM internships").fetchall()
-    companies_list = conn.execute("SELECT * FROM placement_companies").fetchall()
-    summary_list = conn.execute("SELECT * FROM placement_summary").fetchall()
     batches_raw  = conn.execute("SELECT batch, is_image FROM timetable_meta").fetchall()
     conn.close()
     
@@ -3121,8 +2698,6 @@ def admin_panel():
         programs=programs,
         alumni_list=alumni_list,
         interns_list=interns_list,
-        companies_list=companies_list,
-        summary_list=summary_list,
         transactions=transactions,
         admin_notifs=admin_notifs,
         all_batches=all_batches,
@@ -3408,121 +2983,7 @@ def admin_programs_delete(pid):
 # ADMIN — PLACEMENT SUMMARY CRUD
 # ─────────────────────────────────────────────────
 
-@app.route('/admin/placement-summary/edit/<int:sid>', methods=["POST"])
-def admin_placement_summary_edit(sid):
-    if not admin_required():
-        return redirect(url_for("login"))
-    f = request.form
-    conn = get_db_connection()
-    try:
-        conn.execute(
-            "UPDATE placement_summary SET icon=%s, value=%s, label=%s, company=%s WHERE id=%s",
-            (f['icon'], f['value'], f['label'], f.get('company', ''), sid)
-        )
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Placement summary updated!", "success")
-    return redirect(url_for("admin_panel") + "#placements")
-
-
-# ─────────────────────────────────────────────────
-# ADMIN — PLACEMENT COMPANIES CRUD
-# ─────────────────────────────────────────────────
-
-@app.route('/admin/companies/add', methods=["POST"])
-def admin_companies_add():
-    if not admin_required():
-        return redirect(url_for("login"))
-    f = request.form
-    conn = get_db_connection()
-    try:
-        conn.execute("INSERT INTO placement_companies (name, url, sector) VALUES (%s,%s,%s)",
-                     (f['name'], f.get('url', ''), f.get('sector', 'IT')))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Company added!", "success")
-    return redirect(url_for("admin_panel") + "#placements")
-
-@app.route('/admin/companies/delete/<int:cid>', methods=["POST"])
-def admin_companies_delete(cid):
-    if not admin_required():
-        return redirect(url_for("login"))
-    conn = get_db_connection()
-    try:
-        conn.execute("DELETE FROM placement_companies WHERE id=%s", (cid,))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Company deleted!", "warning")
-    return redirect(url_for("admin_panel") + "#placements")
-
-
-# ─────────────────────────────────────────────────
-# ADMIN — ALUMNI CRUD
-# ─────────────────────────────────────────────────
-
-@app.route('/admin/alumni/add', methods=["POST"])
-def admin_alumni_add():
-    if not admin_required():
-        return redirect(url_for("login"))
-    f = request.form
-    conn = get_db_connection()
-    try:
-        conn.execute("INSERT INTO alumni (name, batch, company, package, photo, testimonial) VALUES (%s,%s,%s,%s,%s,%s)",
-                     (f['name'], f['batch'], f['company'], f['package'], f.get('photo', ''), f.get('testimonial', '')))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Alumni added!", "success")
-    return redirect(url_for("admin_panel") + "#placements")
-
-@app.route('/admin/alumni/delete/<int:aid>', methods=["POST"])
-def admin_alumni_delete(aid):
-    if not admin_required():
-        return redirect(url_for("login"))
-    conn = get_db_connection()
-    try:
-        conn.execute("DELETE FROM alumni WHERE id=%s", (aid,))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Alumni deleted!", "warning")
-    return redirect(url_for("admin_panel") + "#placements")
-
-
-# ─────────────────────────────────────────────────
-# ADMIN — INTERNSHIPS CRUD
-# ─────────────────────────────────────────────────
-
-@app.route('/admin/internships/add', methods=["POST"])
-def admin_internships_add():
-    if not admin_required():
-        return redirect(url_for("login"))
-    f = request.form
-    conn = get_db_connection()
-    try:
-        conn.execute("INSERT INTO internships (title, company, domain, location, description, link) VALUES (%s,%s,%s,%s,%s,%s)",
-                     (f['title'], f['company'], f.get('domain', 'IT'), f.get('location', ''), f.get('description', ''), f.get('link', '#')))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Internship added!", "success")
-    return redirect(url_for("admin_panel") + "#placements")
-
-@app.route('/admin/internships/delete/<int:iid>', methods=["POST"])
-def admin_internships_delete(iid):
-    if not admin_required():
-        return redirect(url_for("login"))
-    conn = get_db_connection()
-    try:
-        conn.execute("DELETE FROM internships WHERE id=%s", (iid,))
-        conn.commit()
-    finally:
-        conn.close()
-    flash("Internship deleted!", "warning")
-    return redirect(url_for("admin_panel") + "#placements")
+# Placement admin routes removed
 
 
 @app.route('/api/chat', methods=['POST'])
@@ -3559,18 +3020,7 @@ def notice_detail(notice_id):
     return render_template('notice_detail.html', notice=mock_notice, active_page='')
 
 
-@app.route('/placement/drive/<int:drive_id>')
-def placement_detail(drive_id):
-    mock_drive = {
-        'id': drive_id,
-        'company': 'Amazon Dev Center' if drive_id == 1 else 'Sutherland',
-        'role': 'SDE Intern' if drive_id == 1 else 'System Associate',
-        'ctc': '25 LPA' if drive_id == 1 else '4.5 LPA',
-        'eligible_batch': 'Batch 10',
-        'deadline': '31 Mar 2025',
-        'date': 'Just Now'
-    }
-    return render_template('placement_detail.html', drive=mock_drive, active_page='')
+# Placement details removed
 
 
 @app.route('/student-dashboard/timetable')
@@ -3579,11 +3029,7 @@ def student_dashboard_timetable_redirect():
         return redirect(url_for("login"))
     return redirect(url_for('student_timetable'))
 
-@app.route('/student-dashboard/placements')
-def student_placements():
-    if "user_id" not in session or session.get("role") != "student":
-        return redirect(url_for("login"))
-    return render_template('student_placement_tracker.html', active_page='')
+# Student placement tracker removed
 
 @app.route('/student-dashboard/notifications')
 def student_notifications():

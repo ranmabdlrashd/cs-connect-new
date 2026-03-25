@@ -1,254 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ profile.name }} — Faculty Profile</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/faculty_profile.css') }}">
-</head>
-<body>
-<div class="dash-wrapper">
+{% extends "base.html" %}
 
-  <!-- ════════════ SIDEBAR ════════════ -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-        <polyline points="2 17 12 22 22 17"></polyline>
-        <polyline points="2 12 12 17 22 12"></polyline>
-      </svg>
-    </div>
-    <nav class="nav-items">
-      <div class="nav-item" data-tip="Dashboard" onclick="location.href='/faculty-dashboard'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
-      </div>
-      <div class="nav-item" data-tip="My Students" onclick="location.href='/faculty/my-students'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-      </div>
-      <div class="nav-item" data-tip="Attendance" onclick="location.href='/faculty/mark-attendance'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-      </div>
-      <div class="nav-item" data-tip="Mark Entry" onclick="location.href='/marks-entry'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-      </div>
-      <div class="nav-item" data-tip="Library" onclick="location.href='/library'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-      </div>
-      <div class="nav-item" data-tip="Dept Files" onclick="location.href='/academics'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-      </div>
-      <div class="nav-item" data-tip="Upload Material" onclick="location.href='/faculty/upload-material'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-      </div>
-      <div class="nav-item" data-tip="Send Circular" onclick="location.href='/faculty/send-circular'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-      </div>
+{% block title %}{{ profile.name }} - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
+<style>
+  /* Page-specific overrides */
+  nav, .news-ticker { display: none !important; }
+  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+
+  .profile-hero {
+    background: white; border: 1px solid var(--border-accent); border-radius: 20px;
+    padding: 32px; display: flex; gap: 32px; align-items: center; margin-bottom: 24px;
+  }
+  .profile-avatar {
+    width: 120px; height: 120px; border-radius: 50%; font-size: 3rem; font-weight: 800; color: white;
+    background: linear-gradient(135deg, var(--accent-crimson), #6B1010);
+    display: flex; align-items: center; justify-content: center;
+    border: 4px solid #FDFCF8; box-shadow: 0 8px 16px rgba(139, 29, 29, 0.1);
+  }
+  .profile-name { font-size: 2.2rem; font-weight: 900; color: var(--accent-crimson); margin: 0; font-family: 'Playfair Display', serif; }
+  .profile-tagline { font-size: 0.95rem; color: var(--text-secondary); margin: 4px 0 16px 0; }
+  
+  .badge { background: #F4F1EA; color: var(--accent-crimson); padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #EAE5D8; }
+
+  .profile-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; }
+  .info-card { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; }
+  .info-section { margin-bottom: 24px; }
+  .info-label { font-size: 0.7rem; color: var(--accent-crimson); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+  .info-value { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="user" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="window.history.back()"><i data-lucide="arrow-left"></i></div>
+      <div class="dash-sidebar-item active" title="Profile"><i data-lucide="user"></i></div>
+      <div class="dash-sidebar-item" title="Settings"><i data-lucide="settings"></i></div>
     </nav>
-    <div class="sidebar-bottom">
-      <div class="nav-item" data-tip="Settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      </div>
-      <!-- Profile Active Icon -->
-      <div class="user-avatar" style="border:2px solid var(--accent); cursor:default;">{{ profile.initials }}</div>
-    </div>
   </aside>
 
-  <!-- ════════════ MAIN ════════════ -->
-  <div class="main-content">
-    
-    <header class="top-bar">
-      <span class="breadcrumb">CS Connect · Faculty Portal · <b>Profile &amp; Hub</b></span>
-      <div class="notif-btn" onclick="location.href='/faculty-dashboard'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-        <span class="notif-dot"></span>
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">Faculty &middot; <b>Profile</b></div>
+      <div class="dash-top-actions">
+        <button class="dash-btn-primary" style="padding: 8px 16px; font-size: 0.75rem;">Edit Profile</button>
       </div>
     </header>
 
-    <div class="page-content">
-
-      <!-- Profile Hero -->
-      <section class="profile-card">
-        <div class="pr-avatar">{{ profile.initials }}</div>
-        <div class="pr-details">
-          <div class="pr-name-row">
-            <h1 class="pr-name">{{ profile.name }}</h1>
-            <span class="pr-badge">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              {{ profile.designation }}
-            </span>
+    <div class="dash-content">
+      <div class="profile-hero">
+        <div class="profile-avatar">{{ profile.initials }}</div>
+        <div>
+          <h1 class="profile-name">{{ profile.name }}</h1>
+          <p class="profile-tagline">{{ profile.designation }} &middot; {{ profile.department|default('CSE') }}</p>
+          <div style="display: flex; gap: 8px;">
+            <span class="badge">{{ profile.degree }}</span>
+            <span class="badge">{{ profile.experience|default('10+ Yrs Exp') }}</span>
           </div>
-          <p class="pr-meta">
-            <span>{{ profile.degree }}</span> &middot; {{ profile.institution }}<br>
-            Research: {{ profile.research }}
-          </p>
-          <div class="pr-actions">
-            <button class="btn-pr">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              Message
-            </button>
-            <button class="btn-pr">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              {{ profile.email }}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Universal Search Interface -->
-      <section class="search-container">
-        <div class="search-header">
-          <h2>Department Hub &amp; Resources</h2>
-        </div>
-        
-        <div class="search-box">
-          <div class="inp-wrap">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" class="sz-inp" id="searchInput" placeholder="Search notices, lab manuals, research papers..." autocomplete="off">
-          </div>
-          <button class="btn-filter" title="Advanced Filters">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-          </button>
-        </div>
-
-        <div class="tab-bar" id="tabBar" style="margin-top: 20px;">
-          <button class="tab active" data-filter="all">All</button>
-          <button class="tab" data-filter="notice">Notices</button>
-          <button class="tab" data-filter="resource">Resources</button>
-          <button class="tab" data-filter="event">Events</button>
-          <button class="tab" data-filter="research">Research</button>
-        </div>
-
-        <div class="loader" id="hzLoader"></div>
-
-        <div class="results-list" id="resultsBox">
-          <!-- Results injected via JS -->
-        </div>
-
-      </section>
-
-    </div><!-- page-content -->
-  </div><!-- main-content -->
-</div><!-- dash-wrapper -->
-
-<script>
-/* ── UI Logic ── */
-const searchInput = document.getElementById('searchInput');
-const resultsBox  = document.getElementById('resultsBox');
-const loader      = document.getElementById('hzLoader');
-const tabs        = document.querySelectorAll('.tab');
-let activeFilter  = 'all';
-let debounceTimer;
-
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    activeFilter = tab.dataset.filter;
-    performSearch();
-  });
-});
-
-searchInput.addEventListener('input', () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(performSearch, 300);
-});
-
-/* ── Highlighting Engine ── */
-function highlightText(text, query) {
-  if (!query) return text;
-  // Basic regex highlight wrapping matches in animated <span class="highlight">
-  const qStr = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape regex
-  const regex = new RegExp(`(${qStr})`, 'gi');
-  return text.replace(regex, '<span class="highlight">$1</span>');
-}
-
-/* ── Content Mapping ── */
-function getIconForType(type) {
-  switch(type) {
-    case 'resource': return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
-    case 'notice':   return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`;
-    case 'event':    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-    case 'research': return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
-    default:         return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
-  }
-}
-
-function renderCards(records, query) {
-  resultsBox.innerHTML = '';
-  
-  if (!records || records.length === 0) {
-    resultsBox.innerHTML = `
-      <div class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 15l6 6m-9-9a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg>
-        <h3>No results found</h3>
-        <p>Try adjusting your search terms or checking another category filter.</p>
-      </div>`;
-    return;
-  }
-
-  records.forEach(r => {
-    const card = document.createElement('div');
-    card.className = `sr-card type-${r.type}`;
-    
-    // Tag formatting
-    let tagHtml = `<span class="sr-tag tag-${r.type}">${r.tag}</span>`;
-    
-    // DL button or action
-    let actionHtml = '';
-    if (r.type === 'resource' || r.type === 'research') {
-      actionHtml = `
-        <a href="#" class="dl-pill">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          PDF
-        </a>`;
-    }
-
-    card.innerHTML = `
-      <div class="sr-icon">${getIconForType(r.type)}</div>
-      <div class="sr-body">
-        <div class="sr-top">
-          <div class="sr-title">${highlightText(r.title, query)}</div>
-          ${tagHtml}
-        </div>
-        <div class="sr-excerpt">${highlightText(r.excerpt, query)}</div>
-        <div class="sr-meta">
-          <div class="sr-meta-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            ${r.date}
-          </div>
-          <div class="sr-meta-item hide-xs">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            ${r.views} views
-          </div>
-          <div style="flex:1"></div>
-          ${actionHtml}
         </div>
       </div>
-    `;
-    resultsBox.appendChild(card);
-  });
-}
 
-function performSearch() {
-  const query = searchInput.value.trim();
-  loader.classList.add('active');
-  
-  fetch(`/api/faculty/search-hub?q=${encodeURIComponent(query)}&type=${activeFilter}`)
-    .then(res => res.json())
-    .then(data => {
-      setTimeout(() => { // artificial delay for smooth loader UI
-        loader.classList.remove('active');
-        renderCards(data.results, query);
-      }, 300);
-    })
-    .catch(() => {
-      loader.classList.remove('active');
-      resultsBox.innerHTML = '<div class="empty-state"><h3>Connection Error</h3><p>Unable to connect to the search hub.</p></div>';
-    });
-}
+      <div class="profile-grid">
+        <div class="info-card">
+          <h3 style="font-size: 1.1rem; color: var(--accent-crimson); font-weight: 800; margin-top: 0; margin-bottom: 20px;">Contact Information</h3>
+          <div class="info-section">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">{{ profile.email }}</span>
+          </div>
+          <div class="info-section">
+            <span class="info-label">Employee ID</span>
+            <span class="info-value">{{ profile.emp_id|default('EMP8829') }}</span>
+          </div>
+          <div class="info-section">
+            <span class="info-label">Office Location</span>
+            <span class="info-value">Block B, Room 402</span>
+          </div>
+        </div>
 
-/* initial load */
-document.addEventListener('DOMContentLoaded', performSearch);
+        <div class="info-card">
+          <h3 style="font-size: 1.1rem; color: var(--accent-crimson); font-weight: 800; margin-top: 0; margin-bottom: 20px;">Academic & Research</h3>
+          <div class="info-section">
+            <span class="info-label">Specialization</span>
+            <span class="info-value">{{ profile.research|default('Distributed Systems, AI Safety') }}</span>
+          </div>
+          <div class="info-section">
+            <span class="info-label">Key Subjects</span>
+            <span class="info-value">Data Structures, Compilers, Theory of Computation</span>
+          </div>
+          <div class="info-section">
+            <span class="info-label">Publications</span>
+            <span class="info-value">12 International Journals, 4 Conference Papers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 </script>
-</body>
-</html>
+{% endblock %}

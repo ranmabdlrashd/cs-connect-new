@@ -1,0 +1,213 @@
+/* ===================================
+   SHARED DASHBOARD DESIGN SYSTEM
+   Standardized components for Student, Faculty, and Admin
+   =================================== */
+
+:root {
+  /* Dashboard Specific Tokens - inheriting from style.css */
+  --dash-sidebar-bg: #FFFFFF;
+  --dash-sidebar-border: rgba(45, 41, 38, 0.08);
+  --dash-topbar-bg: #FFFFFF;
+  --dash-card-bg: #FFFFFF;
+  --dash-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --dash-active-bg: rgba(139, 29, 29, 0.08);
+  --dash-hover-bg: rgba(139, 29, 29, 0.04);
+}
+
+/* Layout Wrapper */
+.dash-wrapper {
+  display: flex;
+  height: calc(100vh - 105px); /* Offset for global nav (~70px) and ticker (~35px) */
+  background: var(--bg-color); /* Cream #FDFCF8 */
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+
+/* Sidebar */
+.dash-sidebar {
+  width: 72px;
+  min-width: 72px;
+  background: var(--dash-sidebar-bg);
+  border-right: 1px solid var(--dash-sidebar-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  z-index: 100;
+}
+
+.dash-sidebar-logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent-crimson), var(--accent-dark));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(139, 29, 29, 0.2);
+}
+
+.dash-sidebar-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+.dash-sidebar-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-muted);
+}
+
+.dash-sidebar-item:hover {
+  background: var(--dash-hover-bg);
+  color: var(--accent-crimson);
+}
+
+.dash-sidebar-item.active {
+  background: var(--dash-active-bg);
+  color: var(--accent-crimson);
+}
+
+.dash-sidebar-item svg, .dash-sidebar-item i {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+
+.dash-sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Main Container */
+.dash-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Top Bar */
+.dash-topbar {
+  height: 72px;
+  background: var(--dash-topbar-bg);
+  border-bottom: 1px solid var(--dash-sidebar-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  flex-shrink: 0;
+}
+
+.dash-breadcrumb {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.dash-breadcrumb b {
+  color: var(--text-primary);
+}
+
+.dash-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Page Content Window */
+.dash-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  scroll-behavior: smooth;
+}
+
+/* Bento Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Cards */
+.dash-card {
+  background: var(--dash-card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--dash-card-shadow);
+  border: 1px solid var(--dash-sidebar-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.dash-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dash-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  margin-bottom: 8px;
+}
+
+/* Helper Classes */
+.card-wide { grid-column: span 2; }
+.card-tall { grid-row: span 2; }
+
+@media (max-width: 992px) {
+  .card-wide { grid-column: span 1; }
+}
+
+/* Badges */
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-crimson { background: var(--dash-active-bg); color: var(--accent-crimson); }
+.badge-success { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+.badge-warning { background: rgba(255, 193, 7, 0.1); color: #856404; }
+
+/* Transitions */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}

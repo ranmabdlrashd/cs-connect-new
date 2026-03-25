@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Internal Marks - Admin - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard_system.css') }}">
+<style>
+  body { margin: 0; padding: 0; background: var(--bg-color); }
+  
+  .marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+  .marks-table th {
+    text-align: left;
+    padding: 12px;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  .marks-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .marks-table tr:hover { background: var(--bg-hover); }
+
+  .edit-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(139,29,29,0.1);
+    color: var(--accent-crimson);
+    border: 1px solid rgba(139,29,29,0.2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .edit-btn:hover { background: var(--accent-crimson); color: white; }
+
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 10000;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 400px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .modal-title { font-family: var(--font-heading); font-size: 1.2rem; }
+  .modal-close { cursor: pointer; color: var(--text-muted); }
+  
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; padding: 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg-secondary);
+    color: var(--text-primary); font-family: inherit;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrapper fade-up">
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+        <div class="dash-sidebar-logo">
+            <div style="width:20px; height:20px; background:white; border-radius:4px;"></div>
+        </div>
+        
+        <nav class="dash-sidebar-items">
+            <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='{{ url_for('admin_bp.admin_command_center') }}'">
+                <i data-lucide="layout-dashboard"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Users" onclick="location.href='{{ url_for('admin_bp.admin_users') }}'">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="dash-sidebar-item active" title="Internal Marks">
+                <i data-lucide="edit-3"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Library Requests" onclick="location.href='{{ url_for('admin_bp.admin_library_dashboard') }}'">
+                <i data-lucide="bell-ring"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Library Management" onclick="location.href='{{ url_for('admin_bp.admin_library_management') }}'">
+                <i data-lucide="book"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Fees" onclick="location.href='{{ url_for('admin_bp.admin_fees') }}'">
+                <i data-lucide="credit-card"></i>
+            </div>
+            <div class="dash-sidebar-item" title="Analytics" onclick="location.href='{{ url_for('admin_bp.admin_analytics') }}'">
+                <i data-lucide="bar-chart-2"></i>
+            </div>
+        </nav>
+
+        <div class="dash-sidebar-bottom">
+            <div class="dash-sidebar-item" title="Settings">
+                <i data-lucide="settings"></i>
+            </div>
+            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
+                AD
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main">
+        <!-- TOPBAR -->
+        <header class="dash-topbar">
+            <div class="dash-breadcrumb">
+                Admin &middot; <b>Internal Marks</b>
+            </div>
+            <div class="dash-top-actions">
+                <div class="notif-container" style="position:relative; cursor:pointer;">
+
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="dash-content">
+            <div class="welcome-header" style="margin-bottom: 24px;">
+                <h1 style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--text-primary); margin: 0;">Internal Marks Management</h1>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Update and verify student internal academic records</p>
+            </div>
+
+            <div class="dash-card">
+                <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                    <div style="flex: 1; position: relative;">
+                        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-ghost);"></i>
+                        <input type="text" id="studentSearch" placeholder="Search by name or roll number..." class="form-input" style="padding-left: 36px;">
+                    </div>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Roll No</th>
+                                <th>Subject</th>
+                                <th>In-1</th>
+                                <th>In-2</th>
+                                <th>Assignment</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTableBody">
+                            {% for mark in internal_marks %}
+                            <tr>
+                                <td>{{ mark.student_name }}</td>
+                                <td>{{ mark.roll_no }}</td>
+                                <td>{{ mark.subject_name }} ({{ mark.subject_code }})</td>
+                                <td>{{ mark.internal_1 }}</td>
+                                <td>{{ mark.internal_2 }}</td>
+                                <td>{{ mark.assignment }}</td>
+                                <td style="font-weight: 700;">{{ mark.total }}</td>
+                                <td>
+                                    <button class="edit-btn" onclick='openEditModal({{ mark | tojson | safe }})'>Edit</button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-ghost);">No marks found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Internal Marks</h3>
+            <i data-lucide="x" class="modal-close" onclick="closeModal()"></i>
+        </div>
+        <form id="editForm">
+            <input type="hidden" id="markId">
+            <div class="form-group">
+                <label>Student</label>
+                <div id="modalStudentName" style="font-weight: 600;"></div>
+            </div>
+            <div class="form-group">
+                <label>Subject</label>
+                <div id="modalSubjectName" style="font-size: 0.9rem;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label>Internal 1</label>
+                    <input type="number" id="in1" step="0.5" class="form-input" max="20" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Internal 2</label>
+                    <input type="number" id="in2" step="0.5" class="form-input" max="20" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Assignment</label>
+                <input type="number" id="assign" step="0.5" class="form-input" max="10" min="0">
+            </div>
+            <button type="submit" class="btn-login" style="width: 100%; margin-top: 10px;">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+
+    function openEditModal(mark) {
+        document.getElementById('markId').value = mark.id;
+        document.getElementById('modalStudentName').textContent = mark.student_name + " (" + mark.roll_no + ")";
+        document.getElementById('modalSubjectName').textContent = mark.subject_name;
+        document.getElementById('in1').value = mark.internal_1;
+        document.getElementById('in2').value = mark.internal_2;
+        document.getElementById('assign').value = mark.assignment;
+        editModal.classList.add('active');
+    }
+
+    function closeModal() {
+        editModal.classList.remove('active');
+    }
+
+    editForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const data = {
+            id: document.getElementById('markId').value,
+            internal_1: parseFloat(document.getElementById('in1').value) || 0,
+            internal_2: parseFloat(document.getElementById('in2').value) || 0,
+            assignment: parseFloat(document.getElementById('assign').value) || 0
+        };
+
+        try {
+            const res = await fetch('/admin/api/internal-marks/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert("Error: " + result.error);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update marks.");
+        }
+    };
+
+    // Search functionality
+    document.getElementById('studentSearch').oninput = function() {
+        const q = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#marksTableBody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+        });
+    };
+</script>
+{% endblock %}

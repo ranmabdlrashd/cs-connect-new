@@ -1,308 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS Connect - User Management</title>
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard_system.css') }}">
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="admin-layout" id="appRoot">
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-        <div class="header-area">
-            <div class="logo-row">
-                <div class="logo-square"></div>
-                <div class="logo-text">CS Connect</div>
-            </div>
-            <div class="sub-text">Admin Panel</div>
+{% block title %}User Management | Admin - CS Connect{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
+<style>
+    /* Page-specific overrides */
+    nav, .news-ticker { display: none !important; }
+    body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+
+    .user-hero { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
+    .user-hero h1 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-crimson); font-size: 1.8rem; }
+    
+    .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; }
+    .search-box { flex: 1; position: relative; }
+    .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid #EAE5D8; border-radius: 10px; background: white; font-size: 0.9rem; outline: none; }
+
+    .user-table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-accent); border-radius: 12px; overflow: hidden; }
+    .user-table th { background: #FDFCF8; padding: 12px 20px; text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-crimson); border-bottom: 1px solid var(--border-accent); }
+    .user-table td { padding: 16px 20px; font-size: 0.85rem; color: var(--text-primary); border-bottom: 1px solid #F0EBE0; }
+    
+    .role-badge { font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+    .role-student { background: #E3F2FD; color: #1976D2; }
+    .role-faculty { background: #F3E5F5; color: #7B1FA2; }
+    .role-admin { background: #FFF3E0; color: #E65100; }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrapper fade-up">
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="dash-sidebar-logo"><i data-lucide="users" style="color:white;"></i></div>
+    <nav class="dash-sidebar-items">
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
+      <div class="dash-sidebar-item active" title="Users"><i data-lucide="users"></i></div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Fees" onclick="location.href='/admin-dashboard/fees'"><i data-lucide="credit-card"></i></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-breadcrumb">System &middot; <b>User Management</b></div>
+      <div style="display:flex; gap:12px;">
+        <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;">Bulk Import</button>
+        <button class="dash-btn-primary" style="font-size:0.75rem ; padding:8px 16px;">+ Add User</button>
+      </div>
+    </header>
+
+    <div class="dash-content">
+      <div class="user-hero">
+        <h1>Access Control</h1>
+        <div style="text-align:right;">
+           <div style="font-size:0.65rem; color:var(--text-muted); font-weight:800;">TOTAL ACCOUNTS</div>
+           <div style="font-size:1.4rem; font-weight:800; color:var(--accent-crimson); font-family:'Playfair Display', serif;">1,240</div>
         </div>
-        
-        <nav class="nav-sections">
-            <div>
-                <div class="nav-section-label">Overview</div>
-                <a href="{{ url_for('admin_bp.admin_command_center') }}" class="nav-item">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span class="label">Dashboard</span>
-                </a>
-                <a href="{{ url_for('admin_bp.admin_users') }}" class="nav-item active">
-                    <i data-lucide="users"></i>
-                    <span class="label">User Management</span>
-                </a>
-            </div>
+      </div>
 
-            <div>
-                <div class="nav-section-label">Academic</div>
-                <div class="nav-item">
-                    <i data-lucide="book-open"></i>
-                    <span class="label">Courses</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="check-square"></i>
-                    <span class="label">Attendance</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="calendar"></i>
-                    <span class="label">Timetable</span>
-                </div>
-            </div>
-
-            <div>
-                <div class="nav-section-label">Content</div>
-                <div class="nav-item">
-                    <i data-lucide="bell-ring"></i>
-                    <span class="label">Notice Board</span>
-                </div>
-                <div class="nav-item">
-                    <i data-lucide="briefcase"></i>
-                    <span class="label">Placements</span>
-                </div>
-            </div>
-
-            <div>
-                <div class="nav-section-label">Finance</div>
-                <a href="{{ url_for('admin_bp.admin_fees') }}" class="nav-item">
-                    <i data-lucide="credit-card"></i>
-                    <span class="label">Fee Management</span>
-                </a>
-            </div>
-
-            <div>
-                <div class="nav-section-label">Analytics</div>
-                <a href="{{ url_for('admin_bp.admin_analytics') }}" class="nav-item">
-                    <i data-lucide="bar-chart-2"></i>
-                    <span class="label">Reports & Analytics</span>
-                </a>
-            </div>
-            
-            <div>
-                <div class="nav-section-label">System</div>
-                <a href="{{ url_for('admin_bp.admin_library_management') }}" class="nav-item">
-                    <i data-lucide="settings"></i>
-                    <span class="label">Settings</span>
-                </a>
-            </div>
-        </nav>
-
-        <div class="bottom-user-block">
-            <div class="user-avatar"></div>
-            <div class="user-info">
-                <span class="user-name">System Admin</span>
-                <span class="user-role">Full Access</span>
-            </div>
+      <div class="filter-bar">
+        <div class="search-box">
+          <i data-lucide="search" style="width:16px;"></i>
+          <input type="text" class="search-input" placeholder="Search by name, roll number, or email...">
         </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="admin-main">
-        <!-- TOPBAR -->
-        <header class="topbar">
-            <div class="breadcrumb">
-                Admin &middot; <span class="breadcrumb-active">User Management</span>
-            </div>
-            <div class="topbar-right">
-                <button class="btn btn-ghost" id="exportBtn">Export CSV</button>
-                <button class="btn btn-primary" id="openAddModalBtn">
-                    <i data-lucide="user-plus" style="width:12px; height:12px"></i> Add User
-                </button>
-                <div class="notification-bell">
-                    <i data-lucide="bell"></i>
-                    <div class="bell-dot"></div>
-                </div>
-            </div>
-        </header>
-
-        <!-- CONTENT -->
-        <div class="content-area">
-            
-            <!-- HEADER -->
-            <div class="welcome-header">
-                <div>
-                    <h1 class="welcome-title">User Management</h1>
-                    <p class="welcome-sub">Manage all student, faculty and admin accounts</p>
-                </div>
-            </div>
-
-            <div id="errorContainer"></div>
-
-            <!-- METRICS ROW -->
-            <div class="metric-grid" id="metricsRow">
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-                <div class="metric-card"><div class="skeleton" style="height: 60px; width: 100%"></div></div>
-            </div>
-
-            <!-- FILTER BAR -->
-            <div class="filter-bar">
-                <div class="filter-pills" id="roleFilters">
-                    <div class="filter-pill active" data-filter="all">All Users</div>
-                    <div class="filter-pill" data-filter="student">Students</div>
-                    <div class="filter-pill" data-filter="faculty">Faculty</div>
-                    <div class="filter-pill" data-filter="admin">Admin</div>
-                    <div class="filter-pill" data-filter-status="Pending">Pending</div>
-                    <div class="filter-pill" data-filter-status="Inactive">Inactive</div>
-                </div>
-                <div class="search-input-wrap">
-                    <i data-lucide="search"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search name, ID...">
-                </div>
-            </div>
-            
-            <!-- BULK BAR -->
-            <div id="bulkActionBar" class="bulk-action-bar" style="display: none;">
-                <span class="bulk-action-text" id="bulkActionCount">0 users selected</span>
-                <div class="bulk-action-buttons">
-                    <button class="btn btn-action-approve" id="bulkApproveBtn">Approve All</button>
-                    <button class="btn btn-action-danger" id="bulkDisableBtn">Disable All</button>
-                    <button class="btn btn-ghost" id="bulkExportBtn">Export Selected</button>
-                </div>
-            </div>
-
-            <!-- USERS TABLE -->
-            <div class="card">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="td-checkbox">
-                                    <input type="checkbox" class="custom-checkbox" id="selectAllCheckbox">
-                                </th>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>ID/Roll No.</th>
-                                <th>Batch/Dept</th>
-                                <th>Email</th>
-                                <th>Registered</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <tr><td colspan="9"><div class="skeleton" style="height:20px; width:100%"></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- PAGINATION -->
-                <div class="pagination-row">
-                    <div class="pagination-info" id="paginationInfo">Showing 0 of 0 users</div>
-                    <div class="pagination-controls" id="paginationControls">
-                        <!-- Buttons injected dynamically -->
-                    </div>
-                </div>
-            </div>
-
+        <div style="display:flex; gap:8px;">
+          <button class="dash-btn-secondary" style="font-size:0.75rem;">All</button>
+          <button class="dash-btn-secondary" style="font-size:0.75rem;">Students</button>
+          <button class="dash-btn-secondary" style="font-size:0.75rem;">Faculty</button>
         </div>
-    </main>
-</div>
+      </div>
 
-<!-- MODALS -->
-
-<!-- Add / Edit User Modal -->
-<div class="modal-overlay" id="userModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="userModalTitle">Add User</h2>
-            <button class="modal-close" onclick="closeModal('userModal')"><i data-lucide="x"></i></button>
-        </div>
-        <div class="modal-body">
-            <form id="userForm">
-                <input type="hidden" id="userIdField">
-                
-                <div class="role-tabs" id="modalRoleTabs">
-                    <div class="role-tab active" data-role="student">Student</div>
-                    <div class="role-tab" data-role="faculty">Faculty</div>
-                    <div class="role-tab" data-role="admin">Admin</div>
-                </div>
-                <input type="hidden" id="roleField" value="student">
-
-                <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" id="nameField" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Email *</label>
-                    <input type="email" id="emailField" class="form-input" placeholder="user@aisat.ac.in" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">ID / Roll No. <span id="rollLabelAsterisk">*</span></label>
-                    <input type="text" id="rollNoField" class="form-input" required>
-                </div>
-                
-                <!-- Dynamic fields based on role -->
-                <div id="studentFields">
-                    <div class="form-group">
-                        <label class="form-label">Batch / Semester</label>
-                        <select id="batchField" class="form-select">
-                            <option value="">Select Batch</option>
-                            <option value="2024">Batch 2024</option>
-                            <option value="2025">Batch 2025</option>
-                            <option value="2026">Batch 2026</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="facultyFields" style="display:none;">
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select id="departmentField" class="form-select">
-                            <option value="">Select Dept</option>
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="Mathematics">Mathematics</option>
-                            <option value="Electronics">Electronics</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Designation</label>
-                        <input type="text" id="designationField" class="form-input" placeholder="e.g. Associate Professor">
-                    </div>
-                </div>
-
-                <div class="form-group" id="passwordGroup">
-                    <label class="form-label">Temporary Password</label>
-                    <input type="text" id="passwordField" class="form-input" readonly value="auto-generated">
-                    <span style="font-size: 9px; color: #666; display: block; margin-top: 4px;">Will be auto-generated and sent via email</span>
-                </div>
-                
-                <div class="form-group" style="display:flex; align-items:center; gap: 8px;">
-                    <input type="checkbox" id="sendEmailField" class="custom-checkbox" checked>
-                    <label class="form-label" style="margin:0;">Send welcome email with credentials</label>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeModal('userModal')">Cancel</button>
-            <button class="btn btn-primary" id="saveUserBtn">Save User</button>
-        </div>
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Role</th>
+            <th>ID / Roll No.</th>
+            <th>Email Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Aravind S.</b></td>
+            <td><span class="role-badge role-student">Student</span></td>
+            <td>AIS22CS045</td>
+            <td>aravind.s@aisat.ac.in</td>
+            <td><span style="color:#2E7D32; font-weight:700; font-size:0.75rem;">Active</span></td>
+            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Options</button></td>
+          </tr>
+          <tr>
+            <td><b>Dr. Smitha Paul</b></td>
+            <td><span class="role-badge role-faculty">Faculty</span></td>
+            <td>FAC-CS-012</td>
+            <td>smitha.p@aisat.ac.in</td>
+            <td><span style="color:#2E7D32; font-weight:700; font-size:0.75rem;">Active</span></td>
+            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Options</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </main>
 </div>
 
-<!-- Confirm Modal -->
-<div class="modal-overlay" id="confirmModal">
-    <div class="modal-content" style="width: 400px;">
-        <div class="modal-header" style="border:none;">
-            <h2 class="modal-title" style="color:var(--red)">Confirm Action</h2>
-            <button class="modal-close" onclick="closeModal('confirmModal')"><i data-lucide="x"></i></button>
-        </div>
-        <div class="modal-body" id="confirmMessage" style="padding-top:0;">
-            Are you sure you want to disable this user? They will lose access immediately.
-        </div>
-        <div class="modal-footer" style="border:none;">
-            <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
-            <button class="btn btn-primary" style="background:var(--red); color:var(--cream)" id="confirmActionBtn">Confirm</button>
-        </div>
-    </div>
-</div>
-
-<!-- JS Main Logic -->
-<script src="{{ url_for('static', filename='js/admin_user_management.js') }}"></script>
-</body>
-</html>
+<script>
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
+{% endblock %}

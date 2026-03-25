@@ -3,11 +3,11 @@
     position: sticky;
     top: 0;
     width: 100%;
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(245, 230, 190, 0.08);
-    z-index: 10;
+    background: rgba(244, 241, 234, 0.98);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    z-index: 10001;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,14 +32,14 @@
 
 .nav-brand-text {
     font-family: var(--font-heading);
-    color: var(--text-primary);
+    color: var(--accent-crimson);
     font-size: 1.1rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
 .nav-brand-text span {
-    color: var(--accent-crimson);
+    color: inherit;
 }
 
 .nav-subtitle {
@@ -81,7 +81,7 @@
 
 .nav-login-btn {
     background: var(--accent-crimson);
-    color: var(--text-primary);
+    color: #FFFFFF;
     font-family: var(--font-body);
     font-size: 11px;
     font-weight: 600;
@@ -105,12 +105,8 @@
 
 <nav class="custom-nav">
     <div class="nav-left">
-        <div class="nav-logo-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" class="icon-stroke">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 12 12 17 22 12"></polyline>
-                <polyline points="2 17 12 22 22 17"></polyline>
-            </svg>
+        <div class="nav-logo-icon" style="background: transparent;">
+            <img src="{{ url_for('static', filename='images/aisat-logo-300x300.png') }}" alt="AISAT Logo" style="width: 32px; height: 32px; object-fit: contain;">
         </div>
         <div>
             <div class="nav-brand-text">CS <span>Connect</span></div>
@@ -122,7 +118,6 @@
         <li><a href="{{ url_for('home') }}" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
         <li><a href="{{ url_for('about_cse') }}" class="{{ 'active' if active_page == 'about_cse' }}">About CSE</a></li>
         <li><a href="{{ url_for('about_aisat') }}" class="{{ 'active' if active_page == 'about_aisat' }}">About AISAT</a></li>
-        <li><a href="{{ url_for('placements') }}" class="{{ 'active' if active_page == 'placements' }}">Placement</a></li>
         <li><a href="{{ url_for('faculty') }}" class="{{ 'active' if active_page == 'faculty' }}">Faculty</a></li>
         <li><a href="{{ url_for('academics') }}" class="{{ 'active' if active_page == 'academics' }}">Academics</a></li>
         <li><a href="{{ url_for('contact') }}" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
@@ -132,13 +127,12 @@
     </ul>
 
     <div class="nav-right">
-        <a href="{{ url_for('search') }}" style="color: var(--text-secondary); display: flex; align-items: center; margin-right: 12px; transition: 0.2s;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </a>
         {% if session.get('user_id') %}
+            <!-- Global Notification Bell -->
+            <div style="margin-right: 12px; position: relative;">
+                {% include 'partials/topbar_actions.html' %}
+            </div>
+
             {% if session.get('role') == 'admin' %}
             <a href="{{ url_for('admin_dashboard') }}" class="nav-login-btn">Dashboard</a>
             {% elif session.get('role') == 'faculty' %}
@@ -146,7 +140,7 @@
             {% else %}
             <a href="{{ url_for('student_dashboard') }}" class="nav-login-btn">Dashboard</a>
             {% endif %}
-            <a href="{{ url_for('logout') }}" style="color: var(--text-muted); font-size: 11px; text-decoration: none;">Logout</a>
+            <a href="{{ url_for('logout') }}" style="color: var(--text-muted); font-size: 11px; text-decoration: none; margin-left: 12px;">Logout</a>
         {% else %}
             <a href="{{ url_for('login') }}" class="nav-login-btn">Login</a>
         {% endif %}
