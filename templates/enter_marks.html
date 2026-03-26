@@ -87,7 +87,7 @@
           <label>Subject</label>
           <select class="cfg-select" id="subjectSel">
             {% for s in subjects %}
-            <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
+            <option value="{{ s.code }}" {% if s.code == selected_subject %}selected{% endif %}>{{ s.code }} · {{ s.name }}</option>
             {% endfor %}
             {% if not subjects %}
             <option value="CS302">CS302 · Data Structures</option>
@@ -101,7 +101,7 @@
           <label>Batch / Section</label>
           <select class="cfg-select" id="batchSel">
             {% for b in batches %}
-            <option value="{{ b }}">{{ b }}</option>
+            <option value="{{ b }}" {% if b == selected_batch %}selected{% endif %}>{{ b }}</option>
             {% endfor %}
             {% if not batches %}
             <option value="S6 CSE-A">S6 CSE - Alpha</option>
@@ -113,12 +113,12 @@
         <div class="cfg-field">
           <label>Exam Type</label>
           <select class="cfg-select" id="examSel">
-            <option value="IA1">Internal Assessment 1</option>
-            <option value="IA2">Internal Assessment 2</option>
-            <option value="IA3">Internal Assessment 3</option>
-            <option value="MODEL">Model Exam</option>
-            <option value="SEE">Semester End Exam</option>
-            <option value="ASGN">Assignment</option>
+            <option value="IA1" {% if selected_exam == 'IA1' %}selected{% endif %}>Internal Assessment 1</option>
+            <option value="IA2" {% if selected_exam == 'IA2' %}selected{% endif %}>Internal Assessment 2</option>
+            <option value="IA3" {% if selected_exam == 'IA3' %}selected{% endif %}>Internal Assessment 3</option>
+            <option value="MODEL" {% if selected_exam == 'MODEL' %}selected{% endif %}>Model Exam</option>
+            <option value="SEE" {% if selected_exam == 'SEE' %}selected{% endif %}>Semester End Exam</option>
+            <option value="ASGN" {% if selected_exam == 'ASGN' %}selected{% endif %}>Assignment</option>
           </select>
         </div>
         <div class="max-marks-wrap">
@@ -176,7 +176,7 @@
           </thead>
           <tbody id="marksBody">
             {% for s in students %}
-            <tr data-id="{{ s.id }}" data-name="{{ s.name }}">
+            <tr data-id="{{ s.user_id }}" data-name="{{ s.name }}">
               <td>
                 <div class="name-cell">
                   <div class="s-av-sm">{{ s.initials }}</div>
@@ -187,8 +187,8 @@
               <td>
                 <input type="number"
                   class="marks-inp"
-                  id="inp-{{ s.id }}"
-                  data-student-id="{{ s.id }}"
+                  id="inp-{{ s.user_id }}"
+                  data-student-id="{{ s.user_id }}"
                   data-student-name="{{ s.name }}"
                   min="0"
                   value="{{ s.existing_marks if s.existing_marks is not none else '' }}"
@@ -197,41 +197,24 @@
                   onblur="validateMark(this)">
               </td>
               <td>
-                <span class="grade-tag g-none" id="grade-{{ s.id }}">—</span>
+                <span class="grade-tag g-none" id="grade-{{ s.user_id }}">—</span>
               </td>
               <td class="hide-mobile">
                 <div class="pbar-sm">
-                  <div class="pbar-sm-fill fw" id="bar-{{ s.id }}" style="width:0%;"></div>
+                  <div class="pbar-sm-fill fw" id="bar-{{ s.user_id }}" style="width:0%;"></div>
                 </div>
               </td>
             </tr>
             {% endfor %}
             {% if not students %}
-            <!-- Fallback dummy students -->
-            {% set dummy = [
-              ('d1','Arjun Kumar','AIS22CS001','AK',''),
-              ('d2','Sneha Krishnan','AIS22CS002','SK',''),
-              ('d3','Rahul Menon','AIS22CS003','RM',''),
-              ('d4','Divya Nair','AIS22CS004','DN',''),
-              ('d5','Priya Suresh','AIS22CS005','PS',''),
-              ('d6','Arun Babu','AIS22CS006','AB',''),
-              ('d7','Meera Thomas','AIS22CS007','MT',''),
-              ('d8','Kiran Raj','AIS22CS008','KR','')
-            ] %}
-            {% for id,name,roll,init,marks in dummy %}
-            <tr data-id="{{ id }}" data-name="{{ name }}">
-              <td><div class="name-cell"><div class="s-av-sm">{{ init }}</div><span class="s-name">{{ name }}</span></div></td>
-              <td class="hide-mobile"><span class="roll-no">{{ roll }}</span></td>
-              <td>
-                <input type="number" class="marks-inp" id="inp-{{ id }}"
-                  data-student-id="{{ id }}" data-student-name="{{ name }}"
-                  min="0" value="{{ marks }}" placeholder="—"
-                  oninput="onMarkInput(this)" onblur="validateMark(this)">
+            <tr>
+              <td colspan="5" style="text-align:center;padding:40px;color:var(--muted);">
+                <div style="font-size:24px;margin-bottom:10px;opacity:0.3;">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                No students found in the database.
               </td>
-              <td><span class="grade-tag g-none" id="grade-{{ id }}">—</span></td>
-              <td class="hide-mobile"><div class="pbar-sm"><div class="pbar-sm-fill fw" id="bar-{{ id }}" style="width:0%;"></div></div></td>
             </tr>
-            {% endfor %}
             {% endif %}
           </tbody>
         </table>
@@ -520,6 +503,27 @@ function showToast(msg, isError = false) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
+/* ═══════════════════════════════════════════
+   BATCH SELECTION RELOAD
+═══════════════════════════════════════════ */
+document.getElementById('batchSel').addEventListener('change', function() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('batch', this.value);
+  window.location.href = url.toString();
+});
+
+document.getElementById('subjectSel').addEventListener('change', function() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('subject', this.value);
+  window.location.href = url.toString();
+});
+
+document.getElementById('examSel').addEventListener('change', function() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('exam', this.value);
+  window.location.href = url.toString();
+});
+
 </script>
 </body>
 </html>

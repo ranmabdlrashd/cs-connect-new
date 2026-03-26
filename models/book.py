@@ -30,7 +30,7 @@ class Book:
     @staticmethod
     def get_by_id(book_id):
         conn = get_db()
-        book = conn.execute("SELECT * FROM books WHERE id = %s", (book_id,)).fetchone()
+        book = conn.execute("SELECT * FROM books WHERE sl_no = %s", (book_id,)).fetchone()
         conn.close()
         return dict(book) if book else None
 
@@ -38,7 +38,7 @@ class Book:
     def update_availability(book_id, availability):
         conn = get_db()
         conn.execute(
-            "UPDATE books SET availability = %s WHERE id = %s", (availability, book_id)
+            "UPDATE books SET availability = %s WHERE sl_no = %s", (availability, book_id)
         )
         conn.commit()
         conn.close()

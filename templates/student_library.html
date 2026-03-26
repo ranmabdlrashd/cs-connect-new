@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
   /* Page-specific overrides */
-  nav, .news-ticker { display: none !important; }
+
   body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
   .lib-header { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 32px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; }
@@ -31,25 +31,47 @@
   .status-pill { font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; align-self: flex-start; }
   .status-available { background: #E8F5E9; color: #2E7D32; }
   .status-issued { background: #FFF3E0; color: #E65100; }
+
+  @media (max-width: 768px) {
+      .lib-header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+      .lib-header h1 { font-size: 1.6rem; }
+      .lib-header div[style*="text-align:right"] { text-align: left !important; }
+      .lib-search { flex-direction: column; padding: 16px; }
+      .search-input { width: 100%; box-sizing: border-box; }
+      .dash-btn-primary { width: 100%; }
+      .book-grid { grid-template-columns: 1fr; }
+  }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="library" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item active" title="Library"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Library">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Library</span>
+      </div>
     </nav>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Resources &middot; <b>Central Library</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Resources &middot; <b>Central Library</b></div>
+      </div>
     </header>
 
     <div class="dash-content">

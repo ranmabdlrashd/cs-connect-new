@@ -124,8 +124,8 @@
 
 /* --- 4. CURRICULUM EXPLORER (ACCORDION) --- */
 .curriculum-wrap {
-  background: rgba(18, 18, 18, 0.4);
-  border: 1px solid var(--border);
+  background: rgba(139, 29, 29, 0.02);
+  border: 1px solid rgba(0,0,0,0.05);
   border-radius: 16px;
   padding: 32px;
 }
@@ -150,9 +150,9 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease-out;
-  background: rgba(10, 10, 10, 0.5);
+  background: #FFFFFF;
   border-radius: 0 0 8px 8px;
-  margin-top: -8px; /* tucks under header slightly visually, offset by padding */
+  margin-top: -8px;
 }
 .sem-content-inner { padding: 24px; border: 1px solid var(--border); border-top: none;}
 .subject-grid {
@@ -307,21 +307,186 @@
 .notice-list::-webkit-scrollbar { width: 4px; }
 .notice-list::-webkit-scrollbar-track { background: var(--bg-primary); }
 .notice-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px;}
-.notice-item { padding: 16px; background: rgba(0,0,0,0.3); border-left: 3px solid var(--text-muted); border-radius: 0 8px 8px 0; transition: 0.3s;}
-.notice-item:hover { background: rgba(139,29,29,0.05); border-left-color: #8B1D1D; }
+.notice-item { padding: 16px; background: rgba(139, 29, 29, 0.03); border-left: 3px solid #8B1D1D; border-radius: 0 8px 8px 0; transition: 0.3s;}
+.notice-item:hover { background: rgba(139, 29, 29, 0.08); }
 .notice-date { font-size: 10px; color: #8B1D1D; letter-spacing: 1px; margin-bottom: 6px; font-weight: 600;}
-.notice-text { font-size: 14px; color: #e0e0e0; line-height: 1.4; }
+.notice-text { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
 
 /* --- 7. RESPONSIVE --- */
 @media (max-width: 1024px) {
   .cal-notice-wrap { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .academics-breadcrumb, .academics-hero, .acad-section { padding-left: 24px; padding-right: 24px; }
-  .hero-title-ac { font-size: 40px; }
-  .vault-controls { flex-direction: column; align-items: flex-start; }
-  .vault-search { max-width: 100%; }
-  .subject-grid { grid-template-columns: 1fr; gap: 32px; }
-  .res-row { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .res-right { width: 100%; justify-content: space-between; border-top: 1px solid var(--bg-primary); padding-top: 16px;}
+  .academics-breadcrumb, .academics-hero, .acad-section { padding-left: 20px; padding-right: 20px; }
+  .hero-title-ac { font-size: 32px; }
+  .hero-sub-ac { font-size: 14px; margin-bottom: 24px; }
+  .vault-controls { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .vault-search { max-width: 100%; order: 1; }
+  .vault-tabs { order: 2; width: 100%; }
+  .subject-grid { grid-template-columns: 1fr; gap: 24px; }
+  .res-row { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+  .res-right { width: 100%; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 12px;}
+  .acad-section { padding-top: 40px; padding-bottom: 40px; }
+  .curriculum-wrap { padding: 16px; }
+}
+
+
+/* --- 8. DYNAMIC NOTES & LOGIN WALL --- */
+.subj-item-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed rgba(139,29,29,0.1) !important;
+  gap: 16px;
+}
+.subj-item-wrap:last-child { border-bottom: none !important; }
+
+.subj-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.subj-main-info span:first-child {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.subj-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.module-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.note-pill {
+  padding: 4px 12px;
+  background: var(--bg-primary);
+  border: 1px solid rgba(139,29,29,0.3);
+  border-radius: 4px;
+  color: #8B1D1D;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.note-pill:hover {
+  background: #8B1D1D;
+  color: #FFFFFF;
+  border-color: #8B1D1D;
+}
+
+.lock-icon {
+  font-size: 14px;
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.no-subjects, .no-subjects-full {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 20px 0;
+}
+
+.login-prompt-box {
+  margin-top: 32px;
+  padding: 24px;
+  background: rgba(139,29,29,0.03);
+  border: 1px solid rgba(139,29,29,0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.lock-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.lock-banner p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+.banner-icon { font-size: 24px; }
+
+.login-action-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: #8B1D1D;
+  color: #FFFFFF;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(139,29,29,0.2);
+}
+.login-action-btn:hover {
+  background: #a32222;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .subj-item-wrap { flex-direction: column; align-items: flex-start; }
+  .module-links { justify-content: flex-start; }
+}
+
+/* --- 9. ACCORDIONS --- */
+.accordion-item {
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background: #FFFFFF;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.accordion-item.active {
+  box-shadow: 0 10px 30px rgba(139,29,29,0.08);
+  border-color: rgba(139,29,29,0.2);
+}
+
+.accordion-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #fdfdfd;
+  user-select: none;
+}
+.accordion-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.accordion-icon {
+  font-size: 10px;
+  color: #8B1D1D;
+  transition: 0.3s;
+}
+.accordion-item.active .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background: #FFFFFF;
+}
+.accordion-inner {
+  padding: 0 24px 24px 24px;
+  border-top: 1px solid rgba(0,0,0,0.03);
 }

@@ -1,0 +1,28 @@
+2026-03-26 08:43:55,452 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:25]
+2026-03-26 08:43:55,452 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:25]
+2026-03-26 08:44:03,324 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:25]
+2026-03-26 08:44:09,901 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:25]
+2026-03-26 08:47:17,061 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:25]
+2026-03-26 08:47:45,558 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:47:45,644 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:47:46,202 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:49:30,133 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:51:40,612 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:51:47,288 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:52:05,151 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:52:14,197 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:52:19,856 INFO: Flask startup [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:30]
+2026-03-26 08:52:27,071 INFO: Headers: Host: 127.0.0.1:5000
+User-Agent: curl/8.18.0
+Accept: */*
+
+ [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:18]
+2026-03-26 08:52:27,071 INFO: Body: b'' [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:19]
+2026-03-26 14:21:24,064 ERROR: Home page error: column "sl_no" does not exist
+LINE 1: SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 1
+                                              ^
+ [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:776]
+2026-03-26 14:21:24,064 ERROR: Home page error: column "sl_no" does not exist
+LINE 1: SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 1
+                                              ^
+ [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:776]

@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
   /* Page-specific overrides */
-  nav, .news-ticker { display: none !important; }
+
   body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
   .bento-grid {
@@ -54,30 +54,57 @@
   .grade-A-plus, .grade-A { background: #2E7D32; }
   .grade-B-plus, .grade-B { background: #F57F17; }
   .grade-C { background: var(--accent-crimson); }
+
+  @media (max-width: 1024px) {
+    .bento-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .dashboard-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-card { grid-column: span 1 !important; }
+    .cgpa-value { font-size: 2.5rem; }
+  }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="award" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item active" title="Results"><i data-lucide="award"></i></div>
-      <div class="dash-sidebar-item" title="Library" onclick="location.href='/student-dashboard/library'"><i data-lucide="library"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Results">
+        <i data-lucide="award"></i>
+        <span class="nav-label">Results</span>
+      </div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/student-dashboard/library'">
+        <i data-lucide="library"></i>
+        <span class="nav-label">Library</span>
+      </div>
     </nav>
     <div class="dash-sidebar-bottom">
-      <div class="dash-sidebar-item" title="Logout" onclick="location.href='/logout'"><i data-lucide="log-out"></i></div>
+      <div class="dash-sidebar-item" title="Logout" onclick="location.href='/logout'">
+        <i data-lucide="log-out"></i>
+        <span class="nav-label">Logout</span>
+      </div>
     </div>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Student &middot; <b>Results & CGPA</b></div>
-
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Student &middot; <b>Results & CGPA</b></div>
+      </div>
     </header>
 
     <div class="dash-content">

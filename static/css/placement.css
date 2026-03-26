@@ -413,11 +413,24 @@
 
 @media (max-width: 1024px) {
   .charts-row { grid-template-columns: 1fr; }
-  .pathways-grid { grid-template-columns: repeat(2, 1fr); }
+  .pathways-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .pathway-card { padding: 24px 16px; }
 }
+
 @media (max-width: 768px) {
+  .placement-breadcrumb, .placement-hero, .drives-section, .alumni-section, .analytics-section, .pathways-section { padding-left: 20px; padding-right: 20px; }
+  .hero-title { font-size: 32px; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-card { padding: 20px 12px; }
+  .stat-value { font-size: 28px; }
+  .analytics-glass { padding: 24px 16px; }
   .charts-row, .pathways-grid { grid-template-columns: 1fr; }
-  .analytics-section, .pathways-section { padding: 40px 24px; }
-  .dir-filters { flex-direction: column; align-items: stretch; }
+  .dir-filters { flex-direction: column; align-items: stretch; gap: 12px; }
+  .historical-table-wrap { padding: 12px; overflow-x: auto; }
 }
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .hero-header { text-align: center; }
+  .placement-hero { gap: 32px; }
+}

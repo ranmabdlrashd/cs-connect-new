@@ -14,18 +14,12 @@
   .config-card { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; }
   .form-group { margin-bottom: 20px; }
   .form-label { font-size: 0.7rem; color: var(--accent-crimson); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
-  .form-select, .form-textarea {
+  .form-select, .form-textarea, .form-input {
     width: 100%; padding: 12px; border: 1px solid #EAE5D8; border-radius: 8px; background: #FDFCF8;
     font-size: 0.85rem; color: var(--text-primary); outline: none; transition: border-color 0.2s;
   }
-  .form-select:focus, .form-textarea:focus { border-color: var(--accent-crimson); }
+  .form-select:focus, .form-textarea:focus, .form-input:focus { border-color: var(--accent-crimson); }
   .form-textarea { height: 100px; resize: none; font-family: inherit; }
-
-  .drop-zone {
-    border: 2px dashed #EAE5D8; border-radius: 12px; padding: 40px; text-align: center;
-    cursor: pointer; transition: all 0.2s; background: #FDFCF8; margin-bottom: 24px;
-  }
-  .drop-zone:hover { border-color: var(--accent-crimson); background: #FFF9F9; }
 
   .history-card { background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; height: 100%; }
   .history-list { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex: 1; margin-top: 16px; }
@@ -36,116 +30,129 @@
   .hist-title { font-weight: 700; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px; }
   .hist-meta { font-size: 0.7rem; color: var(--text-secondary); display: flex; gap: 8px; }
   
-  .dl-btn { background: none; border: 1px solid #EAE5D8; color: var(--accent-crimson); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
+  .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+  .status-success { background: #E8F5E9; color: #2E7D32; }
+
+  @media (max-width: 1024px) {
+      .layout-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+      .dashboard-header h1 { font-size: 1.5rem !important; }
+      .config-card, .history-card { padding: 16px; }
+      .form-group { margin-bottom: 16px; }
+      .form-select, .form-textarea, .form-input { padding: 10px; font-size: 0.8rem; }
+  }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="upload-cloud" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/faculty-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item" title="My Students"><i data-lucide="users"></i></div>
-      <div class="dash-sidebar-item" title="Marks" onclick="location.href='/marks-entry'"><i data-lucide="edit-3"></i></div>
-      <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/faculty/timetable'"><i data-lucide="calendar"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/faculty-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
       <div class="dash-sidebar-active" title="Materials"><i data-lucide="upload"></i></div>
-      <div class="dash-sidebar-item" title="Library" onclick="location.href='/library'"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/faculty/timetable'">
+        <i data-lucide="calendar"></i>
+        <span class="nav-label">Timetable</span>
+      </div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/library'">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Library</span>
+      </div>
     </nav>
-    <div class="dash-sidebar-bottom">
-    </div>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Faculty &middot; <b>Study Materials</b></div>
-
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Faculty &middot; <b>Academic Repository</b></div>
+      </div>
     </header>
 
     <div class="dash-content">
       <div class="dashboard-header" style="margin-bottom: 24px;">
-          <h1 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent-crimson); font-weight: 800; margin: 0;">Academic Repository</h1>
-          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 4px 0 0 0;">Upload lecture notes, manuals, and assignments.</p>
+          <h1 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent-crimson); font-weight: 800; margin: 0;">Update Course Materials</h1>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 4px 0 0 0;">Add Google Drive note links to specific modules.</p>
       </div>
 
       <div class="layout-grid">
         <!-- Configuration Form -->
         <div class="config-card">
-          <h3 style="font-size: 1rem; color: var(--accent-crimson); font-weight: 700; margin-top: 0; margin-bottom: 20px;">Upload Configuration</h3>
-          
-          <div class="form-group">
-            <label class="form-label">Subject & Course</label>
-            <select class="form-select">
-              <option>Software Engineering (CS304)</option>
-              <option>Machine Learning (CS401)</option>
-              <option>Data Structures (CS202)</option>
-            </select>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <form id="uploadForm">
             <div class="form-group">
-              <label class="form-label">Batch</label>
-              <select class="form-select">
-                <option>S6 CSE A</option>
-                <option>S6 CSE B</option>
-                <option>All Enrolled</option>
+              <label class="form-label">Select Semester / Scheme</label>
+              <select class="form-select" id="semesterSelect" name="semester_sl_no" required>
+                <option value="">-- Choose Semester --</option>
+                {% for sem in semesters %}
+                <option value="{{ sem.sl_no }}" data-subjects='{{ sem.subjects|tojson }}'>
+                  {{ sem.title }} ({{ sem.scheme }} Scheme)
+                </option>
+                {% endfor %}
               </select>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Type</label>
-              <select class="form-select">
-                <option>Lecture Notes</option>
-                <option>Assignment</option>
-                <option>Lab Manual</option>
+              <label class="form-label">Subject</label>
+              <select class="form-select" id="subjectSelect" name="subject_code" required disabled>
+                <option value="">-- Select Semester First --</option>
               </select>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="form-label">Instructions</label>
-            <textarea class="form-textarea" placeholder="Add a short description or deadline..."></textarea>
-          </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label">Module Number</label>
+                <select class="form-select" name="module_num" required>
+                  <option value="1">Module 1</option>
+                  <option value="2">Module 2</option>
+                  <option value="3">Module 3</option>
+                  <option value="4">Module 4</option>
+                  <option value="5">Module 5</option>
+                  <option value="6">Labs / Extra</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Resource Type</label>
+                <select class="form-select">
+                  <option>Lecture Notes</option>
+                  <option>Lab Manual</option>
+                  <option>Assignment</option>
+                </select>
+              </div>
+            </div>
 
-          <button class="dash-btn-primary" style="width: 100%; padding: 14px; border-radius: 12px;">Distribute Material</button>
+            <div class="form-group">
+              <label class="form-label">Google Drive / Resource Link</label>
+              <input type="url" class="form-input" name="note_link" placeholder="https://drive.google.com/..." required>
+            </div>
+
+            <button type="submit" class="dash-btn-primary" style="width: 100%; padding: 14px; border-radius: 12px; cursor: pointer;">
+              Update Repository
+            </button>
+          </form>
         </div>
 
-        <!-- Files & History -->
+        <!-- Info & Status -->
         <div style="display: flex; flex-direction: column;">
-          <div class="config-card" style="margin-bottom: 24px;">
-            <h3 style="font-size: 1rem; color: var(--accent-crimson); font-weight: 700; margin-top: 0; margin-bottom: 20px;">File Attachments</h3>
-            <div class="drop-zone" onclick="document.getElementById('fileInp').click()">
-              <i data-lucide="plus-circle" style="width: 32px; height: 32px; color: var(--accent-crimson); margin-bottom: 12px;"></i>
-              <div style="font-weight: 700; color: var(--text-primary);">Click to upload or drag files</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Supported: PDF, ZIP, DOCX, PPTX</div>
-              <input type="file" id="fileInp" style="display: none;" multiple>
-            </div>
-          </div>
-
           <div class="history-card">
-            <h3 style="font-size: 1rem; color: var(--accent-crimson); font-weight: 700; margin: 0;">Recent Uploads</h3>
-            <div class="history-list">
-              <div class="hist-item">
-                <div>
-                  <div class="hist-title">Module_3_Architectures.pdf</div>
-                  <div class="hist-meta">
-                    <span>S6 CSE A</span> &middot; <span>2.4 MB</span> &middot; <span>Mar 18</span>
-                  </div>
-                </div>
-                <button class="dl-btn">Download</button>
-              </div>
-              <div class="hist-item">
-                <div>
-                  <div class="hist-title">Assignment_04_ML.docx</div>
-                  <div class="hist-meta">
-                    <span>S6 CSE B</span> &middot; <span>1.1 MB</span> &middot; <span>Mar 15</span>
-                  </div>
-                </div>
-                <button class="dl-btn">Download</button>
-              </div>
+            <h3 style="font-size: 1rem; color: var(--accent-crimson); font-weight: 700; margin: 0; margin-bottom: 16px;">Guidelines</h3>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+              <p>• Ensure the Google Drive link is set to <b>"Anyone with the link can view"</b>.</p>
+              <p>• Updating a module that already has a link will overwrite the previous entry.</p>
+              <p>• Changes reflect instantly for students on the Academics page.</p>
             </div>
+            
+            <div id="statusMessage" style="margin-top: auto; padding: 16px; border-radius: 12px; display: none;"></div>
           </div>
         </div>
       </div>
@@ -157,5 +164,62 @@
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+
+  const semSelect = document.getElementById('semesterSelect');
+  const subjSelect = document.getElementById('subjectSelect');
+  const uploadForm = document.getElementById('uploadForm');
+  const statusEl = document.getElementById('statusMessage');
+
+  semSelect.addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    subjSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+    
+    if (this.value) {
+      const subjects = JSON.parse(selected.getAttribute('data-subjects'));
+      subjects.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.code;
+        opt.textContent = `${s.name} (${s.code})`;
+        subjSelect.appendChild(opt);
+      });
+      subjSelect.disabled = false;
+    } else {
+      subjSelect.disabled = true;
+    }
+  });
+
+  uploadForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    statusEl.style.display = 'block';
+    statusEl.style.background = '#F5F5F5';
+    statusEl.style.color = '#666';
+    statusEl.innerText = 'Updating repository...';
+
+    try {
+      const response = await fetch('/faculty/submit-material', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      
+      if (result.ok) {
+        statusEl.style.background = '#E8F5E9';
+        statusEl.style.color = '#2E7D32';
+        statusEl.innerText = result.message;
+        uploadForm.reset();
+        subjSelect.disabled = true;
+      } else {
+        statusEl.style.background = '#FFEBEE';
+        statusEl.style.color = '#C62828';
+        statusEl.innerText = 'Error: ' + result.error;
+      }
+    } catch (err) {
+      statusEl.style.background = '#FFEBEE';
+      statusEl.style.color = '#C62828';
+      statusEl.innerText = 'Failed to connect to server.';
+    }
+  });
 </script>
 {% endblock %}

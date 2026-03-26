@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
   /* Page-specific overrides */
-  nav, .news-ticker { display: none !important; }
+
   body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
 
   .tt-container { display: flex; flex-direction: column; height: 100vh; }
@@ -49,11 +49,20 @@
 <div class="dash-wrapper fade-up">
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="calendar" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item active" title="Timetable"><i data-lucide="calendar"></i></div>
-      <div class="dash-sidebar-item" title="Syllabus" onclick="location.href='/dashboard/syllabus'"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Timetable">
+        <i data-lucide="calendar"></i>
+        <span class="nav-label">Timetable</span>
+      </div>
+      <div class="dash-sidebar-item" title="Syllabus" onclick="location.href='/dashboard/syllabus'">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Syllabus</span>
+      </div>
     </nav>
   </aside>
 
@@ -66,73 +75,25 @@
     <div class="dash-content">
       <div class="tt-header-row">
         <div class="tt-title-group">
-          <h1>Weekly Timetable</h1>
-          <p>Semester 6 &middot; Batch B &middot; Academic Year 2024-25</p>
-        </div>
-        <div style="display:flex; gap:12px;">
-           <button class="dash-btn-secondary" style="font-size:0.75rem;"><i data-lucide="download" style="width:14px;"></i> Export PDF</button>
-           <button class="dash-btn-primary" style="font-size:0.75rem;"><i data-lucide="printer" style="width:14px;"></i> Print</button>
+          <h1>Available Timetables</h1>
+          <p>Select your class or lab batch to view the schedule.</p>
         </div>
       </div>
 
-      <div class="day-selector">
-        <div class="day-btn active">Monday</div>
-        <div class="day-btn">Tuesday</div>
-        <div class="day-btn">Wednesday</div>
-        <div class="day-btn">Thursday</div>
-        <div class="day-btn">Friday</div>
-      </div>
-
-      <div class="tt-grid-wrapper">
-        <div class="tt-grid">
-          <!-- Headers -->
-          <div class="tt-slot-header" style="border:none;"></div>
-          <div class="tt-slot-header">Period 1</div>
-          <div class="tt-slot-header">Period 2</div>
-          <div class="tt-slot-header">Period 3</div>
-          <div class="tt-slot-header">Period 4</div>
-          <div class="tt-slot-header">Period 5</div>
-          <div class="tt-slot-header">Period 6</div>
-          <div class="tt-slot-header">Period 7</div>
-
-          <!-- Time Labels (Visual) -->
-          <div class="tt-time-label">09:00 AM</div>
-          
-          <div class="tt-cell">
-            <span class="subject-code">CS302</span>
-            <span class="subject-name">Compiler Design</span>
-            <span class="faculty-name">Dr. Sarah John</span>
-          </div>
-          <div class="tt-cell active">
-            <span class="subject-code">CS304</span>
-            <span class="subject-name">Operating Systems</span>
-            <span class="faculty-name">Prof. Robert Wilson</span>
-            <div style="position:absolute; top:8px; right:8px; width:6px; height:6px; background:#4CAF50; border-radius:50%;"></div>
-          </div>
-          <div class="tt-cell">
-            <span class="subject-code">CS306</span>
-            <span class="subject-name">Computer Networks</span>
-            <span class="faculty-name">Prof. Michael Chen</span>
-          </div>
-
-          <div class="lunch-slot">LUNCH BREAK</div>
-
-          <div class="tt-time-label">01:00 PM</div>
-          <div class="tt-cell lab">
-            <span class="subject-code">CS332</span>
-            <span class="subject-name">Microprocessor Lab</span>
-            <span class="faculty-name">Dr. Emily Davis</span>
-          </div>
-          <div class="tt-cell lab">
-            <span class="subject-code">CS332</span>
-            <span class="subject-name">Microprocessor Lab</span>
-            <span class="faculty-name">Dr. Emily Davis</span>
-          </div>
-          <div class="tt-cell">
-            <span class="subject-code">CS308</span>
-            <span class="subject-name">Software Engineering</span>
-            <span class="faculty-name">Prof. Alan Turing</span>
-          </div>
+      <div style="background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 32px;">
+        <h3 style="margin: 0 0 24px 0; font-family: 'Playfair Display', serif; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="clock" style="color: var(--accent-crimson);"></i> Class Timetables
+        </h3>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          {% if all_batches %}
+            {% for batch in all_batches %}
+            <a href="{{ url_for('timetable', batch=batch) }}" style="background: #FDFCF8; border: 1px solid var(--border-accent); padding: 18px 28px; border-radius: 12px; color: var(--text-secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 10px;" onmouseover="this.style.borderColor='var(--accent-crimson)'; this.style.color='var(--accent-crimson)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-accent)'; this.style.color='var(--text-secondary)'; this.style.transform='none';">
+              {{ batch }}
+            </a>
+            {% endfor %}
+          {% else %}
+            <p style="color: var(--text-muted); width: 100%; text-align: center; padding: 40px 0; font-size: 0.95rem;">No timetables have been published yet.</p>
+          {% endif %}
         </div>
       </div>
     </div>

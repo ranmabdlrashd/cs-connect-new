@@ -550,4 +550,9 @@
   .leadership-grid { grid-template-columns: 1fr; }
 
   .hero-title { font-size: 30px; }
-}
+  
+  .leader-card { flex-direction: column; align-items: center; text-align: center; }
+  .aboutcse-hero { padding-top: 40px; padding-bottom: 30px; }
+  .stat-card-sm { padding: 12px; }
+  .mou-table-wrap { margin-left: -20px; margin-right: -20px; border-radius: 0; border-left: none; border-right: none; }
+}

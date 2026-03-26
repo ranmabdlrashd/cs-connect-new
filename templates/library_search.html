@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('/api/library/search?availability=Available Now&limit=4').then(r=>r.json()).then(d=>{
                 if(d.results) {
                     document.getElementById('zeroPills').innerHTML = d.results.slice(0,4).map(b => 
-                        `<div class="sugg-pill" onclick="location.href='/book/${b.id}'">${b.title}</div>`
+                        `<div class="sugg-pill" onclick="location.href='/book/${b.sl_no}'">${b.title}</div>`
                     ).join('');
                 }
             });
@@ -433,17 +433,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let badge = '', btn = '';
             if(b.is_reference) {
                 badge = `<span class="badge badge-ref">Reference</span>`;
-                btn = `<button class="btn-sm btn-sm-ghost" onclick="event.stopPropagation(); location.href='/book/${b.id}'">View Details</button>`;
+                btn = `<button class="btn-sm btn-sm-ghost" onclick="event.stopPropagation(); location.href='/book/${b.sl_no}'">View Details</button>`;
             } else if(b.available_copies <= 0) {
                 badge = `<span class="badge badge-issued">All Issued</span>`;
                 btn = `<button class="btn-sm btn-sm-outline" onclick="event.stopPropagation(); alert('Reservation endpoint triggered');">Reserve</button>`;
             } else {
                 badge = `<span class="badge badge-avail">Available</span>`;
-                btn = `<button class="btn-sm btn-sm-primary" onclick="event.stopPropagation(); alert('Borrow logic triggered via details API.'); location.href='/book/${b.id}'">Borrow Now</button>`;
+                btn = `<button class="btn-sm btn-sm-primary" onclick="event.stopPropagation(); alert('Borrow logic triggered via details API.'); location.href='/book/${b.sl_no}'">Borrow Now</button>`;
             }
 
             return `
-            <div class="result-card" onclick="location.href='/book/${b.id}'">
+            <div class="result-card" onclick="location.href='/book/${b.sl_no}'">
               <div class="res-icon-box" style="background:${theme.bg};">
                  <i data-lucide="book-open" style="stroke:${theme.stroke}; width:20px; height:20px;"></i>
               </div>

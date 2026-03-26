@@ -75,45 +75,58 @@
     border: 1px solid var(--border); background: var(--bg-secondary);
     color: var(--text-primary); font-family: inherit;
   }
+
+  @media (max-width: 768px) {
+    .modal-card { width: 90%; padding: 20px; }
+    .welcome-header h1 { font-size: 1.5rem !important; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="dash-sidebar">
-        <div class="dash-sidebar-logo">
-            <div style="width:20px; height:20px; background:white; border-radius:4px;"></div>
+        
         </div>
         
         <nav class="dash-sidebar-items">
             <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='{{ url_for('admin_bp.admin_command_center') }}'">
-                <i data-lucide="layout-dashboard"></i>
-            </div>
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
             <div class="dash-sidebar-item" title="Users" onclick="location.href='{{ url_for('admin_bp.admin_users') }}'">
-                <i data-lucide="users"></i>
-            </div>
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
             <div class="dash-sidebar-item active" title="Internal Marks">
-                <i data-lucide="edit-3"></i>
-            </div>
+        <i data-lucide="edit-3"></i>
+        <span class="nav-label">Internal Marks</span>
+      </div>
             <div class="dash-sidebar-item" title="Library Requests" onclick="location.href='{{ url_for('admin_bp.admin_library_dashboard') }}'">
-                <i data-lucide="bell-ring"></i>
-            </div>
+        <i data-lucide="bell-ring"></i>
+        <span class="nav-label">Library Requests</span>
+      </div>
             <div class="dash-sidebar-item" title="Library Management" onclick="location.href='{{ url_for('admin_bp.admin_library_management') }}'">
-                <i data-lucide="book"></i>
-            </div>
+        <i data-lucide="book"></i>
+        <span class="nav-label">Library Management</span>
+      </div>
             <div class="dash-sidebar-item" title="Fees" onclick="location.href='{{ url_for('admin_bp.admin_fees') }}'">
-                <i data-lucide="credit-card"></i>
-            </div>
+        <i data-lucide="credit-card"></i>
+        <span class="nav-label">Fees</span>
+      </div>
             <div class="dash-sidebar-item" title="Analytics" onclick="location.href='{{ url_for('admin_bp.admin_analytics') }}'">
-                <i data-lucide="bar-chart-2"></i>
-            </div>
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
         </nav>
 
         <div class="dash-sidebar-bottom">
             <div class="dash-sidebar-item" title="Settings">
-                <i data-lucide="settings"></i>
-            </div>
+        <i data-lucide="settings"></i>
+        <span class="nav-label">Settings</span>
+      </div>
             <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
                 AD
             </div>
@@ -124,8 +137,13 @@
     <main class="dash-main">
         <!-- TOPBAR -->
         <header class="dash-topbar">
-            <div class="dash-breadcrumb">
-                Admin &middot; <b>Internal Marks</b>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="dash-breadcrumb">
+                    Admin &middot; <b>Internal Marks</b>
+                </div>
             </div>
             <div class="dash-top-actions">
                 <div class="notif-container" style="position:relative; cursor:pointer;">
@@ -232,7 +250,7 @@
     const editForm = document.getElementById('editForm');
 
     function openEditModal(mark) {
-        document.getElementById('markId').value = mark.id;
+        document.getElementById('markId').value = mark.sl_no;
         document.getElementById('modalStudentName').textContent = mark.student_name + " (" + mark.roll_no + ")";
         document.getElementById('modalSubjectName').textContent = mark.subject_name;
         document.getElementById('in1').value = mark.internal_1;
@@ -248,7 +266,7 @@
     editForm.onsubmit = async (e) => {
         e.preventDefault();
         const data = {
-            id: document.getElementById('markId').value,
+            sl_no: document.getElementById('markId').value,
             internal_1: parseFloat(document.getElementById('in1').value) || 0,
             internal_2: parseFloat(document.getElementById('in2').value) || 0,
             assignment: parseFloat(document.getElementById('assign').value) || 0

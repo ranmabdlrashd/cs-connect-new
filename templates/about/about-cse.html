@@ -10,55 +10,58 @@
 
 {# ── DUMMY DATA ────────────────────────────────────────────────────── #}
 {% set dummy_stats = [
-  {"value": "500+",  "label": "Students Enrolled"},
-  {"value": "25+",   "label": "Years of Excellence"},
-  {"value": "50+",   "label": "Expert Faculty"},
-  {"value": "15+",   "label": "Research Labs"}
+{"value": "500+", "label": "Students Enrolled"},
+{"value": "25+", "label": "Years of Excellence"},
+{"value": "50+", "label": "Expert Faculty"},
+{"value": "15+", "label": "Research Labs"}
 ] %}
 
 {% set dummy_programs = [
-  {
-    "badge": "Flagship Program",
-    "name": "B.Tech Computer Science & Engineering",
-    "meta": "4 Years · 160 Credits · KTU Affiliated",
-    "desc": "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software engineering with strong lab and project components.",
-    "featured": true
-  },
-  {
-    "badge": "Postgraduate",
-    "name": "M.Tech Computer Science & Engineering",
-    "meta": "2 Years · KTU Affiliated",
-    "desc": "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems with research thesis component.",
-    "featured": false
-  },
-  {
-    "badge": "Doctoral",
-    "name": "Ph.D. Computer Science",
-    "meta": "3–5 Years · Full-time / Part-time",
-    "desc": "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals. Supervision by experienced research guides.",
-    "featured": false
-  }
+{
+"badge": "Flagship Program",
+"name": "B.Tech Computer Science & Engineering",
+"meta": "4 Years · 160 Credits · KTU Affiliated",
+"desc": "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software
+engineering with strong lab and project components.",
+"featured": true
+},
+{
+"badge": "Postgraduate",
+"name": "M.Tech Computer Science & Engineering",
+"meta": "2 Years · KTU Affiliated",
+"desc": "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems
+with research thesis component.",
+"featured": false
+},
+{
+"badge": "Doctoral",
+"name": "Ph.D. Computer Science",
+"meta": "3–5 Years · Full-time / Part-time",
+"desc": "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals.
+Supervision by experienced research guides.",
+"featured": false
+}
 ] %}
 
 {% set dummy_faculty = [
-  {
-    "initials": "MJ",
-    "name": "Dr. Mathew Joseph",
-    "role": "Head of Department · Professor",
-    "qual": "Ph.D. IIT Bombay · M.Tech (CS) · 18+ years experience",
-    "tags": ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"]
-  },
-  {
-    "initials": "AR",
-    "name": "Dr. Anitha R.",
-    "role": "Associate Professor · PG Coordinator",
-    "qual": "Ph.D. NIT Calicut · M.Tech (AI) · 12+ years experience",
-    "tags": ["Machine Learning", "NLP", "Research Guide", "8 Publications"]
-  }
+{
+"initials": "MJ",
+"name": "Dr. Mathew Joseph",
+"role": "Head of Department · Professor",
+"qual": "Ph.D. IIT Bombay · M.Tech (CS) · 18+ years experience",
+"tags": ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"]
+},
+{
+"initials": "AR",
+"name": "Dr. Anitha R.",
+"role": "Associate Professor · PG Coordinator",
+"qual": "Ph.D. NIT Calicut · M.Tech (AI) · 12+ years experience",
+"tags": ["Machine Learning", "NLP", "Research Guide", "8 Publications"]
+}
 ] %}
 
 {# ── Use backend data if available, else dummy ─────────────────────── #}
-{% set page_stats  = dept_stats if dept_stats else dummy_stats %}
+{% set page_stats = dept_stats if dept_stats else dummy_stats %}
 {% set page_programs = programs if programs else dummy_programs %}
 
 <div class="aboutcse-page">
@@ -102,8 +105,10 @@
       {# Vision #}
       <div class="vm-card">
         <div class="vm-icon-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
           </svg>
         </div>
         <h3 class="vm-title">Our Vision</h3>
@@ -116,8 +121,10 @@
       {# Mission #}
       <div class="vm-card">
         <div class="vm-icon-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
         <h3 class="vm-title">Our Mission</h3>
@@ -157,8 +164,10 @@
 
       <div class="facility-card">
         <div class="facility-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
         <div>
@@ -169,20 +178,23 @@
 
       <div class="facility-card">
         <div class="facility-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
         </div>
         <div>
           <div class="facility-name">Cybersecurity Lab</div>
-          <div class="facility-desc">Ethical hacking environment, Kali Linux, network simulation tools, Cisco partner</div>
+          <div class="facility-desc">Ethical hacking environment, Kali Linux, network simulation tools, Cisco partner
+          </div>
         </div>
       </div>
 
       <div class="facility-card">
         <div class="facility-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
           </svg>
         </div>
         <div>
@@ -193,8 +205,10 @@
 
       <div class="facility-card">
         <div class="facility-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B1D1D" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+            <line x1="12" y1="18" x2="12.01" y2="18" />
           </svg>
         </div>
         <div>
@@ -306,7 +320,8 @@
             <td class="mou-idx">{{ loop.index }}</td>
             <td class="mou-org">{{ mou.organization }}</td>
             <td class="mou-date">{{ mou.date_of_signing }}</td>
-            <td><span class="mou-status {% if mou.status == 'Active' %}mou-active{% else %}mou-expired{% endif %}">{{ mou.status }}</span></td>
+            <td><span class="mou-status {% if mou.status == 'Active' %}mou-active{% else %}mou-expired{% endif %}">{{
+                mou.status }}</span></td>
           </tr>
           {% endfor %}
         </tbody>
@@ -321,97 +336,105 @@
 
 {% block extra_js %}
 <script>
-/* ── About CSE — Client-side fallback & fetch logic ────────────────── */
+  /* ── About CSE — Client-side fallback & fetch logic ────────────────── */
 
-// ── Dept Stats — fetch from backend, fallback to inline dummy ────────
-(async function loadStats() {
-  const dummy = [
-    { value: "500+", label: "Students Enrolled" },
-    { value: "25+",  label: "Years of Excellence" },
-    { value: "50+",  label: "Expert Faculty" },
-    { value: "15+",  label: "Research Labs" }
-  ];
+  // ── Dept Stats — fetch from backend, fallback to inline dummy ────────
+  (async function loadStats() {
+    const dummy = [
+      { value: "500+", label: "Students Enrolled" },
+      { value: "25+", label: "Years of Excellence" },
+      { value: "50+", label: "Expert Faculty" },
+      { value: "15+", label: "Research Labs" }
+    ];
 
-  // Stats are already rendered server-side (Jinja). Only override if bar is empty.
-  const bar = document.getElementById("statsBar");
-  if (!bar || bar.querySelectorAll(".stat-card-sm").length > 0) return;
+    // Stats are already rendered server-side (Jinja). Only override if bar is empty.
+    const bar = document.getElementById("statsBar");
+    if (!bar || bar.querySelectorAll(".stat-card-sm").length > 0) return;
 
-  dummy.forEach(s => {
-    const div = document.createElement("div");
-    div.className = "stat-card-sm";
-    div.innerHTML = `<div class="stat-num">${s.value}</div><div class="stat-label">${s.label}</div>`;
-    bar.appendChild(div);
-  });
-})();
+    dummy.forEach(s => {
+      const div = document.createElement("div");
+      div.className = "stat-card-sm";
+      div.innerHTML = `<div class="stat-num">${s.value}</div><div class="stat-label">${s.label}</div>`;
+      bar.appendChild(div);
+    });
+  })();
 
-// ── Programs — fetch from /api equivalent; or already rendered ───────
-(async function loadPrograms() {
-  const grid = document.getElementById("programsGrid");
-  if (!grid || grid.querySelectorAll(".prog-card").length > 0) return;
+  // ── Programs — fetch from /api equivalent; or already rendered ───────
+  (async function loadPrograms() {
+    const grid = document.getElementById("programsGrid");
+    if (!grid || grid.querySelectorAll(".prog-card").length > 0) return;
 
-  const dummy = [
-    { badge: "Flagship Program", name: "B.Tech Computer Science & Engineering",
-      meta: "4 Years · 160 Credits · KTU Affiliated", featured: true,
-      desc: "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software engineering with strong lab and project components." },
-    { badge: "Postgraduate", name: "M.Tech Computer Science & Engineering",
-      meta: "2 Years · KTU Affiliated", featured: false,
-      desc: "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems with research thesis component." },
-    { badge: "Doctoral", name: "Ph.D. Computer Science",
-      meta: "3–5 Years · Full-time / Part-time", featured: false,
-      desc: "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals. Supervision by experienced research guides." }
-  ];
+    const dummy = [
+      {
+        badge: "Flagship Program", name: "B.Tech Computer Science & Engineering",
+        meta: "4 Years · 160 Credits · KTU Affiliated", featured: true,
+        desc: "A comprehensive undergraduate program covering algorithms, AI/ML, networks, databases, OS, and software engineering with strong lab and project components."
+      },
+      {
+        badge: "Postgraduate", name: "M.Tech Computer Science & Engineering",
+        meta: "2 Years · KTU Affiliated", featured: false,
+        desc: "Advanced specialization in Artificial Intelligence, Machine Learning, Data Science, and Distributed Systems with research thesis component."
+      },
+      {
+        badge: "Doctoral", name: "Ph.D. Computer Science",
+        meta: "3–5 Years · Full-time / Part-time", featured: false,
+        desc: "Research-focused doctoral program with active publications in IEEE, Springer, and Elsevier journals. Supervision by experienced research guides."
+      }
+    ];
 
-  let programs = dummy;
-  try {
-    const res = await fetch("/api/programs");
-    if (res.ok) { const d = await res.json(); if (d && d.length) programs = d; }
-  } catch (_) {}
+    let programs = dummy;
+    try {
+      const res = await fetch("/api/programs");
+      if (res.ok) { const d = await res.json(); if (d && d.length) programs = d; }
+    } catch (_) { }
 
-  programs.forEach((p, i) => {
-    const card = document.createElement("div");
-    card.className = "prog-card" + (p.featured || i === 0 ? " prog-featured" : "");
-    card.innerHTML = `
+    programs.forEach((p, i) => {
+      const card = document.createElement("div");
+      card.className = "prog-card" + (p.featured || i === 0 ? " prog-featured" : "");
+      card.innerHTML = `
       <span class="prog-badge">${p.badge || ""}</span>
       <div class="prog-name">${p.name}</div>
       <div class="prog-meta">${p.meta || p.duration || ""}</div>
       <p class="prog-desc">${p.desc || p.description || ""}</p>
       <a href="#" class="prog-link">View Curriculum →</a>`;
-    grid.appendChild(card);
-  });
-})();
+      grid.appendChild(card);
+    });
+  })();
 
-// ── Leadership — fetch faculty, filter for leadership ────────────────
-(async function loadLeadership() {
-  const grid = document.getElementById("leadershipGrid");
-  if (!grid || grid.querySelectorAll(".leader-card").length > 0) return;
+  // ── Leadership — fetch faculty, filter for leadership ────────────────
+  (async function loadLeadership() {
+    const grid = document.getElementById("leadershipGrid");
+    if (!grid || grid.querySelectorAll(".leader-card").length > 0) return;
 
-  const dummy = [
-    { initials: "MJ", name: "Dr. Mathew Joseph", role: "Head of Department · Professor",
-      qual: "Ph.D. IIT Bombay · M.Tech (CS) · 18+ years experience",
-      tags: ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"] },
-    { initials: "AR", name: "Dr. Anitha R.", role: "Associate Professor · PG Coordinator",
-      qual: "Ph.D. NIT Calicut · M.Tech (AI) · 12+ years experience",
-      tags: ["Machine Learning", "NLP", "Research Guide", "8 Publications"] }
-  ];
+    const dummy = [
+      {
+        initials: "MJ", name: "Dr. Jeswin Roy Dcouth", role: "Head of Department · Professor",
+        qual: "Department Of Computer Science And Engineering· M.· 18+ years experience",
+        tags: ["Deep Learning", "Computer Vision", "Distributed Systems", "12 Publications"]
+      },
 
-  let leaders = dummy;
-  try {
-    const res = await fetch("/api/faculty?designation=hod,professor");
-    if (res.ok) { const d = await res.json(); if (d && d.length) {
-      leaders = d.slice(0, 4).map(f => ({
-        initials: f.name.split(" ").map(w => w[0]).slice(0,2).join(""),
-        name: f.name, role: f.designation,
-        qual: f.qualification || "",
-        tags: f.research ? [f.research] : []
-      }));
-    }}
-  } catch (_) {}
+    ];
 
-  leaders.forEach(l => {
-    const card = document.createElement("div");
-    card.className = "leader-card";
-    const tagsHtml = (l.tags || []).map(t => `<span class="spec-tag">${t}</span>`).join("");
-    card.innerHTML = `
+    let leaders = dummy;
+    try {
+      const res = await fetch("/api/faculty?designation=hod,professor");
+      if (res.ok) {
+        const d = await res.json(); if (d && d.length) {
+          leaders = d.slice(0, 4).map(f => ({
+            initials: f.name.split(" ").map(w => w[0]).slice(0, 2).join(""),
+            name: f.name, role: f.designation,
+            qual: f.qualification || "",
+            tags: f.research ? [f.research] : []
+          }));
+        }
+      }
+    } catch (_) { }
+
+    leaders.forEach(l => {
+      const card = document.createElement("div");
+      card.className = "leader-card";
+      const tagsHtml = (l.tags || []).map(t => `<span class="spec-tag">${t}</span>`).join("");
+      card.innerHTML = `
       <div class="leader-avatar">${l.initials}</div>
       <div class="leader-info">
         <div class="leader-name">${l.name}</div>
@@ -419,8 +442,8 @@
         <div class="leader-qual">${l.qual}</div>
         <div class="leader-tags">${tagsHtml}</div>
       </div>`;
-    grid.appendChild(card);
-  });
-})();
+      grid.appendChild(card);
+    });
+  })();
 </script>
 {% endblock %}

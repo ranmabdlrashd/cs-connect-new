@@ -31,27 +31,72 @@
     .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     .admin-table th { text-align: left; padding: 12px; background: #FDFCF8; color: var(--accent-crimson); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-accent); }
     .admin-table td { padding: 12px; border-bottom: 1px solid var(--border-accent); color: var(--text-primary); }
+
+    @media (max-width: 900px) {
+        .panel-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+        .lib-hero { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+        .lib-hero h1 { font-size: 1.5rem; }
+    }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="book-open" style="color:white;"></i></div>
+    
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
-      <div class="dash-sidebar-item active" title="Library Console"><i data-lucide="book-open"></i></div>
-      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
+        <div class="dash-sidebar-item" title="Admin Console" onclick="location.href='{{ url_for('admin_panel') }}';">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Admin Console</span>
+      </div>
+        <div class="dash-sidebar-item" title="Users" onclick="location.href='{{ url_for('admin_panel') }}#users';">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
+        <div class="dash-sidebar-item" title="Faculty" onclick="location.href='{{ url_for('admin_panel') }}#faculty';">
+        <i data-lucide="user-cog"></i>
+        <span class="nav-label">Faculty</span>
+      </div>
+        <div class="dash-sidebar-item" title="Library" onclick="location.href='{{ url_for('admin_panel') }}#library';">
+        <i data-lucide="book"></i>
+        <span class="nav-label">Library</span>
+      </div>
+        <div class="dash-sidebar-item" title="Academics" onclick="location.href='{{ url_for('admin_panel') }}#academics';">
+        <i data-lucide="graduation-cap"></i>
+        <span class="nav-label">Academics</span>
+      </div>
+        <div class="dash-sidebar-item active" title="Library Requests">
+        <i data-lucide="bell-ring"></i>
+        <span class="nav-label">Library Requests</span>
+      </div>
     </nav>
+
+    <div class="dash-sidebar-bottom">
+        <div class="dash-sidebar-item" title="Settings">
+        <i data-lucide="settings"></i>
+        <span class="nav-label">Settings</span>
+      </div>
+        <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white;">
+            AD
+        </div>
+    </div>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Library &middot; <b>Circulation Master</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Library &middot; <b>Circulation Master</b></div>
+      </div>
       <div style="display:flex; gap:12px;">
          <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;" onclick="location.href='/admin-dashboard/library'">Catalog Manager</button>
       </div>
@@ -76,6 +121,8 @@
           <table class="admin-table">
             <thead>
               <tr>
+                <th>Sl. No</th>
+                <th>ID</th>
                 <th>Type</th>
                 <th>Book</th>
                 <th>User</th>
@@ -85,11 +132,13 @@
             <tbody>
               {% for req in requests %}
               <tr>
+                <td>{{ loop.index }}</td>
+                <td><code style="font-size: 0.7rem;">#{{ req.sl_no }}</code></td>
                 <td><span class="badge badge-info">{{ req.request_type }}</span></td>
                 <td><b>{{ req.book_title }}</b></td>
                 <td>{{ req.user_name }}</td>
                 <td>
-                  <form action="{{ url_for('admin_bp.approve_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                  <form action="{{ url_for('admin_bp.approve_request', request_id=req.sl_no) }}" method="POST" style="display:inline;">
                     <button class="btn-action">Approve</button>
                   </form>
                 </td>
@@ -107,15 +156,19 @@
            </div>
            <table class="admin-table">
              <thead>
-               <tr>
-                 <th>Book Title</th>
-                 <th>Student</th>
-                 <th>Due Date</th>
-               </tr>
+              <tr>
+                <th>Sl. No</th>
+                <th>ID</th>
+                <th>Book Title</th>
+                <th>Student</th>
+                <th>Due Date</th>
+              </tr>
              </thead>
              <tbody>
                {% for issue in issues %}
                <tr>
+                 <td>{{ loop.index }}</td>
+                 <td><code style="font-size: 0.7rem;">#{{ issue.sl_no }}</code></td>
                  <td><b>{{ issue.book_title }}</b></td>
                  <td>{{ issue.user_name }}</td>
                  <td><span style="color:var(--accent-crimson); font-weight:700;">{{ issue.due_date.strftime('%b %d') if issue.due_date else '-' }}</span></td>
@@ -134,6 +187,8 @@
          <table class="admin-table">
            <thead>
              <tr>
+               <th>Sl. No</th>
+               <th>ID</th>
                <th>Action</th>
                <th>Book</th>
                <th>Student</th>
@@ -143,6 +198,8 @@
            <tbody>
              {% for tx in transactions[:10] %}
              <tr>
+               <td>{{ loop.index }}</td>
+               <td><code style="font-size: 0.7rem;">#{{ tx.sl_no }}</code></td>
                <td><span class="badge badge-{{ tx.badge_class }}">{{ tx.type }}</span></td>
                <td>{{ tx.book_title }}</td>
                <td>{{ tx.user_name }}</td>

@@ -433,6 +433,9 @@ async function fetchBookData() {
                       <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Request Return
                     </button>
                   </form>
+                  <button type="button" class="btn btn-outline" style="border-color:var(--green); color:var(--green); margin-top:8px;" onclick="execRenew()">
+                    <i data-lucide="calendar-plus" style="width:14px;height:14px;"></i> Renew (+14 Days)
+                  </button>
                   <div class="btn-subtext" style="margin-top:8px;">Due back: ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}</div>
                 `;
             } else {
@@ -453,6 +456,10 @@ async function fetchBookData() {
                       <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Request Return
                     </button>
                   </form>
+                  <button type="button" class="btn btn-outline" style="border-color:var(--green); color:var(--green); margin-top:8px;" onclick="execRenew()">
+                    <i data-lucide="calendar-plus" style="width:14px;height:14px;"></i> Renew (+14 Days)
+                  </button>
+                  <div class="btn-subtext" style="margin-top:8px;">Due back: ${new Date(loadedData.student_loan.due_date).toLocaleDateString()}</div>
                 `;
             } else if(loadedData.queue_info) {
                actsHtml = `
@@ -524,7 +531,7 @@ async function fetchBookData() {
                   ? `<div class="pill-mini" style="background:rgba(60,180,100,0.1);color:#5c5;">Available</div>`
                   : `<div class="pill-mini" style="background:rgba(180,130,40,0.1);color:#b85;">Queue</div>`;
                 return `
-                <div class="rel-card" onclick="location.href='/student-dashboard/library/books/${rb.id}'">
+                <div class="rel-card" onclick="location.href='/student-dashboard/library/books/${rb.sl_no}'">
                   <div class="rel-spine" style="background:${rt.str}; border:1px solid ${rt.bdr}">
                      <div class="rel-spine-title">${rb.title}</div>
                   </div>
@@ -583,6 +590,21 @@ async function execBorrow() {
             document.getElementById('borStep2').style.display='block';
             setTimeout(() => { if(document.getElementById('borrowModal').classList.contains('active')) location.reload(); }, 3000);
         } else { alert('Borrow failed: ' + d.error); }
+    } catch(e) { console.error(e); }
+}
+
+async function execRenew() {
+    try {
+        const res = await fetch('/api/library/renew', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ loan_id: loadedData.student_loan.loan_id })
+        });
+        const d = await res.json();
+        if(d.status === 'ok') {
+            alert('Renewed successfully! New due date: ' + new Date(d.new_due_date).toLocaleDateString());
+            location.reload();
+        } else { alert('Renewal failed: ' + d.error); }
     } catch(e) { console.error(e); }
 }
 

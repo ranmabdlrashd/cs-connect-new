@@ -14,40 +14,48 @@
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="dash-sidebar">
-        <div class="dash-sidebar-logo">
-            <div style="width:20px; height:20px; background:white; border-radius:4px;"></div>
+        
         </div>
         
         <nav class="dash-sidebar-items">
             <div class="dash-sidebar-item active" title="Dashboard" onclick="location.href='{{ url_for('admin_bp.admin_command_center') }}'">
-                <i data-lucide="layout-dashboard"></i>
-            </div>
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
             <div class="dash-sidebar-item" title="Users" onclick="location.href='{{ url_for('admin_bp.admin_users') }}'">
-                <i data-lucide="users"></i>
-            </div>
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
             <div class="dash-sidebar-item" title="Library Requests" onclick="location.href='{{ url_for('admin_bp.admin_library_dashboard') }}'">
-                <i data-lucide="bell-ring"></i>
-            </div>
+        <i data-lucide="bell-ring"></i>
+        <span class="nav-label">Library Requests</span>
+      </div>
             <div class="dash-sidebar-item" title="Library Management" onclick="location.href='{{ url_for('admin_bp.admin_library_management') }}'">
-                <i data-lucide="book"></i>
-            </div>
+        <i data-lucide="book"></i>
+        <span class="nav-label">Library Management</span>
+      </div>
             <div class="dash-sidebar-item" title="Internal Marks" onclick="location.href='{{ url_for('admin_bp.admin_internal_marks') }}'">
-                <i data-lucide="edit-3"></i>
-            </div>
+        <i data-lucide="edit-3"></i>
+        <span class="nav-label">Internal Marks</span>
+      </div>
             <div class="dash-sidebar-item" title="Fees" onclick="location.href='{{ url_for('admin_bp.admin_fees') }}'">
-                <i data-lucide="credit-card"></i>
-            </div>
+        <i data-lucide="credit-card"></i>
+        <span class="nav-label">Fees</span>
+      </div>
             <div class="dash-sidebar-item" title="Analytics" onclick="location.href='{{ url_for('admin_bp.admin_analytics') }}'">
-                <i data-lucide="bar-chart-2"></i>
-            </div>
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
         </nav>
 
         <div class="dash-sidebar-bottom">
             <div class="dash-sidebar-item" title="Settings">
-                <i data-lucide="settings"></i>
-            </div>
+        <i data-lucide="settings"></i>
+        <span class="nav-label">Settings</span>
+      </div>
             <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
                 AD
             </div>
@@ -58,8 +66,13 @@
     <main class="dash-main">
         <!-- TOPBAR -->
         <header class="dash-topbar">
-            <div class="dash-breadcrumb">
-                Admin &middot; <b>Command Center</b>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="dash-breadcrumb">
+                    Admin &middot; <b>Command Center</b>
+                </div>
             </div>
             <div class="dash-top-actions">
                 <button class="btn-login" style="font-size: 0.8rem; padding: 6px 16px;" id="exportBtn">Export Report</button>
@@ -146,4 +159,4 @@
         lucide.createIcons();
     }
 </script>
-{% endblock %}
+{% endblock %}

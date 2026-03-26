@@ -60,7 +60,7 @@ function toggleNav() {
 
 // Close nav when a link is clicked on mobile
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".nav-links a").forEach(link => {
+  document.querySelectorAll(".nav-center a").forEach(link => {
     link.addEventListener("click", () => {
       const navLinks = document.getElementById("navLinks");
       const hamburger = document.getElementById("hamburger");
@@ -69,3 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+/**
+ * DASHBOARD SIDEBAR TOGGLE (Mobile)
+ */
+function toggleSidebar() {
+  const wrapper = document.querySelector('.dash-wrapper');
+  if (wrapper) wrapper.classList.toggle('sidebar-open');
+}
+

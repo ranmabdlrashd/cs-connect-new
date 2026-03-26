@@ -44,6 +44,29 @@ body {
   height: 100vh;
 }
 
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 95;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--accent-crimson);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  align-items: center; justify-content: center;
+}
+
+
 .sidebar-logo {
   width: 40px;
   height: 40px;
@@ -303,10 +326,24 @@ body {
 }
 
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main-content { padding: 0 20px 20px; }
+  .sidebar { 
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 260px; /* Wider for labels */
+    height: 100vh;
+  }
+  .sidebar-toggle { display: flex; }
+  .dashboard-wrapper.sidebar-open .sidebar { transform: translateX(0); }
+  .dashboard-wrapper.sidebar-open .sidebar-overlay { display: block; }
+
+  .main-content { margin-left: 0; padding: 0 16px 20px; }
   .bento-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
   .card-schedule, .card-grades, .card-actions, .card-notices { grid-column: span 1; }
   .top-bar { padding: 16px 0; }
   .search-bar { display: none; }
+  
+  /* Show labels in mobile sidebar */
+  .sidebar .nav-item { width: 90%; justify-content: flex-start; padding: 0 16px; gap: 12px; height: 50px; }
+  .sidebar .nav-item::before { content: attr(data-tip); font-size: 14px; font-weight: 500; order: 2; }
 }
+

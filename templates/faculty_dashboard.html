@@ -15,43 +15,49 @@
 
 {% block content %}
 <div class="dash-wrapper fade-up">
-
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- ── SIDEBAR ── -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-        <polyline points="2 17 12 22 22 17"></polyline>
-        <polyline points="2 12 12 17 22 12"></polyline>
-      </svg>
-    </div>
+    
 
     <nav class="dash-sidebar-items">
       <!-- Dashboard (Active) -->
       <div class="dash-sidebar-item active" title="Dashboard">
         <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
       </div>
       <!-- My Classes -->
       <div class="dash-sidebar-item" title="My Classes" onclick="location.href='/timetable'">
         <i data-lucide="book-open"></i>
+        <span class="nav-label">My Classes</span>
       </div>
       <!-- Mark Entry -->
       <div class="dash-sidebar-item" title="Marks" onclick="location.href='/marks-entry'">
         <i data-lucide="edit-3"></i>
+        <span class="nav-label">Marks</span>
       </div>
       <!-- Library -->
       <div class="dash-sidebar-item" title="Library" onclick="location.href='/library'">
         <i data-lucide="library"></i>
+        <span class="nav-label">Library</span>
+      </div>
+      <!-- My Books -->
+      <div class="dash-sidebar-item" title="My Books / Library" onclick="location.href='/my-books'">
+        <i data-lucide="book-check"></i>
+        <span class="nav-label">My Books / Library</span>
       </div>
       <!-- Dept Files -->
       <div class="dash-sidebar-item" title="Dept Files" onclick="location.href='/academics'">
         <i data-lucide="folder"></i>
+        <span class="nav-label">Dept Files</span>
       </div>
       <div class="dash-sidebar-item" title="Upload" onclick="location.href='/faculty/upload-material'">
         <i data-lucide="upload-cloud"></i>
+        <span class="nav-label">Upload</span>
       </div>
       <div class="dash-sidebar-item" title="Circular" onclick="location.href='/faculty/send-circular'">
         <i data-lucide="send"></i>
+        <span class="nav-label">Circular</span>
       </div>
     </nav>
 
@@ -71,7 +77,12 @@
 
     <!-- Top Bar -->
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">CS Connect &middot; <b>Faculty Portal</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">CS Connect &middot; <b>Faculty Portal</b></div>
+      </div>
       
       <div class="dash-top-actions">
         <div class="time-chip" id="live-time" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); background: var(--dash-active-bg); padding: 4px 12px; border-radius: 20px;">—</div>
@@ -239,16 +250,4 @@
   setInterval(updateTime, 30000);
 </script>
 <script src="{{ url_for('static', filename='js/notifications_handler.js') }}"></script>
-{% endblock %}
-e time chip
-  function updateTime() {
-    const now = new Date();
-    document.getElementById('live-time').textContent =
-      now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-  }
-  updateTime();
-  setInterval(updateTime, 30000);
-</script>
-<script src="{{ url_for('static', filename='js/notifications_handler.js') }}"></script>
-</body>
-</html>
+{% endblock %}

@@ -99,8 +99,75 @@
 @media (max-width: 900px) {
     .nav-center {
         display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(244, 241, 234, 0.98);
+        padding: 24px 5%;
+        border-bottom: 1px solid var(--border-subtle);
+        gap: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    
+    .nav-center.nav-open {
+        display: flex;
+    }
+
+    .hamburger {
+        display: flex !important;
+    }
+    
+    .nav-right {
+        gap: 8px;
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .hamburger {
+        margin-right: auto;
+    }
+    
+    .nav-login-btn {
+        padding: 7px 16px;
+        font-size: 10px;
     }
 }
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 10002;
+}
+
+.hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent-crimson);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger.is-open span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger.is-open span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.is-open span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
 </style>
 
 <nav class="custom-nav">
@@ -114,12 +181,13 @@
         </div>
     </div>
     
-    <ul class="nav-center">
+    <ul class="nav-center" id="navLinks">
         <li><a href="{{ url_for('home') }}" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
         <li><a href="{{ url_for('about_cse') }}" class="{{ 'active' if active_page == 'about_cse' }}">About CSE</a></li>
         <li><a href="{{ url_for('about_aisat') }}" class="{{ 'active' if active_page == 'about_aisat' }}">About AISAT</a></li>
         <li><a href="{{ url_for('faculty') }}" class="{{ 'active' if active_page == 'faculty' }}">Faculty</a></li>
         <li><a href="{{ url_for('academics') }}" class="{{ 'active' if active_page == 'academics' }}">Academics</a></li>
+        <li><a href="{{ url_for('placements') }}" class="{{ 'active' if active_page == 'placements' }}">Placements</a></li>
         <li><a href="{{ url_for('contact') }}" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
         {% if session.get('user_id') %}
         <li><a href="{{ url_for('library_bp.library') }}" class="{{ 'active' if active_page == 'library' }}">Library <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></a></li>
@@ -127,20 +195,26 @@
     </ul>
 
     <div class="nav-right">
+        <button class="hamburger" id="hamburger" onclick="toggleNav()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
         {% if session.get('user_id') %}
             <!-- Global Notification Bell -->
-            <div style="margin-right: 12px; position: relative;">
+            <div style="margin-right: 4px; position: relative;">
                 {% include 'partials/topbar_actions.html' %}
             </div>
 
             {% if session.get('role') == 'admin' %}
-            <a href="{{ url_for('admin_dashboard') }}" class="nav-login-btn">Dashboard</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-login-btn">{{ session.get('name', 'Dashboard') }}</a>
             {% elif session.get('role') == 'faculty' %}
-            <a href="{{ url_for('faculty_dashboard') }}" class="nav-login-btn">Dashboard</a>
+            <a href="{{ url_for('faculty_dashboard') }}" class="nav-login-btn">{{ session.get('name', 'Dashboard') }}</a>
             {% else %}
-            <a href="{{ url_for('student_dashboard') }}" class="nav-login-btn">Dashboard</a>
+            <a href="{{ url_for('student_dashboard') }}" class="nav-login-btn">{{ session.get('name', 'Dashboard') }}</a>
             {% endif %}
-            <a href="{{ url_for('logout') }}" style="color: var(--text-muted); font-size: 11px; text-decoration: none; margin-left: 12px;">Logout</a>
+            <a href="{{ url_for('logout') }}" style="color: var(--text-muted); font-size: 11px; text-decoration: none; margin-left: 8px;">Logout</a>
         {% else %}
             <a href="{{ url_for('login') }}" class="nav-login-btn">Login</a>
         {% endif %}

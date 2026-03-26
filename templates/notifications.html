@@ -134,12 +134,14 @@
 
     <!-- Active Icon: Bell -->
     <div class="dash-sidebar-item active" title="Notifications">
-      <i data-lucide="bell" style="stroke: var(--accent); width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
+        <i data-lucide="bell" style="stroke: var(--accent); width: 18px; height: 18px; stroke-width: 1.5;"></i>
+        <span class="nav-label">Notifications</span>
+      </div>
 
     <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/student-dashboard'">
-      <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
-    </div>
+        <i data-lucide="layout-dashboard" style="stroke: #555; width: 18px; height: 18px; stroke-width: 1.5;"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
     
 
     <!-- Bottom avatar -->
@@ -300,7 +302,7 @@
 
   async function markRead(id) {
     // Optimistic UI update
-    const notif = allNotifications.find(n => n.id === id);
+    const notif = allNotifications.find(n => n.sl_no === id);
     if (notif && !notif.is_read) {
       notif.is_read = true;
       updateCounts();
@@ -347,7 +349,7 @@
       
       const el = document.createElement('div');
       el.className = `notification-item ${isUnread ? 'unread' : ''}`;
-      el.onclick = () => markRead(n.id);
+      el.onclick = () => markRead(n.sl_no);
 
       el.innerHTML = `
         <!-- Left: Category Icon -->

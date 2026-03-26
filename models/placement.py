@@ -6,7 +6,7 @@ class Placement:
     @staticmethod
     def get_user_profile(user_id):
         conn = get_db()
-        user = conn.execute("SELECT u.branch, u.batch, r.cgpa FROM users u LEFT JOIN results r ON u.id = r.student_id WHERE u.id = %s", (user_id,)).fetchone()
+        user = conn.execute("SELECT u.branch, u.batch, r.cgpa FROM users u LEFT JOIN results r ON u.user_id = r.student_id WHERE u.user_id = %s", (user_id,)).fetchone()
         conn.close()
         return dict(user) if user else None
 
@@ -57,7 +57,7 @@ class Placement:
         apps_cursor = conn.execute("""
             SELECT pd.company_name, pd.role, pa.applied_date, pa.status
             FROM placement_applications pa
-            JOIN placement_drives pd ON pa.drive_id = pd.id
+            JOIN placement_drives pd ON pa.drive_id = pd.sl_no
             WHERE pa.student_id = %s
             ORDER BY pa.applied_date DESC
         """, (student_id,))
@@ -69,6 +69,6 @@ class Placement:
     @staticmethod
     def get_drive_by_id(drive_id):
         conn = get_db()
-        drive = conn.execute("SELECT * FROM placement_drives WHERE id = %s", (drive_id,)).fetchone()
+        drive = conn.execute("SELECT * FROM placement_drives WHERE sl_no = %s", (drive_id,)).fetchone()
         conn.close()
         return dict(drive) if drive else None

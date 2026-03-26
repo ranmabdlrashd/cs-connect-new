@@ -32,13 +32,28 @@
 <div class="dash-wrapper fade-up">
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="award" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
-      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
-      <div class="dash-sidebar-item active" title="Results"><i data-lucide="award"></i></div>
-      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'"><i data-lucide="book-open"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'">
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Results">
+        <i data-lucide="award"></i>
+        <span class="nav-label">Results</span>
+      </div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Library</span>
+      </div>
     </nav>
   </aside>
 
@@ -83,6 +98,7 @@
       <table class="res-table">
         <thead>
           <tr>
+            <th>Sl. No</th>
             <th>Subject Name</th>
             <th>Faculty</th>
             <th>Batch</th>
@@ -92,22 +108,17 @@
           </tr>
         </thead>
         <tbody>
+          {% for res in results_stats %}
           <tr>
-            <td><b>Compiler Design</b></td>
-            <td>Prof. Sreejith K.</td>
-            <td>S6 CSE</td>
-            <td><b>38.5 / 50</b></td>
-            <td><span class="status-badge status-published">Published</span></td>
+            <td>{{ loop.index }}</td>
+            <td><b>{{ res.subject }}</b></td>
+            <td>{{ res.faculty }}</td>
+            <td>{{ res.batch }}</td>
+            <td><b>{{ res.avg_marks }} / 50</b></td>
+            <td><span class="status-badge status-{{ 'published' if res.status == 'published' else 'pending' }}">{{ res.status }}</span></td>
             <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Audit</button></td>
           </tr>
-          <tr>
-            <td><b>Computer Networks</b></td>
-            <td>Prof. Anjali R.</td>
-            <td>S6 CSE</td>
-            <td><b>34.2 / 50</b></td>
-            <td><span class="status-badge status-pending">In Review</span></td>
-            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Approve</button></td>
-          </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>

@@ -18,6 +18,12 @@ Research Publications - Dark Academic Theme
   padding: 40px 5%;
 }
 
+@media (max-width: 768px) {
+  .page { padding: 24px 16px; }
+  .page-title { font-size: 28px; }
+}
+
+
 /* Typography Overrides */
 h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
@@ -200,9 +206,11 @@ Requirement 3: Quick Actions Sidebar
 }
 
 @media (max-width: 900px) {
-  .research-grid { grid-template-columns: 1fr; }
+  .research-grid { grid-template-columns: 1fr; gap: 24px; }
   .stats-grid { grid-template-columns: 1fr; }
+  .stat-value { font-size: 30px; }
 }
+
 </style>
 {% endblock %}
 

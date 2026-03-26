@@ -159,6 +159,9 @@
   .btn-return { background: linear-gradient(135deg, #b8860b, #966f07); }
   .btn-return:hover { background: linear-gradient(135deg, #daa520, #aa7f0a); }
 
+  .btn-renew { background: linear-gradient(135deg, #2D3748, #1A202C); }
+  .btn-renew:hover { background: linear-gradient(135deg, #4A5568, #2D3748); }
+
   .btn-request { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); }
   .btn-request:hover { background: linear-gradient(135deg, #a82222, var(--accent)); }
 
@@ -250,21 +253,21 @@
                     {% else %}
                         <!-- ISSUE -->
                         <!-- ISSUE -->
-                        <form action="{{ url_for('library_bp.issue_book', book_id=book.id) }}" method="POST" style="flex: 1; min-width: 120px;">
+                        <form action="{{ url_for('library_bp.issue_book', book_id=book.sl_no) }}" method="POST" style="flex: 1; min-width: 120px;">
                             <button type="submit" class="btn-action btn-issue" {% if book.availability == false %}disabled style="opacity: 0.6; cursor: not-allowed; filter: grayscale(1);" title="Book is currently issued"{% endif %}>
                                 <i data-lucide="hand-metal" style="width: 18px; height: 18px;"></i> ISSUE
                             </button>
                         </form>
 
                         <!-- RETURN -->
-                        <form action="{{ url_for('library_bp.return_book', book_id=book.id) }}" method="POST" style="flex: 1; min-width: 120px;">
+                        <form action="{{ url_for('library_bp.return_book', book_id=book.sl_no) }}" method="POST" style="flex: 1; min-width: 120px;">
                             <button type="submit" class="btn-action btn-return">
                                 <i data-lucide="rotate-ccw" style="width: 18px; height: 18px;"></i> RETURN
                             </button>
                         </form>
 
                         <!-- REQUEST -->
-                        <form action="{{ url_for('library_bp.request_book', book_id=book.id) }}" method="POST" style="flex: 1; min-width: 120px;">
+                        <form action="{{ url_for('library_bp.request_book', book_id=book.sl_no) }}" method="POST" style="flex: 1; min-width: 120px;">
                             <button type="submit" class="btn-action btn-request">
                                 <i data-lucide="bookmark" style="width: 18px; height: 18px;"></i> REQUEST
                             </button>
@@ -284,7 +287,7 @@
                                     <strong style="color: var(--cream);">{{ req.user_name }}</strong> requested this book.
                                 </div>
                                 {% if holder %}
-                                <form action="{{ url_for('admin_bp.send_request_message', request_id=req.id) }}" method="POST">
+                                <form action="{{ url_for('admin_bp.send_request_message', request_id=req.sl_no) }}" method="POST">
                                     <button type="submit" style="padding: 8px 16px; background: var(--bg-hover); color: var(--accent); border: 1px solid var(--border-accent); border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;">
                                         Notify Current Holder
                                     </button>

@@ -23,29 +23,60 @@
 
     .status-pill { font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
     .status-available { background: #E8F5E9; color: #2E7D32; }
+    .status-available { background: #E8F5E9; color: #2E7D32; }
     .status-issued { background: #FFF3E0; color: #E65100; }
+
+    @media (max-width: 768px) {
+        .lib-hero { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+        .lib-hero h1 { font-size: 1.5rem; }
+        .lib-tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .books-table-wrapper { overflow-x: auto; border: 1px solid var(--border-accent); border-radius: 12px; }
+        .books-table { border: none; }
+        .books-table th, .books-table td { padding: 12px 16px; white-space: nowrap; }
+    }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="library" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
-      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
-      <div class="dash-sidebar-item active" title="Library"><i data-lucide="book-open"></i></div>
-      <div class="dash-sidebar-item" title="Fees" onclick="location.href='/admin-dashboard/fees'"><i data-lucide="credit-card"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'">
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Library">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Library</span>
+      </div>
+      <div class="dash-sidebar-item" title="Fees" onclick="location.href='/admin-dashboard/fees'">
+        <i data-lucide="credit-card"></i>
+        <span class="nav-label">Fees</span>
+      </div>
     </nav>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Resources &middot; <b>Library Inventory</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Resources &middot; <b>Library Inventory</b></div>
+      </div>
       <div style="display:flex; gap:12px;">
         <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;">Export CSV</button>
         <button class="dash-btn-primary" style="font-size:0.75rem ; padding:8px 16px;">+ Add New Book</button>
@@ -74,38 +105,40 @@
         <div class="lib-tab">Requests</div>
       </div>
 
-      <table class="books-table">
-        <thead>
-          <tr>
-            <th>Book Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for book in books %}
-          <tr>
-            <td><b>{{ book.title }}</b></td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.id }}</td>
-            <td>{{ book.subject }}</td>
-            <td>
-              {% if book.availability %}
-              <span class="status-pill status-available">Available</span>
-              {% else %}
-              <span class="status-pill status-issued">Issued</span>
-              {% endif %}
-            </td>
-            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Edit</button></td>
-          </tr>
-          {% else %}
-          <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No books available in the inventory</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="books-table-wrapper">
+        <table class="books-table">
+          <thead>
+            <tr>
+              <th>Book Title</th>
+              <th>Author</th>
+              <th>ISBN</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for book in books %}
+            <tr>
+              <td><b>{{ book.title }}</b></td>
+              <td>{{ book.author }}</td>
+              <td>{{ book.sl_no }}</td>
+              <td>{{ book.subject }}</td>
+              <td>
+                {% if book.availability %}
+                <span class="status-pill status-available">Available</span>
+                {% else %}
+                <span class="status-pill status-issued">Issued</span>
+                {% endif %}
+              </td>
+              <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Edit</button></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No books available in the inventory</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 </div>

@@ -26,27 +26,57 @@
     .form-group { margin-bottom: 16px; }
     .form-label { font-size: 0.65rem; color: var(--accent-crimson); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; display: block; }
     .form-input { width: 100%; padding: 10px; border: 1px solid #EAE5D8; border-radius: 8px; font-size: 0.8rem; background: #FDFCF8; }
+
+    @media (max-width: 1024px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .fee-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+        .fee-hero { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+        .fee-hero h1 { font-size: 1.5rem; }
+        .stats-row { grid-template-columns: 1fr; gap: 16px; }
+        .data-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table th, .data-table td { white-space: nowrap; }
+    }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="credit-card" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item active" title="Fee Management"><i data-lucide="credit-card"></i></div>
-      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
-      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'"><i data-lucide="users"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Fee Management">
+        <i data-lucide="credit-card"></i>
+        <span class="nav-label">Fee Management</span>
+      </div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'">
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="dash-sidebar-item" title="Users" onclick="location.href='/admin-dashboard/users'">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
     </nav>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">Accounts &middot; <b>Fee Management</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">Accounts &middot; <b>Fee Management</b></div>
+      </div>
     </header>
 
     <div class="dash-content">
@@ -76,24 +106,26 @@
       <div class="fee-layout">
         <div class="table-panel">
           <h3 style="font-family:'Playfair Display', serif; margin:0 0 16px 0; font-size:1rem;">Recent Transactions</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>Arjun Kumar</b> <span style="font-size:0.75rem; color:var(--text-muted);">(S6 CSE)</span></td>
-                <td>₹35,000</td>
-                <td>Tuition</td>
-                <td style="color:#2E7D32; font-weight:800;">Success</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Amount</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Arjun Kumar</b> <span style="font-size:0.75rem; color:var(--text-muted);">(S6 CSE)</span></td>
+                  <td>₹35,000</td>
+                  <td>Tuition</td>
+                  <td style="color:#2E7D32; font-weight:800;">Success</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="form-panel">

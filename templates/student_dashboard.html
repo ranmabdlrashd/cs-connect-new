@@ -17,47 +17,31 @@
 
 {% block content %}
 <div class="dash-wrapper fade-up">
-
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- ── SIDEBAR ── -->
   <aside class="dash-sidebar">
-    
-    <!-- Logo -->
-    <div class="dash-sidebar-logo">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-
-    <!-- Nav icons -->
-    <div class="dash-sidebar-items">
-      <!-- Dashboard - ACTIVE -->
+    <nav class="dash-sidebar-items">
       <div class="dash-sidebar-item active" title="Dashboard" onclick="location.href='/student-dashboard'">
         <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
       </div>
-      
-      <!-- Results -->
       <div class="dash-sidebar-item" title="Results" onclick="location.href='/dashboard/results'">
         <i data-lucide="award"></i>
+        <span class="nav-label">Results</span>
       </div>
-      
-      <!-- Timetable -->
       <div class="dash-sidebar-item" title="Timetable" onclick="location.href='/dashboard/timetable'">
         <i data-lucide="calendar"></i>
+        <span class="nav-label">Timetable</span>
       </div>
-    </div>
-
-    <!-- Bottom section -->
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/student-dashboard/library'">
+        <i data-lucide="library"></i>
+        <span class="nav-label">Library</span>
+      </div>
+    </nav>
     <div class="dash-sidebar-bottom">
-      
-      <!-- Avatar with student initials -->
-      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; border: 1px solid rgba(255,255,255,0.1);">
-        {% set sname = session.get('name', 'Student') %}
-        {% set parts = sname.split() %}
-        {% if parts|length > 1 %}
-          {{ parts[0][0]|upper }}{{ parts[-1][0]|upper }}
-        {% else %}
-          {{ sname[:2]|upper }}
-        {% endif %}
+      <div class="dash-sidebar-item" title="Logout" onclick="location.href='/logout'">
+        <i data-lucide="log-out"></i>
+        <span class="nav-label">Logout</span>
       </div>
     </div>
   </aside>
@@ -68,8 +52,13 @@
     <!-- Top bar -->
     <header class="dash-topbar">
       <!-- Breadcrumb -->
-      <div class="dash-breadcrumb">
-        CS Connect · <b>Student Dashboard</b>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">
+          CS Connect · <b>Student Dashboard</b>
+        </div>
       </div>
       
         <!-- Right side -->
@@ -114,19 +103,7 @@
           </div>
         </div>
 
-        <!-- Class Timetables -->
-        <div class="dash-card">
-          <div class="dash-card-title">
-            <i data-lucide="clock" style="width:14px; height:14px;"></i> Class Timetables
-          </div>
-          <div class="batch-grid">
-            {% for batch in all_batches %}
-            <a class="batch-card" href="{{ url_for('timetable', batch=batch) }}">
-              {{ batch }}
-            </a>
-            {% endfor %}
-          </div>
-        </div>
+
 
         <!-- Internal Marks -->
         <div class="dash-card card-wide">
@@ -163,18 +140,29 @@
           </div>
         </div>
 
-        <!-- Documents -->
+        <!-- Document Vault -->
         <div class="dash-card">
           <div class="dash-card-title">
             <i data-lucide="file-check" style="width:14px; height:14px;"></i> Document Vault
           </div>
           <div class="doc-list">
-            <div class="doc-item">
-              <div class="doc-name">📊 S5_Grade_Card.pdf</div>
-              <a href="#" class="doc-action">View</a>
-            </div>
+            {% if downloaded_docs %}
+              {% for doc in downloaded_docs %}
+              <div class="doc-item">
+                <div class="doc-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;">
+                  <i data-lucide="file-text" style="width: 14px; margin-right: 6px; flex-shrink: 0;"></i>
+                  {{ doc.title }}
+                </div>
+                <a href="{{ url_for('static', filename='uploads/materials/' + doc.file_url) }}" target="_blank" class="doc-action">View</a>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="doc-item" style="justify-content:center; color: var(--text-muted); font-size: 0.85rem;">
+                No downloaded documents yet.
+              </div>
+            {% endif %}
           </div>
-          <button class="upload-btn" style="border-style: dashed; border-width: 1px;">+ Upload New</button>
+          <button class="upload-btn" onclick="location.href='/academics'" style="border-style: dashed; border-width: 1px;">Browse Resources</button>
         </div>
 
       </div><!-- End Bento -->

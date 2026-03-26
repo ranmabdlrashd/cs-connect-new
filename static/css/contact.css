@@ -153,6 +153,15 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 
 /* Responsive */
 @media (max-width: 900px) {
-  .contact-container { grid-template-columns: 1fr; margin-top: 32px; }
-  .ch-title { font-size: 40px; }
+  .contact-container { grid-template-columns: 1fr; margin-top: 24px; }
+  .ch-title { font-size: 36px; }
+  .contact-hero { padding: 60px 20px; }
 }
+
+@media (max-width: 480px) {
+  .ch-title { font-size: 28px; }
+  .ch-sub { font-size: 14px; }
+  .smart-form-container { padding: 24px 20px; }
+  .sf-title { font-size: 22px; }
+}
+

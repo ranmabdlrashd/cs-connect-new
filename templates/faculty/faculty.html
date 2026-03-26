@@ -38,6 +38,13 @@
       <button class="tab-btn" data-filter="asst">Assistant Professors</button>
       <button class="tab-btn" data-filter="staff">Lab Staff</button>
     </div>
+    <div class="search-wrapper">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="facultySearch" class="search-input" placeholder="Search by name or research area...">
+    </div>
   </div>
 
   {# --- 2.3 HOD FEATURE --- #}
@@ -53,8 +60,10 @@
 
     {# No Results State #}
     <div class="no-results" id="noResults">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
       <p>No faculty members match your criteria.</p>
     </div>
@@ -65,144 +74,135 @@
 
 {% block extra_js %}
 <script>
-/**
- * FACULTY LISTING ENGINE
- * Handles API fetching, real data fallbacks, and multi-criteria filtering.
- */
+  /**
+   * FACULTY LISTING ENGINE
+   * Handles API fetching, real data fallbacks, and multi-criteria filtering.
+   */
 
-const FALLBACK_DATA = [
-  {
-    id: 101,
-    name: "Dr. Jeswin Roy Dcouth",
-    designation: "HoD & Associate Professor",
-    designation_key: "hod",
-    qualification: "Ph.D. CSE, PGDCL",
-    research: "Cyber Security, Digital Forensics",
-    email: "jeswinroy@aisat.ac.in",
-    photo: null
-  },
-  {
-    id: 102,
-    name: "Prof. Divya Mohan",
-    designation: "Associate Professor",
-    designation_key: "prof",
-    qualification: "M.Tech, Ph.D Researcher",
-    research: "Data Science, Machine Learning",
-    email: "divyamohan@aisat.ac.in",
-    photo: null
-  },
-  {
-    id: 103,
-    name: "Prof. Chinnu Edwin A",
-    designation: "Assistant Professor",
-    designation_key: "asst",
-    qualification: "M.Tech",
-    research: "Cloud Computing, Networking",
-    email: "chinnu.edwin@aisat.ac.in",
-    photo: null
-  },
-  {
-    id: 104,
-    name: "Ms. Nisy John Panicker",
-    designation: "Assistant Professor (Sr.S)",
-    designation_key: "asst",
-    qualification: "M.Tech",
-    research: "Image Processing",
-    email: "nisyjohn@aisat.ac.in",
-    photo: null
-  },
-  {
-    id: 105,
-    name: "Ms. Lima Sebastian",
-    designation: "Assistant Professor",
-    designation_key: "asst",
-    qualification: "M.Tech",
-    research: "Compiler Design",
-    email: "limaseb@aisat.ac.in",
-    photo: null
-  },
-  {
-    id: 106,
-    name: "Ms. Teenu Jose",
-    designation: "Assistant Professor",
-    designation_key: "asst",
-    qualification: "M.Tech",
-    research: "Software Engineering",
-    email: "teenu.jose@aisat.ac.in",
-    photo: null
-  }
-];
+  const FALLBACK_DATA = [
+    {
+      id: 101,
+      name: "Dr. Jeswin Roy Dcouth",
+      designation: "HoD & Associate Professor",
+      designation_key: "hod",
+      qualification: "Ph.D. CSE, PGDCL",
+      research: "Cyber Security, Digital Forensics",
+      email: "jeswinroy@aisat.ac.in",
+      photo: null
+    },
+    {
+      id: 102,
+      name: "Prof. Divya Mohan",
+      designation: "Associate Professor",
+      designation_key: "prof",
+      qualification: "M.Tech, Ph.D Researcher",
+      research: "Data Science, Machine Learning",
+      email: "divyamohan@aisat.ac.in",
+      photo: null
+    },
 
-let allFaculty = [];
-let activeFilter = 'all';
-let searchQuery = '';
+    {
+      id: 104,
+      name: "Ms. Nisy John Panicker",
+      designation: "Assistant Professor (Sr.S)",
+      designation_key: "asst",
+      qualification: "M.Tech",
+      research: "Image Processing",
+      email: "nisyjohn@aisat.ac.in",
+      photo: null
+    },
+    {
+      id: 105,
+      name: "Ms. Lima Sebastian",
+      designation: "Assistant Professor",
+      designation_key: "asst",
+      qualification: "M.Tech",
+      research: "Compiler Design",
+      email: "limaseb@aisat.ac.in",
+      photo: null
+    },
+    {
+      id: 106,
+      name: "Ms. Teenu Jose",
+      designation: "Assistant Professor",
+      designation_key: "asst",
+      qualification: "M.Tech",
+      research: "Software Engineering",
+      email: "teenu.jose@aisat.ac.in",
+      photo: null
+    }
+  ];
 
-async function initFaculty() {
-  const grid = document.getElementById('facultyGrid');
-  const hodSection = document.getElementById('hodSection');
+  let allFaculty = [];
+  let activeFilter = 'all';
+  let searchQuery = '';
 
-  try {
-    const res = await fetch('/api/faculty');
-    const data = await res.json();
-    allFaculty = (data && data.length > 0) ? data : FALLBACK_DATA;
-  } catch (err) {
-    console.warn("Using fallback faculty data:", err);
-    allFaculty = FALLBACK_DATA;
+  async function initFaculty() {
+    const grid = document.getElementById('facultyGrid');
+    const hodSection = document.getElementById('hodSection');
+
+    try {
+      const res = await fetch('/api/faculty');
+      const data = await res.json();
+      allFaculty = (data && data.length > 0) ? data : FALLBACK_DATA;
+    } catch (err) {
+      console.warn("Using fallback faculty data:", err);
+      allFaculty = FALLBACK_DATA;
+    }
+
+    renderFaculty();
+    setupEventListeners();
   }
 
-  renderFaculty();
-  setupEventListeners();
-}
+  function renderFaculty() {
+    const grid = document.getElementById('facultyGrid');
+    const hodSection = document.getElementById('hodSection');
+    const noResults = document.getElementById('noResults');
 
-function renderFaculty() {
-  const grid = document.getElementById('facultyGrid');
-  const hodSection = document.getElementById('hodSection');
-  const noResults = document.getElementById('noResults');
+    // 1. Filter data
+    const filtered = allFaculty.filter(f => {
+      const matchesTab = activeFilter === 'all' || f.designation_key === activeFilter;
+      const matchesSearch = !searchQuery ||
+        f.name.toLowerCase().includes(searchQuery) ||
+        (f.research && f.research.toLowerCase().includes(searchQuery));
+      return matchesTab && matchesSearch;
+    });
 
-  // 1. Filter data
-  const filtered = allFaculty.filter(f => {
-    const matchesTab = activeFilter === 'all' || f.designation_key === activeFilter;
-    const matchesSearch = !searchQuery || 
-                         f.name.toLowerCase().includes(searchQuery) || 
-                         (f.research && f.research.toLowerCase().includes(searchQuery));
-    return matchesTab && matchesSearch;
-  });
-
-  // 2. Handle HOD (Priority Spotlight)
-  const hod = allFaculty.find(f => f.designation_key === 'hod');
-  if (hod && activeFilter === 'all' && !searchQuery) {
-    hodSection.style.display = 'block';
-    hodSection.innerHTML = `
+    // 2. Handle HOD (Priority Spotlight)
+    const hod = allFaculty.find(f => f.designation_key === 'hod');
+    if (hod && activeFilter === 'all' && !searchQuery) {
+      hodSection.style.display = 'block';
+      hodSection.innerHTML = `
       <div class="hod-card">
         ${hod.photo ? `<img src="${hod.photo}" class="hod-avatar" alt="${hod.name}">` : `<div class="hod-avatar-initials">${getInitials(hod.name)}</div>`}
         <div class="hod-content">
           <div class="hod-tag">Head of Department</div>
           <h2 class="hod-name">${hod.name}</h2>
           <div class="hod-qual">${hod.qualification}<br>${hod.research || ''}</div>
-          <a href="/faculty/${hod.id || ''}" class="hod-btn">View Full Profile →</a>
+          <a href="/faculty/${hod.sl_no || ''}" class="hod-btn">View Full Profile →</a>
         </div>
       </div>
     `;
-  } else {
-    hodSection.style.display = 'none';
-  }
+    } else {
+      hodSection.style.display = 'none';
+    }
 
-  // 3. Render Grid
-  grid.innerHTML = '';
-  // Skip the HOD if we are in 'all' view and it's already shown in spotlight
-  const gridItems = (activeFilter === 'all' && !searchQuery) 
-                   ? filtered.filter(f => f.designation_key !== 'hod')
-                   : filtered;
+    // 3. Render Grid
+    grid.innerHTML = '';
+    // Skip the HOD if we are in 'all' view and it's already shown in spotlight
+    const gridItems = (activeFilter === 'all' && !searchQuery)
+      ? filtered.filter(f => f.designation_key !== 'hod')
+      : filtered;
 
-  if (gridItems.length === 0) {
-    noResults.style.display = 'block';
-  } else {
-    noResults.style.display = 'none';
-    gridItems.forEach(f => {
-      const card = document.createElement('a');
-      card.href = `/faculty/${f.id}`;
-      card.className = 'faculty-card';
-      card.innerHTML = `
+    if (gridItems.length === 0) {
+      noResults.style.display = 'block';
+    } else {
+      noResults.style.display = 'none';
+      gridItems.forEach(f => {
+        const card = document.createElement('a');
+        card.href = `/faculty/${f.sl_no}`;
+        card.className = 'faculty-card';
+        card.innerHTML = `
         <div class="card-avatar-box">
           ${f.photo ? `<img src="${f.photo}" class="card-img" alt="${f.name}">` : `<div class="card-initials">${getInitials(f.name)}</div>`}
         </div>
@@ -213,39 +213,39 @@ function renderFaculty() {
           ${(f.research || '').split(',').map(tag => tag.trim() ? `<span class="tag">${tag.trim()}</span>` : '').join('')}
         </div>
       `;
-      grid.appendChild(card);
-    });
+        grid.appendChild(card);
+      });
+    }
   }
-}
 
-function setupEventListeners() {
-  const searchInput = document.getElementById('facultySearch');
-  const tabs = document.querySelectorAll('.tab-btn');
+  function setupEventListeners() {
+    const searchInput = document.getElementById('facultySearch');
+    const tabs = document.querySelectorAll('.tab-btn');
 
-  searchInput.addEventListener('input', (e) => {
-    searchQuery = e.target.value.toLowerCase();
-    renderFaculty();
-  });
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      activeFilter = tab.dataset.filter;
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase();
       renderFaculty();
     });
-  });
-}
 
-function getInitials(name) {
-  return name.split(' ')
-             .filter(n => !n.includes('.')) // skip Dr., Prof.
-             .map(n => n[0])
-             .slice(0, 2)
-             .join('')
-             .toUpperCase() || name[0];
-}
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeFilter = tab.dataset.filter;
+        renderFaculty();
+      });
+    });
+  }
 
-initFaculty();
+  function getInitials(name) {
+    return name.split(' ')
+      .filter(n => !n.includes('.')) // skip Dr., Prof.
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || name[0];
+  }
+
+  initFaculty();
 </script>
 {% endblock %}

@@ -6,28 +6,29 @@ load_dotenv()
 
 def get_db_connection():
     db_url = os.environ.get("NEON_DATABASE_URL") or os.environ.get("LOCAL_DATABASE_URL") or os.environ.get("DATABASE_URL")
-    return psycopg2.connect(db_url) if db_url else None
+    if db_url:
+        return psycopg2.connect(db_url)
+    return psycopg2.connect(
+        host=os.environ.get("DB_HOST", "localhost"),
+        dbname=os.environ.get("DB_NAME", "csconnect"),
+        user=os.environ.get("DB_USER", "postgres"),
+        password=os.environ.get("DB_PASS", "1234")
+    )
 
-conn = get_db_connection()
-if not conn:
-    print("No DB connection")
-    exit(1)
+def check_tables():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    tables = ['users', 'faculty', 'books', 'issues', 'requests']
+    for table in tables:
+        print(f"\nChecking table: {table}")
+        query = f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table}' AND table_schema = 'public'"
+        cur.execute(query)
+        columns = cur.fetchall()
+        for col in columns:
+            print(f"  - {col[0]} ({col[1]})")
+    
+    conn.close()
 
-cur = conn.cursor()
-
-# Get all tables
-cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
-tables = [row[0] for row in cur.fetchall()]
-print("Tables:", tables)
-
-# For each table, get columns
-for t in ["books", "library_loans", "library_fines", "book_reservations", "notices"]:
-    if t in tables:
-        print(f"\n--- {t} ---")
-        cur.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='{t}'")
-        for col in cur.fetchall():
-            print(col[0], col[1])
-    else:
-        print(f"\nTable {t} DOES NOT EXIST.")
-
-conn.close()
+if __name__ == "__main__":
+    check_tables()

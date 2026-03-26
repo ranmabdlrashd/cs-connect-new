@@ -132,10 +132,20 @@ function addMessageToDOM(text, sender, isError=false) {
     
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
-    // Basic Markdown parser for bold and line breaks
-    let formattedText = escapeHtml(text)
-        .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Premium Markdown Rendering
+    let formattedText;
+    if (sender === 'bot') {
+        // AI responses use full Markdown rendering
+        // Ensure all links open in new tab
+        const renderer = new marked.Renderer();
+        renderer.link = ({ href, title, text }) => {
+            return `<a href="${href}" title="${title || ''}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        };
+        formattedText = marked.parse(text, { renderer });
+    } else {
+        // User messages are escaped for security and use basic break replacement
+        formattedText = escapeHtml(text).replace(/\n/g, '<br>');
+    }
         
     if (sender === 'bot') {
         const avatarSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="icon-fill"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="#F5E6BE"/></svg>`;

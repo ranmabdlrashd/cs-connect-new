@@ -17,12 +17,7 @@
         
         <div class="login-logo">
           <div class="logo-icon">
-            <!-- Stroke SVG Logo (Crimson matching omitted, explicitly asked for F5E6BE logo icon) -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5E6BE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-              <polyline points="2 12 12 17 22 12"></polyline>
-              <polyline points="2 17 12 22 22 17"></polyline>
-            </svg>
+            <img src="{{ url_for('static', filename='images/aisat-logo-300x300.png') }}" alt="AISAT Logo" style="height: 48px; width: auto; object-fit: contain;">
           </div>
           <div>
             <h1 class="login-title">CS <span>Connect</span></h1>
@@ -78,16 +73,10 @@
         <h2 class="card-hdr">Authenticate</h2>
         <p class="card-sub">Sign in to securely access your portal.</p>
 
-        <!-- Role Selector -->
-        <div class="role-tabs">
-          <button class="role-btn active" onclick="selectRole('student')">Student</button>
-          <button class="role-btn" onclick="selectRole('faculty')">Faculty</button>
-          <button class="role-btn" onclick="selectRole('admin')">Admin</button>
-        </div>
+
 
         <form method="POST" action="{{ url_for('login') }}">
-          <!-- Hidden Role Input to map seamlessly with backend existing or future logic -->
-          <input type="hidden" name="role" id="roleInput" value="student">
+
 
           <div class="form-group">
             <label>Institution Email</label>
@@ -118,39 +107,13 @@
 
           <button type="submit" class="btn-primary">Sign In</button>
 
-          <p class="login-links">
-            Don't have an account? <a href="{{ url_for('register') }}">Create profile</a>
-          </p>
-        </form>
 
-        <!-- 3-Column Stats Strip -->
-        <div class="stats-strip">
-          <div>
-            <div class="st-val">500+</div>
-            <div class="st-label">Students</div>
-          </div>
-          <div>
-            <div class="st-val">50+</div>
-            <div class="st-label">Faculty</div>
-          </div>
-          <div>
-            <div class="st-val">100%</div>
-            <div class="st-label">Placement</div>
-          </div>
-        </div>
 
       </div>
     </div>
   </div>
 
   <script>
-    // Role Toggling Logic
-    function selectRole(roleStr) {
-      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('roleInput').value = roleStr;
-    }
-
     // Auto-remove flash messages cleanly after 5 seconds to refine UX
     setTimeout(() => {
       const err = document.getElementById('valError');

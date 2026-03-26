@@ -23,10 +23,11 @@ def analyze_intent(user_query: str, chat_history: List[dict]) -> dict:
     system_prompt = (
         "You are a Search Intent Analyzer for a college department portal.\n"
         "Your goal is to determine EXACTLY what the user wants to search for, considering conversation history.\n"
-        "Available Categories: ['faculty', 'library', 'academics', 'placements', 'events', 'general']\n\n"
+        "Available Categories: ['faculty', 'library', 'academics', 'placements', 'events', 'notes', 'general']\n"
+        "RULES: If the user mentions a person's name (e.g. 'Who is Divya', 'Tell me about Mohan'), ALWAYS categorize as 'faculty'.\n\n"
         "Return ONLY a JSON object with this structure (no Markdown wrap):\n"
         "{\n"
-        "  \"intent\": \"faculty|library|academics|placements|events|general\",\n"
+        "  \"intent\": \"faculty|library|academics|placements|events|notes|general\",\n"
         "  \"subject\": \"the actual noun they are talking about\",\n"
         "  \"keywords\": [\"list\", \"of\", \"keywords\"]\n"
         "}"
@@ -76,15 +77,23 @@ def get_context_by_intent(analysis: dict) -> str:
                     for f in cur.fetchall():
                         context_parts.append(f"FACULTY: {f[0]}, {f[1]}, Qual: {f[2]}, Research: {f[3]}, Email: {f[4]}")
 
+                elif intent == 'notes':
+                    # Prioritize document_name matches over content matches
+                    cur.execute("""
+                        SELECT document_name, content 
+                        FROM document_chunks 
+                        WHERE content ILIKE %s OR document_name ILIKE %s 
+                        ORDER BY (document_name ILIKE %s) DESC 
+                        LIMIT 3
+                    """, (search_term, search_term, search_term))
+                    for c in cur.fetchall():
+                        pdf_url = f"/static/uploads/notes/{c[0]}"
+                        context_parts.append(f"STUDY MATERIAL (PDF): {c[0]} | Preview: {c[1][:300]} | Download URL: {pdf_url}")
+
                 elif intent == 'library':
                     cur.execute("SELECT title, author, subject, status, availability FROM books WHERE title ILIKE %s OR author ILIKE %s OR subject ILIKE %s", (search_term, search_term, search_term))
                     for b in cur.fetchall():
-                        context_parts.append(f"LIBRARY BOOK: {b[0]} by {b[1]} (Subject: {b[2]}, Status: {b[3]}, Avail: {b[4]})")
-                    
-                    cur.execute("SELECT document_name, content FROM document_chunks WHERE content ILIKE %s OR document_name ILIKE %s", (search_term, search_term))
-                    for c in cur.fetchall():
-                        pdf_url = f"/static/uploads/notes/{c[0]}"
-                        context_parts.append(f"TEACHER NOTE: {c[0]} | Content: {c[1][:400]} | Source: {pdf_url}")
+                        context_parts.append(f"LIBRARY BOOK: {b[0]} by {b[1]} (Subject: {b[2]}, Status: {b[3]})")
 
                 elif intent == 'placements':
                     cur.execute("SELECT name, company, package FROM alumni WHERE name ILIKE %s OR company ILIKE %s", (search_term, search_term))
@@ -96,17 +105,35 @@ def get_context_by_intent(analysis: dict) -> str:
                     for s in cur.fetchall():
                         context_parts.append(f"SUBJECT: {s[0]} ({s[1]}) - Faculty: {s[2]}")
 
-                if len(context_parts) < 3:
-                    cur.execute("SELECT title, content FROM website_content WHERE title ILIKE %s OR content ILIKE %s LIMIT 2", (search_term, search_term))
-                    for w in cur.fetchall():
-                        context_parts.append(f"INFO: {w[0]} - {w[1][:300]}")
+        # Global Fallback: If context is still thin or intent is 'general', 
+        # search high-priority categories (Faculty & Notes) automatically.
+        if len(context_parts) < 2:
+            for kw in keywords[:2]:
+                search_term = f"%{kw}%"
+                
+                # Check faculty again as it's the most common "who is" target
+                if intent != 'faculty':
+                    cur.execute("SELECT name, designation, qualification, email FROM faculty WHERE name ILIKE %s LIMIT 2", (search_term,))
+                    for f in cur.fetchall():
+                        context_parts.append(f"POTENTIAL FACULTY MATCH: {f[0]}, {f[1]} ({f[2]}), Email: {f[3]}")
+                
+                # Check notes again in case it was a general material request
+                if intent != 'notes':
+                    cur.execute("SELECT document_name, content FROM document_chunks WHERE document_name ILIKE %s LIMIT 1", (search_term,))
+                    for c in cur.fetchall():
+                        context_parts.append(f"POTENTIAL NOTE MATCH: {c[0]} | Preview: {c[1][:100]}")
+
+                # Check general website content last
+                cur.execute("SELECT title, content FROM website_content WHERE title ILIKE %s OR content ILIKE %s LIMIT 2", (search_term, search_term))
+                for w in cur.fetchall():
+                    context_parts.append(f"INFO: {w[0]} - {w[1][:300]}")
 
     except Exception as e:
         print(f"Retrieval Error: {e}")
     finally:
         conn.close()
 
-    return "\n".join(context_parts) if context_parts else "No specific database records found."
+    return "\n".join(context_parts) if context_parts else "No specific records found for your query. Ask about faculty, library books, or department events."
 
 def generate_response(messages: List[dict], is_logged_in: bool = False) -> str:
     """
@@ -134,11 +161,11 @@ def generate_response(messages: List[dict], is_logged_in: bool = False) -> str:
         "You are 'CS Connect Assistant', a professional AI for AISAT CSE department.\n"
         "RULES:\n"
         "1. MEMORY: Use CONVERSATION HISTORY to understand context. Resolve pronouns like 'him'/'them' from previous messages.\n"
-        "2. NO JARGON: Never mention 'database', 'intent', 'records', or how you got the data.\n"
-        "3. TARGETED: Answer ONLY based on the provided DATABASE CONTEXT and CONVERSATION HISTORY.\n"
-        "4. SOURCE: Link PDFs as [Filename](/static/uploads/notes/filename.pdf).\n"
-        "5. MANAGEMENT MATTERS: For sensitive decisions (e.g. 'who is next HOD'), reply: "
-        "'These are matters handled by the Management and involve high-level decisions.'\n"
+        "3. SECURITY: Never mention internal system paths in plain text. Use ONLY relative URLs for links. The user must NOT see '/static/uploads/...' in your normal sentences.\n"
+        "4. NOTES: Provide ONLY the [View / Download PDF](/static/uploads/notes/filename.pdf) markdown button. Do NOT include ANY conversational text before or after the button (e.g., no 'Here is the note', no 'I found this'). Respond with ONLY the button. If no exact match is found, say 'No notes found for this subject.'\n"
+        "5. NO JARGON: Never mention 'database', 'intent', 'context', or 'retrieval' in your response.\n"
+        "6. DEFERMENT: For sensitive leadership/management decisions, reply: "
+        "'These are matters handled by the Management and involve institutional policy decisions.'\n"
         f"6. {login_instruction}\n\n"
         f"DATABASE CONTEXT:\n{context}\n"
     )

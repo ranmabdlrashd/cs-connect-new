@@ -382,7 +382,7 @@ function renderOutstanding(fines) {
               </div>
               <div class="fc-action">
                  <div class="fc-amt">₹${amt.toFixed(2)}</div>
-                 <button class="btn btn-outline" style="padding:8px 16px; font-size:11px;" onclick="openPaymentModal(${f.id}, ${amt})">Pay This Fine</button>
+                 <button class="btn btn-outline" style="padding:8px 16px; font-size:11px;" onclick="openPaymentModal(${f.sl_no}, ${amt})">Pay This Fine</button>
               </div>
            </div>
         </div>
@@ -420,7 +420,7 @@ function renderHistory(history) {
                <td style="color:#C0A88A;">₹${parseFloat(h.amount).toFixed(2)}</td>
                <td>${pill}</td>
                <td>
-                  <a href="/api/library/fines/${h.id}/receipt" target="_blank" class="dl-link">
+                  <a href="/api/library/fines/${h.sl_no}/receipt" target="_blank" class="dl-link">
                      <i data-lucide="download" style="width:14px;height:14px;"></i> Receipt
                   </a>
                </td>

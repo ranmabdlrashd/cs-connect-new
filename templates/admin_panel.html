@@ -5,9 +5,32 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_shared.css') }}">
 <style>
-  /* Hide global elements */
-  nav, .news-ticker { display: none !important; }
-  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+  /* Panel layout — hide global footer/chatbot, let inner dash-content scroll */
+  body { margin: 0; padding: 0; background: var(--bg-color); overflow: hidden; }
+  footer, #chatbot-container, .chatbot-widget { display: none !important; }
+  .dash-wrapper { height: calc(100vh - 105px); overflow: hidden; }
+
+  @media (max-width: 1024px) {
+    .dash-wrapper { height: auto; overflow: visible; }
+    .layout-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .stats-row { flex-direction: column; }
+    .stat-card { width: 100%; min-width: unset; }
+    .form-row { flex-direction: column; gap: 16px; }
+    .form-group { width: 100%; min-width: unset; }
+    .panel-tab-nav { gap: 8px; }
+    .panel-tab-btn { padding: 8px 12px; font-size: 0.8rem; flex: 1; justify-content: center; }
+    .admin-table th, .admin-table td { padding: 10px; font-size: 0.75rem; }
+    .add-form { padding: 16px; }
+    .modal-box { padding: 20px; width: 90vw; }
+  }
+
+  /* Table Container for scrolling */
+  .admin-table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px; border-radius: 12px; border: 1px solid var(--border-accent); }
+  .admin-table { margin-bottom: 0; border: none; }
+
 
   /* Tab-specific styles for the panel */
   .panel-tab-nav {
@@ -281,59 +304,102 @@
     margin-bottom: 14px;
   }
 </style>
-      <p>Total Users</p>
-    </div>
-    <div class="stat-card">
-      <h2 style="color:#27ae60">{{ student_count }}</h2>
-      <p>Students</p>
-    </div>
-    <div class="stat-card">
-      <h2 style="color:#2980b9">{{ faculty_count }}</h2>
-      <p>Faculty Accounts</p>
-    </div>
-    <div class="stat-card">
-      <h2 style="color:#8e44ad">{{ admin_count }}</h2>
-      <p>Admins</p>
-    </div>
-    <div class="stat-card">
-      <h2 style="color:#e67e22">{{ faculty_list|length }}</h2>
-      <p>Faculty Records</p>
-    </div>
-    <div class="stat-card">
-      <h2 style="color:#16a085">{{ books_list|length }}</h2>
-      <p>Books</p>
-    </div>
-  </div>
+{% endblock %}
 
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  {% for cat, msg in messages %}
-  <div class="flash-{{ 'success' if cat=='success' else 'error' }}">
-    {{ msg }}
-  </div>
-  {% endfor %}
-  {% endif %}
-  {% endwith %}
+{% block content %}
+<div class="dash-wrapper fade-up">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+        
+        
+        <nav class="dash-sidebar-items">
+            <div class="dash-sidebar-item active" title="Admin Console">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Admin Console</span>
+      </div>
+            <div class="dash-sidebar-item" title="Users" onclick="switchTab('users')">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
+            <div class="dash-sidebar-item" title="Faculty" onclick="switchTab('faculty');">
+        <i data-lucide="user-cog"></i>
+        <span class="nav-label">Faculty</span>
+      </div>
+            <div class="dash-sidebar-item" title="Library" onclick="switchTab('library');">
+        <i data-lucide="book"></i>
+        <span class="nav-label">Library</span>
+      </div>
+            <div class="dash-sidebar-item" title="Academics" onclick="switchTab('academics');">
+        <i data-lucide="graduation-cap"></i>
+        <span class="nav-label">Academics</span>
+      </div>
+            <div class="dash-sidebar-item" title="Library Requests" onclick="location.href='{{ url_for('admin_bp.admin_library') }}';">
+        <i data-lucide="bell-ring"></i>
+        <span class="nav-label">Library Requests</span>
+      </div>
+        </nav>
 
-  <!-- Tab Nav -->
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('users')">
-      <span class="tab-icon">👥</span> Users
-    </button>
-    <button class="tab-btn" onclick="switchTab('faculty')">
-      <span class="tab-icon">🧑‍🏫</span> Faculty
-    </button>
-    <button class="tab-btn" onclick="switchTab('library')">
-      <span class="tab-icon">📚</span> Library
-    </button>
-    <button class="tab-btn" onclick="switchTab('academics')">
-      <span class="tab-icon">🎓</span> Academics
-    </button>
-    <button class="tab-btn" onclick="switchTab('placements')">
-      <span class="tab-icon">💼</span> Placements
-    </button>
-  </div>
+        <div class="dash-sidebar-bottom">
+            <div class="dash-sidebar-item" title="Settings">
+        <i data-lucide="settings"></i>
+        <span class="nav-label">Settings</span>
+      </div>
+            <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-crimson),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white;">
+                AD
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="dash-main">
+        <!-- TOPBAR -->
+        <header class="dash-topbar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="dash-breadcrumb">
+                    Admin &middot; <b>Console</b>
+                </div>
+            </div>
+            <div class="dash-top-actions">
+                <button class="dash-btn-secondary" style="font-size: 0.7rem; padding: 6px 12px;" onclick="location.reload()">Refresh Data</button>
+            </div>
+        </header>
+
+        <div class="dash-content">
+            <!-- Metrics Row (Standardized) -->
+            <div class="bento-grid">
+                <div class="dash-card">
+                    <div class="dash-card-title"><i data-lucide="users"></i> Total Users</div>
+                    <div class="dash-card-value">{{ student_count + faculty_count + admin_count }}</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-title"><i data-lucide="graduation-cap"></i> Students</div>
+                    <div class="dash-card-value">{{ student_count }}</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-title"><i data-lucide="user-cog"></i> Faculty</div>
+                    <div class="dash-card-value">{{ faculty_count }}</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-title"><i data-lucide="book"></i> Books</div>
+                    <div class="dash-card-value">{{ books_list|length }}</div>
+                </div>
+            </div>
+
+            <!-- Legacy Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for cat, msg in messages %}
+            <div class="flash-{{ 'success' if cat=='success' else 'error' }}">
+                {{ msg }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
 
   <!-- ─── USERS TAB ─── -->
   <div id="tab-users" class="tab-pane active">
@@ -399,10 +465,11 @@
     </div>
 
     <p class="section-title">All Registered Users</p>
+    <div class="admin-table-container">
     <table class="admin-table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Sl. No</th>
           <th>Name</th>
           <th>Email</th>
           <th>User ID</th>
@@ -413,15 +480,15 @@
       <tbody>
         {% for u in all_users %}
         <tr>
-          <td>{{ u['id'] }}</td>
+          <td>{{ loop.index }}</td>
           <td>{{ u['name'] }}</td>
           <td>{{ u['email'] }}</td>
           <td>{{ u['user_id'] }}</td>
           <td><span class="badge {{ u['role'] }}">{{ u['role'] }}</span></td>
           <td style="display:flex; gap:6px; align-items: center; justify-content: center;">
-            <button class="btn-edit" data-id="{{ u['id'] }}" data-name="{{ u['name'] }}" data-email="{{ u['email'] }}"
+            <button class="btn-edit" data-id="{{ u['user_id'] }}" data-name="{{ u['name'] }}" data-email="{{ u['email'] }}"
               data-role="{{ u['role'] }}" onclick="handleUserEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_users_delete', uid=u['id']) }}"
+            <form method="POST" action="{{ url_for('admin_users_delete', uid=u['user_id']) }}"
               onsubmit="return confirm('WARNING: Are you sure you want to permanently delete this user?');"
               style="margin:0;">
               <button type="submit" class="btn-delete"
@@ -432,6 +499,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 
   <!-- ─── FACULTY TAB ─── -->
@@ -472,10 +540,11 @@
     </div>
 
     <!-- Faculty Table -->
+    <div class="admin-table-container">
     <table class="admin-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th>Sl. No</th>
           <th>Name</th>
           <th>Designation</th>
           <th>Email</th>
@@ -486,18 +555,18 @@
       <tbody>
         {% for f in faculty_list %}
         <tr>
-          <td>{{ f['id'] }}</td>
+          <td>{{ loop.index }}</td>
           <td>{{ f['name'] }}</td>
           <td>{{ f['designation'] }}</td>
           <td>{{ f['email'] }}</td>
           <td>{{ f['joined'] }}</td>
           <td style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn-edit" data-id="{{ f['id'] }}" data-name="{{ f['name'] }}"
+            <button class="btn-edit" data-id="{{ f['sl_no'] }}" data-name="{{ f['name'] }}"
               data-designation="{{ f['designation'] }}" data-dkey="{{ f['designation_key'] }}"
               data-qual="{{ f['qualification'] }}" data-joined="{{ f['joined'] }}" data-research="{{ f['research'] }}"
               data-email="{{ f['email'] }}" data-photo="{{ f['photo'] }}"
               onclick="handleFacultyEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_faculty_delete', fid=f['id']) }}"
+            <form method="POST" action="{{ url_for('admin_faculty_delete', fid=f['sl_no']) }}"
               onsubmit="return confirm('Delete this faculty member?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
@@ -506,6 +575,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 
   <!-- ─── LIBRARY TAB ─── -->
@@ -542,10 +612,11 @@
     </div>
 
 
+    <div class="admin-table-container">
     <table class="admin-table" id="adminBooksTable">
       <thead>
         <tr>
-          <th>#</th>
+          <th>Sl. No</th>
           <th>Title</th>
           <th>Author</th>
           <th>Category</th>
@@ -556,8 +627,8 @@
       <tbody>
         {% for b in books_list %}
         <tr>
-          <td>{{ b['id'] }}</td>
-          <td><a href="{{ url_for('library_bp.book_details', book_id=b['id']) }}"
+          <td>{{ loop.index }}</td>
+          <td><a href="{{ url_for('library_bp.book_details', book_id=b['sl_no']) }}"
               style="color: #2980b9; text-decoration: none; font-weight: 500;">{{ b['title'] }}</a></td>
           <td>{{ b['author'] }}</td>
           <td>{{ b['category'] }}</td>
@@ -569,10 +640,10 @@
             {% endif %}
           </td>
           <td style="display:flex; gap:6px;">
-            <button class="btn-edit" data-id="{{ b['id'] }}" data-title="{{ b['title'] }}"
+            <button class="btn-edit" data-id="{{ b['sl_no'] }}" data-title="{{ b['title'] }}"
               data-author="{{ b['author'] }}" data-category="{{ b['category'] }}" data-status="{{ b['status'] }}"
               onclick="handleBookEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_books_delete', bid=b['id']) }}"
+            <form method="POST" action="{{ url_for('admin_books_delete', bid=b['sl_no']) }}"
               onsubmit="return confirm('Delete this book?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
@@ -581,6 +652,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
     <!-- Circulation History -->
     <div
@@ -601,6 +673,7 @@
         </div>
       </div>
 
+      <div class="admin-table-container">
       <table style="width: 100%; border-collapse: collapse; margin-top: 15px;" id="historyTable">
         <thead>
           <tr style="background: #f8f9fa; border-bottom: 2px solid #eee; text-align: left;">
@@ -630,8 +703,16 @@
             </td>
           </tr>
           {% endfor %}
+          {% if not transactions %}
+          <tr>
+            <td colspan="4" style="padding: 24px; text-align: center; color: #999; font-size: 0.9rem;">
+              <i class="fas fa-inbox" style="margin-right: 6px;"></i> No circulation records found yet.
+            </td>
+          </tr>
+          {% endif %}
         </tbody>
       </table>
+      </div>
     </div>
 
   </div>
@@ -664,10 +745,11 @@
       </form>
     </div>
 
+    <div class="admin-table-container">
     <table class="admin-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th>Sl. No</th>
           <th>Program Name</th>
           <th>Duration</th>
           <th>Intake</th>
@@ -677,17 +759,17 @@
       <tbody>
         {% for p in programs %}
         <tr>
-          <td>{{ p['id'] }}</td>
+          <td>{{ loop.index }}</td>
           <td>{{ p['name'] }}</td>
           <td>{{ p['duration'] }}</td>
           <td>{{ p['intake'] }}</td>
           <td style="display:flex; gap:6px;">
-            <button class="btn-edit" data-id="{{ p['id'] }}" data-name="{{ p['name'] }}"
+            <button class="btn-edit" data-id="{{ p['sl_no'] }}" data-name="{{ p['name'] }}"
               data-duration="{{ p['duration'] }}" data-intake="{{ p['intake'] }}"
               data-eligibility="{{ p['eligibility'] }}" data-extra-label="{{ p.get('extra_label','') }}"
               data-extra-value="{{ p.get('extra_value','') }}" data-highlights="{{ p.get('highlights_text','') }}"
               onclick="handleProgramEdit(this)">Edit</button>
-            <form method="POST" action="{{ url_for('admin_programs_delete', pid=p['id']) }}"
+            <form method="POST" action="{{ url_for('admin_programs_delete', pid=p['sl_no']) }}"
               onsubmit="return confirm('Delete this program?');" style="display:inline;">
               <button type="submit" class="btn-del">Delete</button>
             </form>
@@ -696,6 +778,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
     <p class="section-title" style="margin-top: 40px;">📅 Timetable Management</p>
 
@@ -714,6 +797,7 @@
       </form>
     </div>
 
+    <div class="admin-table-container">
     <table class="admin-table">
       <thead>
         <tr>
@@ -750,6 +834,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
   </div>
 
@@ -883,13 +968,24 @@
 
 
 
+        </div> <!-- end dash-content -->
+    </main> <!-- end dash-main -->
+</div> <!-- end dash-wrapper -->
 <script>
   // Tab switching — read hash on load
   function switchTab(tab) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel-tab-btn, .dash-sidebar-item').forEach(b => b.classList.remove('active'));
+    
     document.getElementById('tab-' + tab).classList.add('active');
-    event.target.classList.add('active');
+    
+    // Update sidebar active state
+    document.querySelectorAll('.dash-sidebar-item').forEach(item => {
+        if(item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + tab + "'")) {
+            item.classList.add('active');
+        }
+    });
+
     location.hash = tab;
   }
 
@@ -935,6 +1031,7 @@
   function openUserEdit(id, name, email, role) {
     document.getElementById('user-edit-form').action = `/admin/users/edit/${id}`;
     document.getElementById('ue-name').value = name;
+    document.getElementById('ue-user_id').value = id; // New field if we want to change user_id
     document.getElementById('ue-email').value = email;
     document.getElementById('ue-role').value = role;
     document.getElementById('modal-user').classList.add('open');

@@ -24,8 +24,8 @@
       Curriculum designed by APJ Abdul Kalam Technological University (KTU), enhanced by AISAT's industry-aligned pedagogy.
     </p>
     <div class="scheme-tabs fade-up" style="animation-delay: 0.2s;">
-      <div class="scheme-tab active" data-scheme="2019">KTU 2019 Scheme</div>
-      <div class="scheme-tab" data-scheme="2024">KTU 2024 Scheme</div>
+      <a href="{{ url_for('academics', scheme='2019') }}" class="scheme-tab {{ 'active' if active_scheme == '2019' else '' }}">KTU 2019 Scheme</a>
+      <a href="{{ url_for('academics', scheme='2024') }}" class="scheme-tab {{ 'active' if active_scheme == '2024' else '' }}">KTU 2024 Scheme</a>
     </div>
   </section>
 
@@ -37,97 +37,81 @@
     </div>
     <div class="curriculum-wrap">
       
-      <!-- S1 & S2 Combined Example -->
+      {% for sem in semesters %}
       <div class="sem-accordion">
         <div class="sem-header">
-          <h3>Semester 1 & 2</h3>
+          <h3>{{ sem.title }}</h3>
           <span class="sem-icon">▼</span>
         </div>
         <div class="sem-content">
           <div class="sem-content-inner">
             <div class="subject-grid">
-              <div class="subj-group">
-                <h4>Core Engineering</h4>
-                <ul class="subj-list">
-                  <li><span>Linear Algebra & Calculus</span> <span class="subj-code">MAT101</span></li>
-                  <li><span>Engineering Physics A</span> <span class="subj-code">PHT100</span></li>
-                  <li><span>Engineering Chemistry</span> <span class="subj-code">CYT100</span></li>
-                  <li><span>Engineering Graphics</span> <span class="subj-code">EST110</span></li>
-                </ul>
-              </div>
-              <div class="subj-group">
-                <h4>Computing Fundamentals</h4>
-                <ul class="subj-list">
-                  <li><span>Programming in C</span> <span class="subj-code">EST102</span></li>
-                  <li><span>Basics of Electrical & Electronics</span> <span class="subj-code">EST130</span></li>
-                  <li><span>Design & Engineering</span> <span class="subj-code">EST200</span></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              {% if sem.subjects %}
+                {% set core_subjects = [] %}
+                {% set lab_subjects = [] %}
+                
+                {% for subj in sem.subjects %}
+                  {% if 'lab' in subj.name.lower() or 'workshop' in subj.name.lower() or 'project' in subj.name.lower() %}
+                    {% do lab_subjects.append(subj) %}
+                  {% else %}
+                    {% do core_subjects.append(subj) %}
+                  {% endif %}
+                {% endfor %}
 
-      <!-- S3 Example -->
-      <div class="sem-accordion">
-        <div class="sem-header">
-          <h3>Semester 3</h3>
-          <span class="sem-icon">▼</span>
-        </div>
-        <div class="sem-content">
-          <div class="sem-content-inner">
-            <div class="subject-grid">
-              <div class="subj-group">
-                <h4>Core Subjects</h4>
-                <ul class="subj-list">
-                  <li><span>Discrete Mathematical Structures</span> <span class="subj-code">MAT203</span></li>
-                  <li><span>Data Structures</span> <span class="subj-code">CST201</span></li>
-                  <li><span>Logic System Design</span> <span class="subj-code">CST203</span></li>
-                  <li><span>Object Oriented Programming using Java</span> <span class="subj-code">CST205</span></li>
-                </ul>
-              </div>
-              <div class="subj-group">
-                <h4>Labs & Associated</h4>
-                <ul class="subj-list">
-                  <li><span>Data Structures Lab</span> <span class="subj-code">CSL201</span></li>
-                  <li><span>Object Oriented Programming Lab (in Java)</span> <span class="subj-code">CSL203</span></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <div class="subj-group">
+                  <h4>Core Subjects</h4>
+                  <ul class="subj-list">
+                    {% for subj in core_subjects %}
+                    <li class="subj-item-wrap">
+                      <div class="subj-main-info">
+                        <span>{{ subj.name }}</span>
+                        <span class="subj-code">{{ subj.code }}</span>
+                      </div>
+                      
+                      <div class="subj-actions">
+                        {% if session.user_id %}
+                          {% if subj.notes %}
+                            <div class="module-links">
+                              {% for note in subj.notes %}
+                                <a href="{{ note.url }}" class="note-pill" target="_blank" title="{{ note.title }}" data-title="{{ note.title }}" data-url="{{ note.url }}" onclick="handleNoteClick(this)">
+                                  {{ note.title }}
+                                </a>
+                              {% endfor %}
+                            </div>
+                          {% else %}
+                            <a href="{{ subj.url }}" class="note-pill main-page-link" target="_blank" data-title="{{ subj.name }}" data-url="{{ subj.url }}" onclick="handleNoteClick(this)">View Notes</a>
+                          {% endif %}
+                        {% else %}
+                          <div class="lock-overlay" title="Login to access notes">
+                            <span class="lock-icon">🔒</span>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
 
-       <!-- S5 Example -->
-       <div class="sem-accordion">
-        <div class="sem-header">
-          <h3>Semester 5</h3>
-          <span class="sem-icon">▼</span>
-        </div>
-        <div class="sem-content">
-          <div class="sem-content-inner">
-            <div class="subject-grid">
-              <div class="subj-group">
-                <h4>Core Subjects</h4>
-                <ul class="subj-list">
-                  <li><span>Formal Languages and Automata Theory</span> <span class="subj-code">CST301</span></li>
-                  <li><span>Computer Networks</span> <span class="subj-code">CST303</span></li>
-                  <li><span>System Software</span> <span class="subj-code">CST305</span></li>
-                  <li><span>Microprocessors and Microcontrollers</span> <span class="subj-code">CST307</span></li>
-                  <li><span>Management of Software Systems</span> <span class="subj-code">CST309</span></li>
-                </ul>
-              </div>
-              <div class="subj-group">
-                <h4>Labs & Associated</h4>
-                <ul class="subj-list">
-                  <li><span>System Software and Microprocessors Lab</span> <span class="subj-code">CSL331</span></li>
-                  <li><span>Database Management Systems Lab</span> <span class="subj-code">CSL333</span></li>
-                </ul>
-              </div>
+
+              {% else %}
+                <div class="no-subjects-full">Syllabus details for this semester are currently being updated.</div>
+              {% endif %}
             </div>
+
+            {% if not session.user_id %}
+            <div class="login-prompt-box">
+              <div class="lock-banner">
+                <span class="banner-icon">🛡️</span>
+                <p>Detailed module notes and resources are exclusive to AISAT students.</p>
+              </div>
+              <a href="{{ url_for('login') }}" class="login-action-btn">Login to Unlock Resources</a>
+            </div>
+            {% endif %}
+
           </div>
         </div>
       </div>
+      {% endfor %}
 
     </div>
   </section>
@@ -368,6 +352,25 @@ function renderResources(filterStr, searchStr = '') {
         </div>
       `;
     });
+  }
+}
+
+// --- NEW ACCORDION TOGGLE ---
+window.toggleAccordion = function(id) {
+  const content = document.getElementById(id);
+  const item = content.closest('.accordion-item');
+  const allItems = document.querySelectorAll('.accordion-item');
+  const allContent = document.querySelectorAll('.accordion-content');
+  
+  const isActive = item.classList.contains('active');
+  
+  // Close all
+  allItems.forEach(i => i.classList.remove('active'));
+  allContent.forEach(c => c.style.maxHeight = null);
+  
+  if(!isActive) {
+    item.classList.add('active');
+    content.style.maxHeight = content.scrollHeight + "px";
   }
 }
 

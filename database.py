@@ -9,26 +9,34 @@ load_dotenv()
 
 def get_db_connection():
     """
-    Establish and return a connection to the PostgreSQL database.
-    Favors NEON_DATABASE_URL, then LOCAL_DATABASE_URL, then DATABASE_URL.
+    Establish and return a connection to the PostgreSQL database with fallbacks.
     """
-    db_url = os.environ.get("NEON_DATABASE_URL") or os.environ.get("LOCAL_DATABASE_URL") or os.environ.get("DATABASE_URL")
+    urls = [
+        os.environ.get("NEON_DATABASE_URL"),
+        os.environ.get("LOCAL_DATABASE_URL"),
+        os.environ.get("DATABASE_URL")
+    ]
+    urls = [u for u in urls if u]
     
-    try:
-        if db_url:
+    for db_url in urls:
+        try:
             conn = psycopg2.connect(db_url)
-        else:
-            # Fallback for old local config if env vars are missing
-            conn = psycopg2.connect(
-                host=os.environ.get("DB_HOST", "localhost"),
-                dbname=os.environ.get("DB_NAME", "csconnect"),
-                user=os.environ.get("DB_USER", "postgres"),
-                password=os.environ.get("DB_PASS", "1234"),
-                port=os.environ.get("DB_PORT", "5432")
-            )
+            return conn
+        except Exception as e:
+            print(f"Connection failed for {db_url[:50]}: {e}")
+            
+    # Legacy fallback
+    try:
+        conn = psycopg2.connect(
+            host=os.environ.get("DB_HOST", "localhost"),
+            dbname=os.environ.get("DB_NAME", "csconnect"),
+            user=os.environ.get("DB_USER", "postgres"),
+            password=os.environ.get("DB_PASS", "1234"),
+            port=os.environ.get("DB_PORT", "5432")
+        )
         return conn
-    except psycopg2.Error as e:
-        print(f"Error connecting to the database: {e}")
+    except Exception as e:
+        print(f"All database connection attempts failed: {e}")
         return None
 
 def setup_unstructured_tables():

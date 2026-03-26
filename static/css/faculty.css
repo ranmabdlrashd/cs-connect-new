@@ -309,11 +309,29 @@
 
 @media (max-width: 768px) {
   .faculty-breadcrumb, .faculty-hero, .filter-sticky, .faculty-spotlight, .faculty-container {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
-  .filter-sticky { flex-direction: column; align-items: stretch; gap: 16px; }
+  .filter-sticky { 
+    position: relative; 
+    top: 0; 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 16px; 
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
   .search-wrapper { width: 100%; }
-  .faculty-grid { grid-template-columns: 1fr; }
+  .faculty-grid { grid-template-columns: 1fr; gap: 20px; }
   .hero-title { font-size: 32px; }
+  .hero-subtitle { font-size: 13px; }
+  .faculty-hero { padding: 40px 20px; }
+  .hod-card { padding: 24px 16px; gap: 16px; }
+  .hod-name { font-size: 24px; }
+  .faculty-container { padding-top: 20px; padding-bottom: 40px; }
 }
+
+@media (max-width: 480px) {
+  .filter-tabs { width: 100%; }
+  .tab-btn { padding: 6px 14px; font-size: 10px; }
+}

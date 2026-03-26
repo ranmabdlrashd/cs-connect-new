@@ -12,6 +12,7 @@
 <body>
 
   <div class="dashboard-wrapper">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -63,8 +64,13 @@
       
       <!-- Top Bar -->
       <header class="top-bar">
-        <div class="breadcrumb">
-          CS Connect <span>·</span> <b>Dashboard</b>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="sidebar-toggle" onclick="toggleSidebar()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="breadcrumb">
+            CS Connect <span>·</span> <b>Dashboard</b>
+          </div>
         </div>
         
 
@@ -197,5 +203,11 @@
     </main>
   </div>
 
+  <script>
+    function toggleSidebar() {
+      const wrapper = document.querySelector('.dashboard-wrapper');
+      if (wrapper) wrapper.classList.toggle('sidebar-open');
+    }
+  </script>
 </body>
 </html>

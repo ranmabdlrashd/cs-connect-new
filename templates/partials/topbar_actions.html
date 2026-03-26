@@ -1,3 +1,20 @@
+<style>
+  .notification-dropdown {
+    transform-origin: top right;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  @media (max-width: 480px) {
+    .notification-dropdown {
+      position: fixed !important;
+      top: 60px !important;
+      left: 10px !important;
+      right: 10px !important;
+      width: auto !important;
+      max-width: none !important;
+    }
+  }
+</style>
+
 <div class="notif-wrapper" style="position: relative; display: inline-block; z-index: 9999;">
   <div id="notificationBell" onclick="toggleNotifications(event)" style="width:36px; height:36px; background:var(--dash-active-bg, #F4F1EA); border-radius:10px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border-accent, #E0DBCF); cursor:pointer; color: var(--accent-crimson);">
     <i data-lucide="bell" style="width:16px; height:16px;"></i>

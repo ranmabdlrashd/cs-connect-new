@@ -7,7 +7,7 @@
 <style>
   /* Page-specific overrides */
 
-  body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-color); }
+  body { margin: 0; padding: 0; overflow-y: auto !important; background: var(--bg-color); }
 
   .search-section {
     background: white; border: 1px solid var(--border-accent); border-radius: 16px; padding: 24px;
@@ -54,31 +54,30 @@
   .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; align-self: flex-start; }
   .status-available { background: #E8F5E9; color: #2E7D32; }
   .status-issued { background: #FFEBEE; color: #C62828; }
+
+  @media (max-width: 768px) {
+    .library-container { padding: 16px !important; }
+    .search-section { flex-direction: column; gap: 12px; padding: 16px; }
+    .search-input { height: 46px; }
+    .dash-btn-primary { height: 46px; width: 100%; }
+    .books-grid { grid-template-columns: 1fr; }
+    .book-card { padding: 16px; gap: 16px; }
+    .book-cover { width: 70px; height: 100px; }
+    .book-title { font-size: 1rem; }
+    .dashboard-header h1 { font-size: 1.5rem !important; }
+  }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
-<div class="dash-wrapper fade-up">
-  <!-- SIDEBAR -->
-  <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="library" style="color:white;"></i></div>
-    <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="window.history.back()"><i data-lucide="arrow-left"></i></div>
-      <div class="dash-sidebar-item active" title="Library"><i data-lucide="library"></i></div>
-      <div class="dash-sidebar-item" title="Search"><i data-lucide="search"></i></div>
-      <div class="dash-sidebar-item" title="My Borrowings"><i data-lucide="book-open"></i></div>
-    </nav>
-  </aside>
 
-  <!-- MAIN -->
-  <main class="dash-main">
+<div class="library-container fade-up" style="padding: 32px; max-width: 1400px; margin: 0 auto;">
     <header class="dash-topbar">
       <div class="dash-breadcrumb">Portal &middot; <b>Department Library</b></div>
 
     </header>
 
-    <div class="dash-content">
       <div class="dashboard-header" style="margin-bottom: 24px;">
           <h1 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--accent-crimson); font-weight: 800; margin: 0;">Knowledge Hub</h1>
           <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 4px 0 0 0;">Access technical resources and department archives.</p>
@@ -105,7 +104,7 @@
 
       <div class="books-grid" id="booksGrid">
         {% for book in books %}
-        <div class="book-card" data-id="{{ book.id }}" onclick="location.href='{{ url_for('library_bp.book_details', book_id=book.id) }}'">
+        <div class="book-card" data-id="{{ book.sl_no }}" onclick="location.href='{{ url_for('library_bp.book_details', book_id=book.sl_no) }}'">
           <div class="book-cover"><i data-lucide="book" style="color:white; width:32px;"></i></div>
           <div class="book-info">
             <h3 class="book-title">{{ book.title }}</h3>
@@ -123,8 +122,6 @@
         </div>
         {% endfor %}
       </div>
-    </div>
-  </main>
 </div>
 
 <script>

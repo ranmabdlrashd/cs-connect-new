@@ -9,11 +9,11 @@ class Notification:
     def notify_admin(message, title='Admin Alert', category='Academic'):
         conn = get_db()
         # Find admins (role='admin')
-        admins = conn.execute("SELECT id FROM users WHERE role = 'admin'").fetchall()
+        admins = conn.execute("SELECT user_id FROM users WHERE role = 'admin'").fetchall()
         for admin in admins:
             conn.execute(
                 "INSERT INTO notifications (user_id, title, body, category) VALUES (%s, %s, %s, %s)",
-                (admin[0], title, message, category),
+                (str(admin[0]), title, message, category),
             )
         conn.commit()
         conn.close()
@@ -23,7 +23,7 @@ class Notification:
         conn = get_db()
         conn.execute(
             "INSERT INTO notifications (user_id, title, body, category) VALUES (%s, %s, %s, %s)",
-            (user_id, title, message, category),
+            (str(user_id), title, message, category),
         )
         conn.commit()
         conn.close()
@@ -39,18 +39,17 @@ class Notification:
         conn = get_db()
         notifs = conn.execute(
             """
-            SELECT id, title, body, category, created_at, is_read 
+            SELECT sl_no, title, body, category, created_at, is_read 
             FROM notifications 
             WHERE user_id = %s 
             ORDER BY created_at DESC
         """,
-            (admin_id,),
+            (str(admin_id),),
         ).fetchall()
-
         # Mark as read
         conn.execute(
             "UPDATE notifications SET is_read = TRUE WHERE user_id = %s",
-            (admin_id,),
+            (str(admin_id),),
         )
         conn.commit()
         conn.close()
@@ -71,15 +70,15 @@ class Notification:
         if not user_id:
             return []
         conn = get_db()
-        # API requires: id, title, body, category, is_read, created_at
+        # API requires: sl_no, title, body, category, is_read, created_at
         notifs = conn.execute(
             """
-            SELECT id, title, body, category, is_read, created_at 
+            SELECT sl_no, title, body, category, is_read, created_at 
             FROM notifications 
             WHERE user_id = %s 
             ORDER BY created_at DESC
         """,
-            (user_id,),
+            (str(user_id),),
         ).fetchall()
         conn.close()
         
@@ -102,7 +101,7 @@ class Notification:
         conn = get_db()
         row = conn.execute(
             "SELECT COUNT(*) FROM notifications WHERE user_id = %s AND is_read = FALSE",
-            (user_id,),
+            (str(user_id),),
         ).fetchone()
         conn.close()
         return row[0] if row else 0
@@ -116,7 +115,7 @@ class Notification:
         conn = get_db()
         conn.execute(
             "UPDATE notifications SET is_read = TRUE WHERE user_id = %s",
-            (user_id,),
+            (str(user_id),),
         )
         conn.commit()
         conn.close()
@@ -129,8 +128,8 @@ class Notification:
             return
         conn = get_db()
         conn.execute(
-            "UPDATE notifications SET is_read = TRUE WHERE id = %s AND user_id = %s",
-            (notif_id, user_id),
+            "UPDATE notifications SET is_read = TRUE WHERE sl_no = %s AND user_id = %s",
+            (notif_id, str(user_id)),
         )
         conn.commit()
         conn.close()

@@ -334,8 +334,17 @@
   .aisat-hero,
   .aisat-content { padding-left: 20px; padding-right: 20px; }
 
-  .aisat-stats-bar { grid-template-columns: 1fr 1fr; }
-  .two-col-grid { grid-template-columns: 1fr; }
+  .aisat-stats-bar { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .two-col-grid { grid-template-columns: 1fr; gap: 24px; }
   .campus-grid { grid-template-columns: 1fr; }
-  .aisat-title { font-size: 30px; }
+  .aisat-title { font-size: 32px; }
+  .aisat-hero { padding-top: 40px; padding-bottom: 30px; }
+  .aisat-stats-bar .stat-card-sm { padding: 14px 10px; }
+  .aisat-stats-bar .stat-num { font-size: 24px; }
 }
+
+@media (max-width: 480px) {
+  .aisat-stats-bar { grid-template-columns: 1fr; }
+  .aisat-info-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .aisat-info-val { text-align: left; }
+}

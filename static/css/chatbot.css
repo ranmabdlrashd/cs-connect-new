@@ -310,6 +310,39 @@
 .error-text {
   color: #ef9a9a !important;
 }
+
+/* Markdown Link Styling */
+.bot-bubble a {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: var(--chat-accent);
+  color: #FFFFFF !important;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(139,29,29,0.25);
+  cursor: pointer !important;
+  text-align: center;
+}
+
+.bot-bubble a:hover {
+  background: var(--chat-accent-dk);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139,29,29,0.35);
+}
+
+.bot-bubble p {
+  margin: 0;
+}
+
+.bot-bubble p + p {
+  margin-top: 8px;
+}
+
 .message-time {
   font-size: 10px;
   color: var(--chat-text-sec);
@@ -464,15 +497,48 @@
 }
 
 /* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .chatbot-container {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
 @media (max-width: 480px) {
   .chatbot-window {
-    --chat-w: calc(100vw - 20px);
-    --chat-h: calc(100dvh - 110px);
-    right: 10px;
-    bottom: 90px;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+    border: none;
+    z-index: 20001;
   }
-  .chatbot-container {
-    right: 14px;
-    bottom: 14px;
+  
+  .chatbot-window.active {
+    display: flex;
+    animation: chatSlideUp 0.3s ease-out;
+  }
+
+  .chat-header {
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .chat-messages {
+    padding: 16px;
+  }
+
+  .chat-input-area {
+    padding-bottom: 24px; /* Space for home indicator */
+  }
+
+  .chatbot-fab-wrapper {
+    display: none; /* Hide FAB when window is full screen on mobile? Or keep for closing? */
+  }
+  
+  .chatbot-window.active ~ .chatbot-fab-wrapper {
+    display: none;
   }
 }

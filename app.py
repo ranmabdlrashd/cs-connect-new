@@ -11,7 +11,18 @@ from werkzeug.utils import secure_filename
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "csconnectsecret")
+app.secret_key = "testsecret"
+app.jinja_env.add_extension('jinja2.ext.do')
+
+import logging
+from logging.handlers import RotatingFileHandler
+file_handler = RotatingFileHandler('flask_errors.log', maxBytes=1024 * 1024, backupCount=5)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.ERROR)  # Set to ERROR for production-like use
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.ERROR)
 
 from routes.library_routes import library_bp
 from routes.admin_routes import admin_bp
@@ -25,19 +36,42 @@ app.register_blueprint(admin_bp)
 # PostgreSQL Connection details
 class DBConnection:
     def __init__(self):
-        db_url = os.environ.get("NEON_DATABASE_URL") or os.environ.get("LOCAL_DATABASE_URL") or os.environ.get("DATABASE_URL")
+        urls = [
+            os.environ.get("NEON_DATABASE_URL"),
+            os.environ.get("LOCAL_DATABASE_URL"),
+            os.environ.get("DATABASE_URL")
+        ]
+        # Filter out None and empty strings
+        urls = [u for u in urls if u]
         
-        if db_url:
-            self.conn = psycopg2.connect(db_url)
-        else:
-            # Fallback for old local config if env vars are missing
-            DB_HOST = os.environ.get("DB_HOST", "localhost")
-            DB_NAME = os.environ.get("DB_NAME", "csconnect")
-            DB_USER = os.environ.get("DB_USER", "postgres")
-            DB_PASS = os.environ.get("DB_PASS", "1234")
-            self.conn = psycopg2.connect(
-                host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASS
-            )
+        self.conn = None
+        errors = []
+        
+        for db_url in urls:
+            try:
+                print(f"Attempting connection to: {db_url[:50]}...")
+                self.conn = psycopg2.connect(db_url)
+                print("Connection successful!")
+                break
+            except Exception as e:
+                print(f"Connection failed for {db_url[:50]}: {e}")
+                errors.append(str(e))
+        
+        if not self.conn:
+            # Final fallback to standard host/db/user/pass if all URLs fail
+            try:
+                print("Using legacy fallback local connection")
+                DB_HOST = os.environ.get("DB_HOST", "localhost")
+                DB_NAME = os.environ.get("DB_NAME", "csconnect")
+                DB_USER = os.environ.get("DB_USER", "postgres")
+                DB_PASS = os.environ.get("DB_PASS", "1234")
+                self.conn = psycopg2.connect(
+                    host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASS
+                )
+                print("Legacy connection successful!")
+            except Exception as e:
+                errors.append(f"Legacy fallback failed: {e}")
+                raise Exception(f"Failed to connect to any database. Errors: {'; '.join(errors)}")
     
     def cursor(self):
         return self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -80,13 +114,13 @@ def get_site_data(key, default_val=None):
 
 def get_news_ticker():
     conn = get_db_connection()
-    row = conn.execute("SELECT text FROM news_ticker ORDER BY id DESC LIMIT 1").fetchone()
+    row = conn.execute("SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 1").fetchone()
     conn.close()
     return row[0] if row else ""
 
 def get_home_stats():
     conn = get_db_connection()
-    rows = conn.execute("SELECT value, label FROM home_stats ORDER BY id ASC").fetchall()
+    rows = conn.execute("SELECT value, label FROM home_stats ORDER BY sl_no ASC").fetchall()
     conn.close()
     return [{"value": r[0], "label": r[1]} for r in rows]
 
@@ -160,6 +194,12 @@ def api_notifications_read_all():
     Notification.mark_all_read()
     return jsonify({'status': 'ok'})
 
+# ── PUBLIC PLACEMENTS ROUTE ──
+@app.route('/placements')
+def placements():
+    return render_template('placement.html')
+
+
 # ── NEW DASHBOARD ROUTE ──
 
 @app.route('/dashboard/notifications')
@@ -189,7 +229,7 @@ def api_student_profile():
     conn = get_db_connection()
     try:
         if request.method == 'GET':
-            user = conn.execute("SELECT name, email, user_id, batch, phone FROM users WHERE id = %s", (session['user_id'],)).fetchone()
+            user = conn.execute("SELECT name, email, user_id, batch, phone FROM users WHERE user_id = %s", (session['user_id'],)).fetchone()
             if not user:
                 return jsonify({'error': 'User not found'}), 404
             return jsonify(dict(user))
@@ -210,7 +250,7 @@ def api_student_profile():
                 
             if updates:
                 params.append(session['user_id'])
-                query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
+                query = f"UPDATE users SET {', '.join(updates)} WHERE user_id = %s"
                 conn.execute(query, tuple(params))
                 conn.commit()
                 return jsonify({'status': 'ok'})
@@ -230,7 +270,7 @@ def api_notification_preferences():
     valid_fields = ['library_alerts', 'department_notices', 'exam_alerts']
     try:
         if request.method == 'GET':
-            query = f"SELECT {', '.join(valid_fields)} FROM users WHERE id = %s"
+            query = f"SELECT {', '.join(valid_fields)} FROM users WHERE user_id = %s"
             prefs = conn.execute(query, (session['user_id'],)).fetchone()
             return jsonify(dict(prefs) if prefs else {})
             
@@ -246,7 +286,7 @@ def api_notification_preferences():
                     
             if updates:
                 params.append(session['user_id'])
-                query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
+                query = f"UPDATE users SET {', '.join(updates)} WHERE user_id = %s"
                 conn.execute(query, tuple(params))
                 conn.commit()
                 return jsonify({'status': 'ok'})
@@ -271,12 +311,12 @@ def api_change_password():
         
     conn = get_db_connection()
     try:
-        user = conn.execute("SELECT password FROM users WHERE id = %s", (session['user_id'],)).fetchone()
+        user = conn.execute("SELECT password FROM users WHERE user_id = %s", (session['user_id'],)).fetchone()
         if not user or not check_password_hash(user['password'], current_password):
             return jsonify({'error': 'Incorrect current password'}), 400
             
         new_hashed = generate_password_hash(new_password)
-        conn.execute("UPDATE users SET password = %s WHERE id = %s", (new_hashed, session['user_id']))
+        conn.execute("UPDATE users SET password = %s WHERE user_id = %s", (new_hashed, session['user_id']))
         conn.commit()
         return jsonify({'status': 'ok'})
     except Exception as e:
@@ -308,7 +348,7 @@ def init_db():
     # 1. users
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             user_id TEXT NOT NULL UNIQUE,
@@ -332,7 +372,7 @@ def init_db():
     # 2. faculty
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS faculty (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             designation TEXT,
             designation_key TEXT,
@@ -347,7 +387,7 @@ def init_db():
     # 3. books
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS books (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
             author TEXT,
             category TEXT,
@@ -373,32 +413,34 @@ def init_db():
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS issues (
-            id SERIAL PRIMARY KEY,
-            book_id INTEGER,
-            user_id INTEGER,
+            sl_no SERIAL PRIMARY KEY,
+            book_id INTEGER REFERENCES books(sl_no) ON DELETE CASCADE,
+            user_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
             issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             due_date TIMESTAMP,
             return_date TIMESTAMP,
-            status TEXT
+            status TEXT DEFAULT 'issued'
         )
     ''')
     cursor.execute('ALTER TABLE issues ADD COLUMN IF NOT EXISTS due_date TIMESTAMP')
     
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS requests (
-            id SERIAL PRIMARY KEY,
-            book_id INTEGER,
-            requested_by INTEGER,
+            sl_no SERIAL PRIMARY KEY,
+            book_id INTEGER REFERENCES books(sl_no) ON DELETE CASCADE,
+            requested_by TEXT REFERENCES users(user_id) ON DELETE CASCADE,
             request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status TEXT
+            status TEXT DEFAULT 'pending',
+            request_type TEXT,
+            admin_feedback TEXT
         )
     ''')
     
     # Fines
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS library_fines (
-            id SERIAL PRIMARY KEY,
-            student_id INTEGER,
+            sl_no SERIAL PRIMARY KEY,
+            student_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
             book_id INTEGER,
             issue_id INTEGER,
             amount DECIMAL(10,2),
@@ -421,20 +463,20 @@ def init_db():
     # Notifications
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS notifications (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            title TEXT DEFAULT 'Notice',
+            sl_no SERIAL PRIMARY KEY,
+            user_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
+            title TEXT,
             body TEXT,
-            category TEXT DEFAULT 'Academic',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            is_read BOOLEAN DEFAULT FALSE
+            category TEXT,
+            is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
     # 4. placement_summary
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS placement_summary (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             icon TEXT,
             value TEXT,
             label TEXT,
@@ -446,7 +488,7 @@ def init_db():
     # 5. placement_companies
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS placement_companies (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             url TEXT,
             sector TEXT
@@ -456,7 +498,7 @@ def init_db():
     # 6. alumni
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS alumni (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             batch TEXT,
             company TEXT,
@@ -469,7 +511,7 @@ def init_db():
     # 7. internships
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS internships (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
             company TEXT,
             domain TEXT,
@@ -482,7 +524,7 @@ def init_db():
     # 8. programs
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS programs (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             duration TEXT,
             intake TEXT,
@@ -497,7 +539,7 @@ def init_db():
     # 9. semesters
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS semesters (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
             subjects TEXT
         )
@@ -506,7 +548,7 @@ def init_db():
     # 10. news_ticker
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS news_ticker (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             text TEXT
         )
     ''')
@@ -514,7 +556,7 @@ def init_db():
     # 11. home_stats
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS home_stats (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             value TEXT,
             label TEXT
         )
@@ -523,7 +565,7 @@ def init_db():
     # 12. placement_batches
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS placement_batches (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             batch_key TEXT,
             label TEXT,
             stats JSONB,
@@ -542,7 +584,7 @@ def init_db():
     # 14. timetable_subjects
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS timetable_subjects (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             batch TEXT DEFAULT 'S2 CSE A',
             code TEXT NOT NULL,
             full_name TEXT,
@@ -554,7 +596,7 @@ def init_db():
     # 15. timetable
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS timetable (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             batch TEXT DEFAULT 'S2 CSE A',
             day TEXT NOT NULL,
             period INTEGER NOT NULL,
@@ -577,8 +619,8 @@ def init_db():
     # 17. portal_sessions
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS portal_sessions (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
+            sl_no SERIAL PRIMARY KEY,
+            user_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
             ip_address TEXT,
             user_agent TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -589,9 +631,9 @@ def init_db():
     # 18. pending_approvals
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pending_approvals (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             type TEXT NOT NULL,
-            requestor_id INTEGER,
+            requestor_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
             requestor_name TEXT,
             details TEXT,
             status TEXT DEFAULT 'pending',
@@ -682,7 +724,7 @@ def init_db():
     # 19. mous (Memorandum of Understanding)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS mous (
-            id SERIAL PRIMARY KEY,
+            sl_no SERIAL PRIMARY KEY,
             organization TEXT NOT NULL,
             date_of_signing TEXT,
             status TEXT DEFAULT 'Active'
@@ -708,18 +750,6 @@ def init_db():
         ]
         cursor.executemany("INSERT INTO books (title, author, category, isbn, availability) VALUES (%s, %s, %s, %s, %s)", books_data)
 
-    # Seed a Dummy fine for User 1 if exists
-    cursor.execute("SELECT id FROM users WHERE id = 1")
-    if cursor.fetchone():
-        cursor.execute("SELECT id FROM library_fines WHERE student_id = 1")
-        if not cursor.fetchone():
-            from datetime import datetime, timedelta
-            issue_date = datetime.now() - timedelta(days=20)
-            due_date = datetime.now() - timedelta(days=5)
-            cursor.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (8, 1, %s, %s, 'issued') RETURNING id", (issue_date, due_date))
-            issue_id = cursor.fetchone()[0]
-            cursor.execute("INSERT INTO library_fines (student_id, book_id, issue_id, amount, days_overdue, rate_per_day, paid) VALUES (1, 8, %s, 50, 5, 10, false)", (issue_id,))
-
     conn.commit()
     conn.close()
 
@@ -731,13 +761,22 @@ def init_db():
 
 @app.route('/')
 def home():
-    return render_template(
-        'indexn.html',
-        active_page='home',
-        stats=get_home_stats(),
-        feature_cards=get_site_data('home_feature_cards'),
-        events=get_site_data('home_events'),
-    )
+    # Fetch some stats for the home page from the DB if available
+    conn = get_db_connection()
+    try:
+        stats = [
+            {'label': 'Students', 'value': '500+'},
+            {'label': 'Faculty', 'value': '50+'},
+            {'label': 'Placement', 'value': '100%'},
+            {'label': 'Labs', 'value': '15+'}
+        ]
+        # In a real app, you might fetch these from a table
+        return render_template('indexn.html', active_page='home', stats=stats)
+    except Exception as e:
+        app.logger.error(f"Home page error: {e}")
+        return render_template('indexn.html', active_page='home', stats=None)
+    finally:
+        conn.close()
 
 
 @app.route('/timetable')
@@ -750,7 +789,7 @@ def timetable():
     
     # Fetch all batches for dropdown
     batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta").fetchall()
-    all_batches = [b['batch'] for b in batches_raw] if batches_raw else ['S2 CSE A']
+    all_batches = [b['batch'] for b in batches_raw if 'lab' not in b['batch'].lower()] if batches_raw else ['S2 CSE A']
     
     # Determine the selected batch
     selected_batch = request.args.get('batch')
@@ -914,8 +953,8 @@ def faculty():
 @app.route('/about-cse')
 def about_cse():
     conn = get_db_connection()
-    mous_raw = conn.execute("SELECT * FROM mous ORDER BY id ASC").fetchall()
-    programs_raw = conn.execute("SELECT * FROM programs ORDER BY id ASC").fetchall()
+    mous_raw = conn.execute("SELECT * FROM mous ORDER BY sl_no ASC").fetchall()
+    programs_raw = conn.execute("SELECT * FROM programs ORDER BY sl_no ASC").fetchall()
     conn.close()
     mous = [dict(m) for m in mous_raw]
 
@@ -959,9 +998,10 @@ def about_aisat():
 
 @app.route('/academics')
 def academics():
+    scheme = request.args.get('scheme', '2019')
     conn = get_db_connection()
     programs_raw = conn.execute('SELECT * FROM programs').fetchall()
-    semesters_raw = conn.execute('SELECT * FROM semesters').fetchall()
+    semesters_raw = conn.execute('SELECT * FROM semesters WHERE scheme = %s ORDER BY sl_no', (scheme,)).fetchall()
     conn.close()
 
     programs = []
@@ -983,6 +1023,7 @@ def academics():
         active_page='academics',
         programs=programs,
         semesters=semesters,
+        active_scheme=scheme
     )
 
 @app.route('/notice-archive')
@@ -1002,14 +1043,7 @@ def search():
     return render_template('search_results_page.html', active_page='home')
 
 
-@app.route('/dashboard/syllabus')
-def student_syllabus():
-    if not session.get('user_id'):
-        flash("Please log in.", "warning")
-        return redirect(url_for('login'))
-    # Optional: fetch a student's actual current semester to pass into template
-    # Here we default to setting session variable or just returning template
-    return render_template('student_syllabus.html', active_page='syllabus')
+
 
 
 @app.route('/dashboard/timetable')
@@ -1017,7 +1051,13 @@ def student_timetable():
     if not session.get('user_id'):
         flash("Please log in.", "warning")
         return redirect(url_for('login'))
-    return render_template('student_timetable.html', active_page='timetable')
+        
+    conn = get_db_connection()
+    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta ORDER BY batch").fetchall()
+    all_batches = [b['batch'] for b in batches_raw if 'lab' not in b['batch'].lower()] if batches_raw else []
+    conn.close()
+    
+    return render_template('student_timetable.html', active_page='timetable', all_batches=all_batches)
 
 
 # ── Period-to-time mapping (Mon–Fri, 8 display slots) ──────────────────────
@@ -1191,12 +1231,12 @@ def api_library_my_books():
     student_id = session.get('user_id')
     conn = get_db_connection()
     query = """
-    SELECT i.id, b.title, b.author, i.issue_date as issued_date, 
+    SELECT i.sl_no, b.title, b.author, i.issue_date as issued_date, 
            i.issue_date + INTERVAL '14 days' as due_date, 
            i.return_date as returned_date, i.status, i.book_id,
            DATE_PART('day', (i.issue_date + INTERVAL '14 days') - NOW()) as days_remaining 
     FROM issues i 
-    JOIN books b ON i.book_id = b.id 
+    JOIN books b ON i.book_id = b.sl_no 
     WHERE i.user_id = %s 
     ORDER BY 
       CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END, 
@@ -1239,7 +1279,7 @@ def api_library_search():
     cat = request.args.get('category', 'all')
     
     conn = get_db_connection()
-    query = "SELECT id, title, author, category, availability, cover_icon, cover_gradient FROM books WHERE 1=1"
+    query = "SELECT sl_no, title, author, category, availability, cover_icon, cover_gradient FROM books WHERE 1=1"
     params = []
     if q:
         query += " AND (LOWER(title) LIKE %s OR LOWER(author) LIKE %s)"
@@ -1265,13 +1305,13 @@ def api_library_reservations():
     # Find position using ROW_NUMBER
     query = """
     WITH Queue AS (
-      SELECT id, requested_by as student_id, book_id, request_date as created_at,
+      SELECT sl_no, requested_by as student_id, book_id, request_date as created_at,
              ROW_NUMBER() OVER (PARTITION BY book_id ORDER BY request_date ASC) as position
       FROM requests WHERE status = 'pending'
     )
     SELECT q.position as queue_position, b.title 
     FROM Queue q 
-    JOIN books b ON q.book_id = b.id 
+    JOIN books b ON q.book_id = b.sl_no 
     WHERE q.student_id = %s
     """
     rows = conn.execute(query, (student_id,)).fetchall()
@@ -1290,7 +1330,7 @@ def api_library_renew():
     conn = get_db_connection()
     # In issues table, we can fake renew by advancing issue_date
     try:
-        conn.execute("UPDATE issues SET issue_date = issue_date + INTERVAL '14 days' WHERE id = %s", (loan_id,))
+        conn.execute("UPDATE issues SET issue_date = issue_date + INTERVAL '14 days' WHERE sl_no = %s", (loan_id,))
         conn.commit()
     except Exception as e:
         print(e)
@@ -1379,7 +1419,7 @@ def api_academics_resources():
     
     # 1. Fetch semester-specific resources
     query_sem = """
-    SELECT id, title, description, file_url, file_size, category 
+    SELECT sl_no, title, description, file_url, file_size, category 
     FROM resources 
     WHERE semester = %s AND category IN ('syllabus','lab_manual','question_bank','prev_papers') 
     ORDER BY category, title
@@ -1388,7 +1428,7 @@ def api_academics_resources():
     
     # 2. Fetch additional general resources
     query_gen = """
-    SELECT id, title, description, file_url, file_size, category 
+    SELECT sl_no, title, description, file_url, file_size, category 
     FROM resources 
     WHERE category = 'department_general'
     ORDER BY title
@@ -1411,12 +1451,48 @@ def api_log_download(id):
             # Log the download into resource_downloads table
             conn.execute(
                 "INSERT INTO resource_downloads (resource_id, user_id) VALUES (%s, %s)",
-                (id, session.get('id', 0))
+                (id, session.get('user_id'))
             )
             conn.commit()
             conn.close()
         except Exception as e:
             print("Error logging download:", e)
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/log-external-download', methods=['POST'])
+def log_external_download():
+    if not session.get('user_id'):
+        return jsonify({'status': 'unauthorized'}), 401
+        
+    data = request.get_json()
+    title = data.get('title')
+    file_url = data.get('url')
+    
+    if title and file_url:
+        try:
+            conn = get_db_connection()
+            # Check if this external resource is already in the resources table
+            res = conn.execute("SELECT id FROM resources WHERE file_url = %s", (file_url,)).fetchone()
+            if res:
+                res_id = res['id']
+            else:
+                # Insert a placeholder resource so it can be logged (semester 0, empty description)
+                cur = conn.execute(
+                    "INSERT INTO resources (title, file_url, category, file_size, semester, description) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                    (title, file_url, 'academics', 'External', 0, '')
+                )
+                res_id = cur.fetchone()['id']
+                
+            # Log the download
+            conn.execute(
+                "INSERT INTO resource_downloads (resource_id, user_id) VALUES (%s, %s)",
+                (res_id, session['user_id'])
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print("Error logging external download:", e)
+            
     return jsonify({'status': 'ok'})
 
 
@@ -1533,14 +1609,14 @@ def verify():
         if otp and len(otp) == 6:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("UPDATE users SET is_verified = TRUE WHERE email = %s RETURNING id, name, role", (email,))
+            cursor.execute("UPDATE users SET is_verified = TRUE WHERE email = %s RETURNING user_id, name, role", (email,))
             user = cursor.fetchone()
             conn.commit()
             conn.close()
             
             if user:
                 # Log them in automatically
-                session['user_id'] = user['id']
+                session['user_id'] = user['user_id']
                 session['name'] = user['name']
                 session['role'] = user['role']
                 session['email'] = email
@@ -1568,12 +1644,12 @@ def forgot_password():
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE email = %s AND role = %s", (email, role))
+        cursor.execute("SELECT user_id FROM users WHERE email = %s AND role = %s", (email, role))
         user = cursor.fetchone()
         
         if user:
             token = secrets.token_urlsafe(32)
-            cursor.execute("UPDATE users SET reset_token = %s WHERE id = %s", (token, user['id']))
+            cursor.execute("UPDATE users SET reset_token = %s WHERE user_id = %s", (token, user['user_id']))
             conn.commit()
             # Mock email send
             flash(f"Reset link sent to {email}. (Demo: Use token {token[:6]} in next screen)", "success")
@@ -1597,12 +1673,12 @@ def reset_password():
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE reset_token = %s", (post_token,))
+        cursor.execute("SELECT user_id FROM users WHERE reset_token = %s", (post_token,))
         user = cursor.fetchone()
         
         if user:
             hashed = generate_password_hash(new_password)
-            cursor.execute("UPDATE users SET password = %s, reset_token = NULL WHERE id = %s", (hashed, user['id']))
+            cursor.execute("UPDATE users SET password = %s, reset_token = NULL WHERE user_id = %s", (hashed, user['user_id']))
             conn.commit()
             conn.close()
             session.pop('reset_email', None)
@@ -1628,7 +1704,7 @@ def dashboard():
     # Fetch student's roll number and name from database
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id, name FROM users WHERE id = %s", (user_id,))
+    cursor.execute("SELECT user_id, name FROM users WHERE user_id = %s", (user_id,))
     user_data = cursor.fetchone()
     
     roll_no = user_data[0] if user_data else "AIS-CS-000"
@@ -1659,7 +1735,7 @@ def dashboard():
         schedule.append({"time": f"P{row[1]}", "subject": row[0], "status": status})
 
     # 3. Recent Announcements (Latest 3 notices)
-    cursor.execute("SELECT text FROM news_ticker ORDER BY id DESC LIMIT 3")
+    cursor.execute("SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 3")
     announcements = [r[0] for r in cursor.fetchall()]
 
     conn.close()
@@ -1695,7 +1771,7 @@ def my_students():
 
     # Fetch all students from users table
     cursor.execute(
-        "SELECT id, name, email, user_id FROM users WHERE role = 'student' ORDER BY name"
+        "SELECT user_id, name, email FROM users WHERE role = 'student' ORDER BY name"
     )
     raw_students = cursor.fetchall()
 
@@ -1710,7 +1786,8 @@ def my_students():
 
     # Build student objects
     students = []
-    for i, (sid, name, email, roll_no) in enumerate(raw_students):
+    for i, (sid, name, email) in enumerate(raw_students):
+        roll_no = None
         # Initials
         parts = name.strip().split()
         initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
@@ -1794,9 +1871,15 @@ def enter_marks():
 
     raw = []
     try:
-        cursor.execute(
-            "SELECT id, name, email, user_id FROM users WHERE role='student' ORDER BY name"
-        )
+        if batch_q:
+            cursor.execute(
+                "SELECT user_id, name, email FROM users WHERE role='student' AND batch = %s ORDER BY name",
+                (batch_q,)
+            )
+        else:
+            cursor.execute(
+                "SELECT user_id, name, email FROM users WHERE role='student' ORDER BY name"
+            )
         raw = cursor.fetchall()
     except Exception:
         pass
@@ -1817,22 +1900,25 @@ def enter_marks():
     conn.close()
 
     students = []
-    for i, (sid, name, email, roll_no) in enumerate(raw):
+    for i, (roll_no, name, email) in enumerate(raw):
         parts    = name.strip().split()
         initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) > 1 else name[:2].upper()
         students.append({
-            "id":             sid,
+            "id":             roll_no, # Using roll_no as the 'id' for the template
             "name":           name,
             "email":          email,
-            "roll_no":        roll_no or f"AIS-CS-{100+i:03d}",
+            "roll_no":        roll_no,
             "initials":       initials,
-            "existing_marks": existing.get(str(sid)),
+            "existing_marks": existing.get(str(roll_no)),
         })
 
     return render_template("enter_marks.html",
                            subjects=subjects,
                            batches=batches,
-                           students=students)
+                           students=students,
+                           selected_subject=subject,
+                           selected_batch=batch_q,
+                           selected_exam=exam_type)
 
 
 @app.route('/faculty/save-marks', methods=['POST'])
@@ -1952,7 +2038,7 @@ def api_search_hub():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, text, link, created_at FROM news_ticker ORDER BY id DESC LIMIT 20")
+        cursor.execute("SELECT sl_no, text, link, created_at FROM news_ticker ORDER BY sl_no DESC LIMIT 20")
         for r in cursor.fetchall():
             text = r[1]
             if query and query not in text.lower():
@@ -2114,13 +2200,67 @@ def faculty_upload_material():
         flash("Access denied. Faculty only.", "danger")
         return redirect(url_for("home"))
         
+    conn = get_db_connection()
+    semesters_raw = conn.execute("SELECT sl_no, title, subjects, scheme FROM semesters ORDER BY scheme, sl_no").fetchall()
+    conn.close()
+    
+    semesters = []
+    for row in semesters_raw:
+        semesters.append({
+            "sl_no": row["sl_no"],
+            "title": row["title"],
+            "scheme": row["scheme"],
+            "subjects": json.loads(row["subjects"]) if isinstance(row["subjects"], str) else row["subjects"]
+        })
+        
     initials = "".join([p[0].upper() for p in session.get("name", "F M").split()[:2]])
-    return render_template("faculty_upload_material.html", initials=initials)
+    return render_template("faculty_upload_material.html", initials=initials, semesters=semesters)
 
 
-@app.route('/api/faculty/study-material/upload', methods=['POST'])
-def api_faculty_upload_material():
-    """API endpoint to receive study material files from faculty"""
+@app.route('/faculty/submit-material', methods=['POST'])
+def submit_faculty_material():
+    """Handle material/note link submission from faculty"""
+    if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
+        return jsonify({"ok": False, "error": "Unauthorized"}), 403
+        
+    semester_sl_no = request.form.get("semester_sl_no")
+    subject_code = request.form.get("subject_code")
+    module_num = request.form.get("module_num")
+    note_link = request.form.get("note_link")
+    
+    if not all([semester_sl_no, subject_code, module_num, note_link]):
+        return jsonify({"ok": False, "error": "Missing required fields"})
+        
+    conn = get_db_connection()
+    try:
+        # Fetch current subjects for this semester
+        row = conn.execute("SELECT subjects FROM semesters WHERE sl_no = %s", (semester_sl_no,)).fetchone()
+        if not row:
+            return jsonify({"ok": False, "error": "Semester not found"})
+            
+        subjects = json.loads(row["subjects"]) if isinstance(row["subjects"], str) else row["subjects"]
+        
+        # Update the specific subject if found
+        updated = False
+        for subj in subjects:
+            if subj["code"] == subject_code:
+                if "notes" not in subj:
+                    subj["notes"] = {}
+                subj["notes"][f"Module {module_num}"] = note_link
+                updated = True
+                break
+        
+        if updated:
+            conn.execute("UPDATE semesters SET subjects = %s WHERE sl_no = %s", (json.dumps(subjects), semester_sl_no))
+            conn.commit()
+            return jsonify({"ok": True, "message": "Note link updated successfully!"})
+        else:
+            return jsonify({"ok": False, "error": "Subject code not found in this semester"})
+            
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+    finally:
+        conn.close()
     if not session.get("user_id") or session.get("role") not in ("faculty", "admin"):
         return jsonify({"ok": False, "error": "Unauthorized"}), 403
         
@@ -2141,14 +2281,15 @@ def login():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        cursor.execute("SELECT user_id, name, email, password, role FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
 
-        if user and check_password_hash(user[4], password):
-            session["user_id"] = user[0]
-            session["name"]    = user[1]
-            session["role"]    = user[5]   # ← STEP 1: save role in session
+        if user and check_password_hash(user['password'], password):
+            session["user_id"] = user['user_id']   # TEXT user_id, not integer sl_no
+            session["name"]    = user['name']
+            session["email"]   = user['email']
+            session["role"]    = user['role']   # ← STEP 1: save role in session
             flash("Login successful!", "success")
 
             # ← STEP 2: redirect to public page
@@ -2195,7 +2336,7 @@ def faculty_dashboard():
     # Fetch faculty profile
     try:
         cursor.execute(
-            "SELECT id, name, designation, dept FROM faculty WHERE email = %s LIMIT 1",
+            "SELECT sl_no, name, designation, dept FROM faculty WHERE email = %s LIMIT 1",
             (faculty_email,)
         )
         row = cursor.fetchone()
@@ -2225,7 +2366,7 @@ def faculty_dashboard():
 
     # Recent announcements
     try:
-        cursor.execute("SELECT text FROM news_ticker ORDER BY id DESC LIMIT 3")
+        cursor.execute("SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 3")
         notices = [r[0] for r in cursor.fetchall()]
     except Exception:
         notices = []
@@ -2332,7 +2473,7 @@ def faculty_mou_edit(mid):
     status = request.form.get('status', 'Active').strip()
     conn = get_db_connection()
     conn.execute(
-        "UPDATE mous SET organization=%s, date_of_signing=%s, status=%s WHERE id=%s",
+        "UPDATE mous SET organization=%s, date_of_signing=%s, status=%s WHERE sl_no=%s",
         (org, dos, status, mid)
     )
     conn.commit()
@@ -2347,7 +2488,7 @@ def faculty_mou_delete(mid):
         flash("Access denied! Faculty only.", "danger")
         return redirect(url_for('login'))
     conn = get_db_connection()
-    conn.execute("DELETE FROM mous WHERE id=%s", (mid,))
+    conn.execute("DELETE FROM mous WHERE sl_no=%s", (mid,))
     conn.commit()
     conn.close()
     flash("MOU deleted.", "success")
@@ -2361,15 +2502,19 @@ def student_dashboard():
         flash("Access denied! Students only.", "danger")
         return redirect(url_for("login"))
 
-    # Fetch all batches for the timetable widget
     conn = get_db_connection()
-    batches_raw = conn.execute("SELECT DISTINCT batch FROM timetable_meta ORDER BY batch").fetchall()
-    all_batches = [b['batch'] for b in batches_raw] if batches_raw else []
+    user_id = session.get('user_id')
+    downloaded_docs = conn.execute('''
+        SELECT r.title, r.file_url, rd.downloaded_at 
+        FROM resource_downloads rd
+        JOIN resources r ON r.id = rd.resource_id
+        WHERE rd.user_id = %s
+        ORDER BY rd.downloaded_at DESC
+        LIMIT 5
+    ''', (user_id,)).fetchall()
     conn.close()
 
-    return render_template("student_dashboard.html",
-                           active_page='student_dashboard',
-                           all_batches=all_batches)
+    return render_template("student_dashboard.html", active_page='student_dashboard', downloaded_docs=downloaded_docs)
 
 # Attendance page removed
 
@@ -2380,23 +2525,32 @@ def student_results():
         return redirect(url_for("login"))
         
     conn = get_db_connection()
-    user_id = session.get('user_id')
+    user_id_str = session.get('user_id')
+    cursor = conn.cursor()
+    
+    # Verify the user and get their integer sl_no
+    cursor.execute("SELECT sl_no FROM users WHERE user_id = %s", (user_id_str,))
+    user = cursor.fetchone()
+    if not user:
+        conn.close()
+        return redirect(url_for('login'))
+        
+    user_sl_no = user['sl_no']
     
     # Fetch real internal marks
-    cursor = conn.cursor()
     cursor.execute("""
         SELECT subject_code, subject_name, internal_1, internal_2, assignment, total 
         FROM internal_marks 
         WHERE user_id = %s
-    """, (user_id,))
+    """, (user_sl_no,))
     rows = cursor.fetchall()
     
     # Fetch performance summary
-    cursor.execute("SELECT cgpa, cgpa_improvement, prev_sem, credits, rank_percentile FROM student_performance WHERE user_id = %s", (user_id,))
+    cursor.execute("SELECT cgpa, cgpa_improvement, prev_sem, credits, rank_percentile FROM student_performance WHERE user_id = %s", (user_sl_no,))
     perf = cursor.fetchone()
     
     # Fetch semester GPAs
-    cursor.execute("SELECT semester, sgpa, credits FROM student_semester_gpas WHERE user_id = %s ORDER BY semester", (user_id,))
+    cursor.execute("SELECT semester, sgpa FROM student_semester_gpas WHERE user_id = %s ORDER BY semester", (user_sl_no,))
     gpas = cursor.fetchall()
     
     conn.close()
@@ -2409,7 +2563,7 @@ def student_results():
         'earned_credits': perf['credits'] if perf else 0,
         'total_credits': 160,
         'rank_percentile': perf['rank_percentile'] if perf else 0,
-        'semester_results': [dict(g) for g in gpas],
+        'semester_results': [dict(g, credits=20) for g in gpas],
         'current_semester_marks': [dict(r) for r in rows],
         'grade_distribution': {'A+': 12, 'A': 15, 'B+': 8, 'B': 4, 'C': 1}
     }
@@ -2590,7 +2744,7 @@ def admin_timetable_subj_delete():
     data = request.json
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM timetable_subjects WHERE id=%s", (data['id'],))
+        conn.execute("DELETE FROM timetable_subjects WHERE sl_no=%s", (data['id'],))
         conn.commit()
         return jsonify({"success": True})
     finally:
@@ -2659,32 +2813,38 @@ def admin_panel():
     from models.issue import Issue
     from models.request import Request
     from models.notification import Notification
-    
-    all_issues = Issue.get_all_issues()
-    all_reqs = Request.get_all_requests()
-    admin_notifs = Notification.get_admin_notifications()
 
     transactions = []
-    for issue in all_issues:
-        transactions.append({
-            'type': issue['status'],
-            'book_title': issue['book_title'],
-            'book_id': issue['book_id'],
-            'user_name': issue['user_name'],
-            'date': issue['return_date'] if issue['status'] == 'returned' and issue['return_date'] else issue['issue_date'],
-            'badge_class': 'success' if issue['status'] == 'returned' else 'warning'
-        })
-    for req in all_reqs:
-        transactions.append({
-            'type': 'requested' if req['status'] == 'pending' else 'processed request',
-            'book_title': req['book_title'],
-            'book_id': req['book_id'],
-            'user_name': req['user_name'],
-            'date': req['request_date'],
-            'badge_class': 'info' if req['status'] == 'pending' else 'secondary'
-        })
-    
-    transactions.sort(key=lambda x: str(x['date'] or ''), reverse=True)
+    try:
+        all_issues = Issue.get_all_issues()
+        all_reqs = Request.get_all_requests()
+        for issue in all_issues:
+            transactions.append({
+                'type': issue['status'],
+                'book_title': issue['book_title'],
+                'book_id': issue['book_id'],
+                'user_name': issue['user_name'],
+                'date': issue['return_date'] if issue['status'] == 'returned' and issue['return_date'] else issue['issue_date'],
+                'badge_class': 'success' if issue['status'] == 'returned' else 'warning'
+            })
+        for req in all_reqs:
+            transactions.append({
+                'type': 'requested' if req['status'] == 'pending' else 'processed request',
+                'book_title': req['book_title'],
+                'book_id': req['book_id'],
+                'user_name': req['user_name'],
+                'date': req['request_date'],
+                'badge_class': 'info' if req['status'] == 'pending' else 'secondary'
+            })
+        transactions.sort(key=lambda x: str(x['date'] or ''), reverse=True)
+    except Exception as e:
+        print(f"[admin_panel] Error building circulation history: {e}")
+
+    try:
+        admin_notifs = Notification.get_admin_notifications()
+    except Exception as e:
+        print(f"[admin_panel] Error fetching admin notifications: {e}")
+        admin_notifs = []
 
     return render_template(
         "admin_panel.html",
@@ -2703,19 +2863,30 @@ def admin_panel():
         all_batches=all_batches,
     )
 
-@app.route('/admin/users/edit/<int:uid>', methods=["POST"])
+@app.route('/admin/users/edit/<string:uid>', methods=['POST'])
 def admin_users_edit(uid):
     if not admin_required():
-        return redirect(url_for("login"))
-    f = request.form
+        return redirect(url_for('login'))
+        
+    name = request.form.get('name')
+    email = request.form.get('email')
+    user_id_new = request.form.get('user_id')  # This is the NEW user_id value
+    role = request.form.get('role')
+    
     conn = get_db_connection()
-    conn.execute(
-        "UPDATE users SET name=%s, email=%s, role=%s WHERE id=%s",
-        (f['name'], f['email'], f['role'], uid)
-    )
-    conn.commit()
-    conn.close()
-    flash("User updated!", "success")
+    try:
+        conn.execute(
+            "UPDATE users SET name = %s, email = %s, user_id = %s, role = %s WHERE user_id = %s",
+            (name, email, user_id_new, role, uid)
+        )
+        conn.commit()
+        flash("User updated!", "success")
+    except psycopg2.errors.UniqueViolation:
+        conn.rollback()
+        flash("Error: User ID or Email already exists. Please choose another.", "danger")
+    finally:
+        conn.close()
+       
     return redirect(url_for("admin_panel") + "#users")
 
 @app.route('/admin/users/add', methods=["POST"])
@@ -2747,7 +2918,7 @@ def admin_users_add():
     return redirect(url_for("admin_panel") + "#users")
 
 
-@app.route('/admin/users/delete/<int:uid>', methods=["POST"])
+@app.route('/admin/users/delete/<string:uid>', methods=['POST'])
 def admin_users_delete(uid):
     if not admin_required():
         return redirect(url_for("login"))
@@ -2758,10 +2929,22 @@ def admin_users_delete(uid):
         return redirect(url_for("admin_panel") + "#users")
         
     conn = get_db_connection()
-    conn.execute("DELETE FROM users WHERE id=%s", (uid,))
-    conn.commit()
-    conn.close()
-    flash("User deleted!", "success")
+    try:
+        # Delete dependent records first to avoid ForeignKeyViolation
+        conn.execute("DELETE FROM results WHERE student_id = %s", (uid,))
+        conn.execute("DELETE FROM issues WHERE user_id = %s", (uid,))
+        conn.execute("DELETE FROM requests WHERE requested_by = %s", (uid,))
+        conn.execute("DELETE FROM notifications WHERE user_id = %s", (uid,))
+        
+        # Finally delete the user
+        conn.execute("DELETE FROM users WHERE user_id=%s", (uid,))
+        conn.commit()
+        flash("User and all related records deleted!", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting user: {str(e)}", "danger")
+    finally:
+        conn.close()
     return redirect(url_for("admin_panel") + "#users")
 
 # ─────────────────────────────────────────────────
@@ -2793,7 +2976,7 @@ def admin_faculty_edit(fid):
     conn = get_db_connection()
     try:
         conn.execute(
-            "UPDATE faculty SET name=%s, designation=%s, designation_key=%s, qualification=%s, joined=%s, research=%s, email=%s, photo=%s WHERE id=%s",
+            "UPDATE faculty SET name=%s, designation=%s, designation_key=%s, qualification=%s, joined=%s, research=%s, email=%s, photo=%s WHERE sl_no=%s",
             (f['name'], f['designation'], f['designation_key'], f['qualification'], f['joined'], f['research'], f['email'], f['photo'], fid)
         )
         conn.commit()
@@ -2808,7 +2991,7 @@ def admin_faculty_delete(fid):
         return redirect(url_for("login"))
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM faculty WHERE id=%s", (fid,))
+        conn.execute("DELETE FROM faculty WHERE sl_no=%s", (fid,))
         conn.commit()
     finally:
         conn.close()
@@ -2822,7 +3005,7 @@ def faculty_detail(fid):
 @app.route('/api/faculty/<int:fid>')
 def api_faculty_detail(fid):
     conn = get_db_connection()
-    row = conn.execute("SELECT * FROM faculty WHERE id = %s", (fid,)).fetchone()
+    row = conn.execute("SELECT * FROM faculty WHERE sl_no = %s", (fid,)).fetchone()
     conn.close()
 
     if not row:
@@ -2898,7 +3081,7 @@ def admin_books_edit(bid):
     conn = get_db_connection()
     try:
         conn.execute(
-            "UPDATE books SET title=%s, author=%s, category=%s, status=%s WHERE id=%s",
+            "UPDATE books SET title=%s, author=%s, category=%s, status=%s WHERE sl_no=%s",
             (f['title'], f['author'], f['category'], f['status'], bid)
         )
         conn.commit()
@@ -2913,7 +3096,7 @@ def admin_books_delete(bid):
         return redirect(url_for("login"))
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM books WHERE id=%s", (bid,))
+        conn.execute("DELETE FROM books WHERE sl_no=%s", (bid,))
         conn.commit()
     finally:
         conn.close()
@@ -2954,7 +3137,7 @@ def admin_programs_edit(pid):
     conn = get_db_connection()
     try:
         conn.execute(
-            "UPDATE programs SET name=%s, duration=%s, intake=%s, eligibility=%s, extra_label=%s, extra_value=%s, highlights=%s WHERE id=%s",
+            "UPDATE programs SET name=%s, duration=%s, intake=%s, eligibility=%s, extra_label=%s, extra_value=%s, highlights=%s WHERE sl_no=%s",
             (f['name'], f['duration'], f['intake'], f['eligibility'],
              f.get('extra_label', ''), f.get('extra_value', ''),
              json.dumps(highlights), pid)
@@ -2971,7 +3154,7 @@ def admin_programs_delete(pid):
         return redirect(url_for("login"))
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM programs WHERE id=%s", (pid,))
+        conn.execute("DELETE FROM programs WHERE sl_no=%s", (pid,))
         conn.commit()
     finally:
         conn.close()

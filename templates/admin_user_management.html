@@ -25,28 +25,59 @@
     .role-student { background: #E3F2FD; color: #1976D2; }
     .role-faculty { background: #F3E5F5; color: #7B1FA2; }
     .role-admin { background: #FFF3E0; color: #E65100; }
+
+    @media (max-width: 768px) {
+        .user-hero { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+        .user-hero h1 { font-size: 1.5rem; }
+        .filter-bar { flex-direction: column; align-items: stretch; }
+        .search-box { width: 100%; }
+        .user-table-wrapper { overflow-x: auto; border: 1px solid var(--border-accent); border-radius: 12px; }
+        .user-table { border: none; }
+        .user-table th, .user-table td { padding: 12px 16px; white-space: nowrap; }
+    }
 </style>
 <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dash-wrapper fade-up">
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- SIDEBAR -->
   <aside class="dash-sidebar">
-    <div class="dash-sidebar-logo"><i data-lucide="users" style="color:white;"></i></div>
+    
     <nav class="dash-sidebar-items">
-      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'"><i data-lucide="layout-dashboard"></i></div>
-      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'"><i data-lucide="bar-chart-2"></i></div>
-      <div class="dash-sidebar-item active" title="Users"><i data-lucide="users"></i></div>
-      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'"><i data-lucide="book-open"></i></div>
-      <div class="dash-sidebar-item" title="Fees" onclick="location.href='/admin-dashboard/fees'"><i data-lucide="credit-card"></i></div>
+      <div class="dash-sidebar-item" title="Dashboard" onclick="location.href='/admin-dashboard'">
+        <i data-lucide="layout-dashboard"></i>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="dash-sidebar-item" title="Analytics" onclick="location.href='/admin-dashboard/analytics'">
+        <i data-lucide="bar-chart-2"></i>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="dash-sidebar-item active" title="Users">
+        <i data-lucide="users"></i>
+        <span class="nav-label">Users</span>
+      </div>
+      <div class="dash-sidebar-item" title="Library" onclick="location.href='/admin-dashboard/library'">
+        <i data-lucide="book-open"></i>
+        <span class="nav-label">Library</span>
+      </div>
+      <div class="dash-sidebar-item" title="Fees" onclick="location.href='/admin-dashboard/fees'">
+        <i data-lucide="credit-card"></i>
+        <span class="nav-label">Fees</span>
+      </div>
     </nav>
   </aside>
 
   <!-- MAIN -->
   <main class="dash-main">
     <header class="dash-topbar">
-      <div class="dash-breadcrumb">System &middot; <b>User Management</b></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="dash-breadcrumb">System &middot; <b>User Management</b></div>
+      </div>
       <div style="display:flex; gap:12px;">
         <button class="dash-btn-secondary" style="font-size:0.75rem; padding:8px 16px;">Bulk Import</button>
         <button class="dash-btn-primary" style="font-size:0.75rem ; padding:8px 16px;">+ Add User</button>
@@ -74,36 +105,34 @@
         </div>
       </div>
 
-      <table class="user-table">
-        <thead>
-          <tr>
-            <th>Full Name</th>
-            <th>Role</th>
-            <th>ID / Roll No.</th>
-            <th>Email Address</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><b>Aravind S.</b></td>
-            <td><span class="role-badge role-student">Student</span></td>
-            <td>AIS22CS045</td>
-            <td>aravind.s@aisat.ac.in</td>
-            <td><span style="color:#2E7D32; font-weight:700; font-size:0.75rem;">Active</span></td>
-            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Options</button></td>
-          </tr>
-          <tr>
-            <td><b>Dr. Smitha Paul</b></td>
-            <td><span class="role-badge role-faculty">Faculty</span></td>
-            <td>FAC-CS-012</td>
-            <td>smitha.p@aisat.ac.in</td>
-            <td><span style="color:#2E7D32; font-weight:700; font-size:0.75rem;">Active</span></td>
-            <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Options</button></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="user-table-wrapper">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Sl. No</th>
+              <th>Full Name</th>
+              <th>Role</th>
+              <th>ID / Roll No.</th>
+              <th>Email Address</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td><b>{{ user.name }}</b></td>
+              <td><span class="role-badge role-{{ user.role.lower() }}">{{ user.role }}</span></td>
+              <td>{{ user.user_id }}</td>
+              <td>{{ user.email }}</td>
+              <td><span style="color:#2E7D32; font-weight:700; font-size:0.75rem;">Active</span></td>
+              <td><button class="dash-btn-secondary" style="font-size:0.65rem; padding:4px 10px;">Options</button></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 </div>

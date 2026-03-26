@@ -18,8 +18,7 @@ def admin_library():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
 
-    # Update fines before fetching data
-    Issue.update_fines()
+    # Fines are calculated dynamically via the issues_with_fines DB view — no manual update needed.
 
     # Get all issues and requests to display in admin dashboard (Active)
     issues = Issue.get_all_active_issues()
@@ -117,8 +116,8 @@ def approve_request(request_id):
             return redirect(url_for("admin_bp.admin_library"))
         
         # Check if student already has a book (double check)
-        if Issue.get_user_active_issued_count(user_id) >= 1:
-            flash("Student already has an issued book. Cannot approve second issue.", "danger")
+        if Issue.get_user_active_issued_count(user_id) >= 3:
+            flash("Student already has the maximum of 3 issued books. Cannot approve second issue.", "danger")
             return redirect(url_for("admin_bp.admin_library"))
 
         # Process Issue
@@ -207,12 +206,13 @@ def legacy_admin_analytics():
     return render_template("admin_analytics.html", active_page="admin_dashboard")
 
 # ─────────────────────────────────────────────────────────────────
-#@admin_bp.route("/admin-dashboard")
+@admin_bp.route("/admin-dashboard")
 def admin_command_center():
     if not admin_required():
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("login"))
-    return render_template("admin_dashboard.html", active_page="admin_dashboard")
+    # Redirect to the main app route that handles the full admin panel data
+    return redirect(url_for("admin_panel"))
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -250,7 +250,7 @@ def api_admin_recent_users():
                    COALESCE(status, 'Active') as status,
                    created_at
             FROM users
-            ORDER BY id DESC LIMIT 8
+            ORDER BY sl_no DESC LIMIT 8
         """).fetchall()
         res = []
         for u in users:
@@ -315,8 +315,8 @@ def api_admin_pending_approvals():
         # Add mock if empty
         if not res:
             res = [
-                {"id": 1, "type": "Leave Request", "requestor_name": "John Doe", "details": "Sick Leave", "created_at": "Today"},
-                {"id": 2, "type": "Event Approval", "requestor_name": "CS Dept", "details": "Tech Fest Budget", "created_at": "Yesterday"}
+                {"sl_no": 1, "type": "Leave Request", "requestor_name": "John Doe", "details": "Sick Leave", "created_at": "Today"},
+                {"sl_no": 2, "type": "Event Approval", "requestor_name": "CS Dept", "details": "Tech Fest Budget", "created_at": "Yesterday"}
             ]
         return jsonify(res)
     finally:
@@ -342,12 +342,12 @@ def api_notices():
     conn = get_db_connection()
     limit = int(request.args.get('limit', 4))
     try:
-        notices = conn.execute("SELECT * FROM notifications WHERE category='Academic' ORDER BY id DESC LIMIT %s", (limit,)).fetchall()
+        notices = conn.execute("SELECT * FROM notifications WHERE category='Academic' ORDER BY sl_no DESC LIMIT %s", (limit,)).fetchall()
         res = []
         for n in notices:
             d = dict(n)
             d['created_at'] = d['created_at'].isoformat() if d['created_at'] else ''
-            d['views'] = d['id'] * 12 + 45
+            d['views'] = d['sl_no'] * 12 + 45
             res.append(d)
         return jsonify(res)
     except Exception:
@@ -369,9 +369,9 @@ def api_admin_post_notice():
     # Post to all students
     conn = get_db_connection()
     try:
-        student_ids = conn.execute("SELECT id FROM users WHERE role='student'").fetchall()
+        student_ids = conn.execute("SELECT user_id FROM users WHERE role='student'").fetchall()
         for s in student_ids:
-            Notification.notify_user(s['id'], body, title=title, category=category)
+            Notification.notify_user(s['user_id'], body, title=title, category=category)
         return jsonify({"success": True, "notified": len(student_ids)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -388,13 +388,13 @@ def api_admin_library_requests():
     except Exception as e:
         return jsonify([])
 
-@admin_bp.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
+@admin_bp.route("/api/admin/users/<string:user_id>", methods=["DELETE"])
 def api_admin_delete_user(user_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        conn.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -439,13 +439,13 @@ def api_admin_library_stats():
     metrics['fines_pending'] = conn.execute("SELECT SUM(amount) FROM library_fines WHERE paid = false").fetchone()[0] or 0
     
     top_borrowed = conn.execute("""
-        SELECT b.id, b.title, COUNT(i.id) as borrow_count
-        FROM books b LEFT JOIN issues i ON b.id = i.book_id
-        GROUP BY b.id, b.title ORDER BY borrow_count DESC LIMIT 5
+        SELECT b.sl_no, b.title, COUNT(i.sl_no) as borrow_count
+        FROM books b LEFT JOIN issues i ON b.sl_no = i.book_id
+        GROUP BY b.sl_no, b.title ORDER BY borrow_count DESC LIMIT 5
     """).fetchall()
     
     low_stock = conn.execute("""
-        SELECT id, title, available_copies 
+        SELECT sl_no, title, available_copies 
         FROM books WHERE available_copies <= 1
         ORDER BY available_copies ASC LIMIT 5
     """).fetchall()
@@ -474,7 +474,7 @@ def api_admin_library_books():
             INSERT INTO books (title, author, isbn, publisher, year, edition, category, 
                                description, subject, total_copies, available_copies, 
                                is_reference, shelf_code)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING sl_no
         """, (
             data.get('title'), data.get('author'), data.get('isbn'), data.get('publisher'),
             data.get('year'), data.get('edition'), data.get('category'), data.get('description'),
@@ -494,7 +494,7 @@ def api_admin_library_book_detail(book_id):
     
     if request.method == "PUT":
         data = request.json
-        old = conn.execute("SELECT total_copies, available_copies FROM books WHERE id = %s", (book_id,)).fetchone()
+        old = conn.execute("SELECT total_copies, available_copies FROM books WHERE sl_no = %s", (book_id,)).fetchone()
         if not old: 
             conn.close()
             return jsonify({"error": "Not Found"}), 404
@@ -506,7 +506,7 @@ def api_admin_library_book_detail(book_id):
             UPDATE books SET title=%s, author=%s, isbn=%s, publisher=%s, year=%s, edition=%s, 
                              category=%s, description=%s, subject=%s, total_copies=%s, 
                              available_copies=%s, is_reference=%s, shelf_code=%s
-            WHERE id=%s
+            WHERE sl_no=%s
         """, (
             data.get('title'), data.get('author'), data.get('isbn'), data.get('publisher'),
             data.get('year'), data.get('edition'), data.get('category'), data.get('description'),
@@ -519,7 +519,7 @@ def api_admin_library_book_detail(book_id):
         
     if request.method == "DELETE":
         try:
-            conn.execute("DELETE FROM books WHERE id = %s", (book_id,))
+            conn.execute("DELETE FROM books WHERE sl_no = %s", (book_id,))
             conn.commit()
         except:
             conn.rollback()
@@ -535,12 +535,12 @@ def api_admin_library_loans():
     conn = get_db_connection()
     
     loans = conn.execute("""
-        SELECT ll.id, u.name as student_name, u.roll_no, b.title as book_title,
+        SELECT ll.sl_no, u.name as student_name, u.roll_no, b.title as book_title,
                ll.issue_date as issued_date, ll.due_date, ll.return_date as returned_date, ll.status,
                DATE_PART('day', NOW() - ll.due_date) as days_overdue
         FROM issues ll
-        JOIN users u ON ll.student_id = u.id
-        JOIN books b ON ll.book_id = b.id
+        JOIN users u ON ll.student_id = u.user_id
+        JOIN books b ON ll.book_id = b.sl_no
         ORDER BY CASE WHEN ll.status='active' THEN 1 ELSE 2 END, ll.due_date ASC
     """).fetchall()
     conn.close()
@@ -561,10 +561,10 @@ def api_admin_library_loans_return(loan_id):
     from app import get_db_connection
     conn = get_db_connection()
     
-    loan = conn.execute("SELECT * FROM issues WHERE id = %s AND status = 'active'", (loan_id,)).fetchone()
+    loan = conn.execute("SELECT * FROM issues WHERE sl_no = %s AND status = 'active'", (loan_id,)).fetchone()
     if loan:
-        conn.execute("UPDATE issues SET status = 'returned', return_date = NOW() WHERE id = %s", (loan_id,))
-        conn.execute("UPDATE books SET available_copies = available_copies + 1 WHERE id = %s", (loan['book_id'],))
+        conn.execute("UPDATE issues SET status = 'returned', return_date = NOW() WHERE sl_no = %s", (loan_id,))
+        conn.execute("UPDATE books SET available_copies = available_copies + 1 WHERE sl_no = %s", (loan['book_id'],))
         conn.commit()
     conn.close()
     return jsonify({"success": True})
@@ -578,7 +578,7 @@ def api_admin_library_loans_remind(loan_id):
     
     loan = conn.execute("""
         SELECT ll.student_id, b.title, ll.due_date 
-        FROM issues ll JOIN books b ON ll.book_id = b.id WHERE ll.id = %s
+        FROM issues ll JOIN books b ON ll.book_id = b.sl_no WHERE ll.sl_no = %s
     """, (loan_id,)).fetchone()
     conn.close()
     
@@ -595,14 +595,14 @@ def api_admin_library_fines():
     conn = get_db_connection()
     
     fines = conn.execute("""
-        SELECT f.id, f.paid_date, f.amount, f.paid, f.status, f.waived_reason,
+        SELECT f.sl_no, f.paid_date, f.amount, f.paid, f.status, f.waived_reason,
                u.name as student_name, b.title as book_title,
                DATE_PART('day', COALESCE(f.paid_date, NOW()) - ll.due_date) as days_overdue
         FROM library_fines f
-        JOIN issues ll ON f.issue_id = ll.id
-        JOIN users u ON f.student_id = u.id
-        JOIN books b ON ll.book_id = b.id
-        ORDER BY f.paid ASC, f.id DESC
+        JOIN issues ll ON f.issue_id = ll.sl_no
+        JOIN users u ON f.student_id = u.user_id
+        JOIN books b ON ll.book_id = b.sl_no
+        ORDER BY f.paid ASC, f.sl_no DESC
     """).fetchall()
     conn.close()
     
@@ -622,10 +622,10 @@ def api_admin_library_fines_action(fine_id, action):
     conn = get_db_connection()
     
     if action == 'paid':
-        conn.execute("UPDATE library_fines SET paid=true, paid_date=NOW(), status='Paid' WHERE id=%s", (fine_id,))
+        conn.execute("UPDATE library_fines SET paid=true, paid_date=NOW(), status='Paid' WHERE sl_no=%s", (fine_id,))
     elif action == 'waive':
         reason = request.json.get('reason', 'Admin Waiver') if request.json else 'Admin Waiver'
-        conn.execute("UPDATE library_fines SET paid=true, paid_date=NOW(), status='Waived', waived_reason=%s WHERE id=%s", (reason, fine_id))
+        conn.execute("UPDATE library_fines SET paid=true, paid_date=NOW(), status='Waived', waived_reason=%s WHERE sl_no=%s", (reason, fine_id))
         
     conn.commit()
     conn.close()
@@ -670,7 +670,7 @@ def api_admin_users():
     limit = int(request.args.get('limit', 15))
     offset = (page - 1) * limit
     
-    query = "SELECT id, name, role, user_id as \"roll_no\", batch, email, created_at, status, department FROM users WHERE 1=1"
+    query = "SELECT sl_no, name, role, user_id as \"roll_no\", batch, email, created_at, status, department FROM users WHERE 1=1"
     params = []
     
     if role != 'all':
@@ -685,7 +685,7 @@ def api_admin_users():
         params.extend([like_search, like_search, like_search])
         
     # Count total for pagination
-    count_query = query.replace("SELECT id, name, role, user_id as \"roll_no\", batch, email, created_at, status, department", "SELECT COUNT(*)")
+    count_query = query.replace("SELECT sl_no, name, role, user_id as \"roll_no\", batch, email, created_at, status, department", "SELECT COUNT(*)")
     total = conn.execute(count_query, params).fetchone()[0]
     
     # Fetch paginated
@@ -777,7 +777,7 @@ def api_admin_update_user(user_id):
             params.append(v)
             
     if fields:
-        query = f"UPDATE users SET {', '.join(fields)} WHERE id = %s"
+        query = f"UPDATE users SET {', '.join(fields)} WHERE sl_no = %s"
         params.append(user_id)
         conn.execute(query, params)
         conn.commit()
@@ -790,7 +790,7 @@ def api_admin_update_user_status(user_id):
     from app import get_db_connection
     status = request.json.get('status')
     conn = get_db_connection()
-    conn.execute("UPDATE users SET status = %s WHERE id = %s", (status, user_id))
+    conn.execute("UPDATE users SET status = %s WHERE sl_no = %s", (status, user_id))
     conn.commit()
     conn.close()
     return jsonify({"success": True})
@@ -809,9 +809,9 @@ def api_admin_users_bulk():
     placeholders = ','.join(['%s']*len(user_ids))
     
     if action == 'approve':
-        conn.execute(f"UPDATE users SET status = 'Active', is_verified = True WHERE id IN ({placeholders})", user_ids)
+        conn.execute(f"UPDATE users SET status = 'Active', is_verified = True WHERE sl_no IN ({placeholders})", user_ids)
     elif action == 'disable':
-        conn.execute(f"UPDATE users SET status = 'Inactive' WHERE id IN ({placeholders})", user_ids)
+        conn.execute(f"UPDATE users SET status = 'Inactive' WHERE sl_no IN ({placeholders})", user_ids)
         
     conn.commit()
     conn.close()
@@ -893,16 +893,16 @@ def api_admin_results_submissions():
     try:
         query = """
             SELECT s.subject_name, f.name as faculty_name,
-                   ms.id as submission_id, ms.exam_type,
+                   ms.sl_no as submission_id, ms.exam_type,
                    COUNT(r.student_id) as submitted_count,
                    ms.total_students as total_students_in_batch,
                    ms.status, ms.published_at
             FROM mark_submissions ms
-            JOIN subjects s ON ms.subject_id = s.id
-            JOIN users f ON ms.faculty_id = f.id
-            LEFT JOIN results r ON ms.id = r.submission_id
+            JOIN subjects s ON ms.subject_id = s.sl_no
+            JOIN users f ON ms.faculty_id = f.user_id
+            LEFT JOIN results r ON ms.sl_no = r.submission_id
             WHERE ms.semester = (SELECT current_semester FROM settings LIMIT 1)
-            GROUP BY s.subject_name, f.name, ms.id, ms.exam_type, ms.total_students, ms.status, ms.published_at
+            GROUP BY s.subject_name, f.name, ms.sl_no, ms.exam_type, ms.total_students, ms.status, ms.published_at
             ORDER BY ms.status ASC, s.subject_name
         """
         rows = conn.execute(query).fetchall()
@@ -920,7 +920,7 @@ def api_admin_results_publish(submission_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("UPDATE mark_submissions SET status='published', published_at=NOW() WHERE id=%s", (submission_id,))
+        conn.execute("UPDATE mark_submissions SET status='published', published_at=NOW() WHERE sl_no=%s", (submission_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1010,7 +1010,7 @@ def api_admin_notices_list():
         # We assume the `notices` table exists as per prompts.
         # Fallback to empty list gracefully if table is missing.
         query = """
-            SELECT id, title, content, category, audience,
+            SELECT sl_no, title, content, category, audience,
                    priority, views_count, is_pinned,
                    DATE_FORMAT(created_at, '%b %d, %Y') as created_at
             FROM notices
@@ -1057,7 +1057,7 @@ def api_admin_notices_update(notice_id):
         query = """
             UPDATE notices 
             SET title=%s, content=%s, category=%s, is_pinned=%s
-            WHERE id=%s
+            WHERE sl_no=%s
         """
         conn.execute(query, (
             data.get('title'), data.get('content'), data.get('category'),
@@ -1077,7 +1077,7 @@ def api_admin_notices_delete(notice_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM notices WHERE id=%s", (notice_id,))
+        conn.execute("DELETE FROM notices WHERE sl_no=%s", (notice_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1123,7 +1123,7 @@ def api_admin_events_list():
     conn = get_db_connection()
     try:
         query = """
-            SELECT id, title, category, event_date, venue,
+            SELECT sl_no, title, category, event_date, venue,
                    description, icon_name, show_on_homepage,
                    registration_link, created_at
             FROM events
@@ -1171,7 +1171,7 @@ def api_admin_events_update(event_id):
         query = """
             UPDATE events 
             SET title=%s, category=%s, event_date=%s, venue=%s, description=%s, show_on_homepage=%s
-            WHERE id=%s
+            WHERE sl_no=%s
         """
         conn.execute(query, (
             data.get('title'), data.get('category'), data.get('event_date'),
@@ -1192,7 +1192,7 @@ def api_admin_events_delete(event_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM events WHERE id=%s", (event_id,))
+        conn.execute("DELETE FROM events WHERE sl_no=%s", (event_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1207,7 +1207,7 @@ def api_admin_events_toggle(event_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        query = "UPDATE events SET show_on_homepage = NOT show_on_homepage WHERE id=%s"
+        query = "UPDATE events SET show_on_homepage = NOT show_on_homepage WHERE sl_no=%s"
         conn.execute(query, (event_id,))
         conn.commit()
         return jsonify({"success": True})
@@ -1260,13 +1260,13 @@ def api_admin_placements_drives():
     conn = get_db_connection()
     try:
         query = """
-            SELECT pd.id, pd.company_name, pd.role, 
+            SELECT pd.sl_no, pd.company_name, pd.role, 
                    pd.package_min, pd.package_max, pd.min_cgpa, pd.branches,
                    pd.drive_date, pd.deadline, pd.status, 
-                   COUNT(pa.id) as applicant_count
+                   COUNT(pa.sl_no) as applicant_count
             FROM placement_drives pd
-            LEFT JOIN placement_applications pa ON pd.id = pa.drive_id
-            GROUP BY pd.id
+            LEFT JOIN placement_applications pa ON pd.sl_no = pa.drive_id
+            GROUP BY pd.sl_no
             ORDER BY pd.drive_date ASC
         """
         rows = conn.execute(query).fetchall()
@@ -1313,7 +1313,7 @@ def api_admin_placements_update(drive_id):
     conn = get_db_connection()
     data = request.json
     try:
-        query = "UPDATE placement_drives SET role=%s, status=%s WHERE id=%s"
+        query = "UPDATE placement_drives SET role=%s, status=%s WHERE sl_no=%s"
         conn.execute(query, (data.get('role'), data.get('status'), drive_id))
         conn.commit()
         return jsonify({"success": True})
@@ -1329,7 +1329,7 @@ def api_admin_placements_close(drive_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("UPDATE placement_drives SET status='Closed' WHERE id=%s", (drive_id,))
+        conn.execute("UPDATE placement_drives SET status='Closed' WHERE sl_no=%s", (drive_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1344,14 +1344,14 @@ def api_admin_placements_applicants(drive_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        drive = conn.execute("SELECT * FROM placement_drives WHERE id=%s", (drive_id,)).fetchone()
+        drive = conn.execute("SELECT * FROM placement_drives WHERE sl_no=%s", (drive_id,)).fetchone()
         
         apps_query = """
-            SELECT pa.id, u.name, u.roll_no, r.cgpa, u.batch,
+            SELECT pa.sl_no, u.name, u.roll_no, r.cgpa, u.batch,
                    pa.applied_date, pa.status, pa.resume_url
             FROM placement_applications pa
-            JOIN users u ON pa.student_id = u.id
-            LEFT JOIN results r ON u.id = r.student_id
+            JOIN users u ON pa.student_id = u.user_id
+            LEFT JOIN results r ON u.user_id = r.student_id
             WHERE pa.drive_id = %s
             ORDER BY r.cgpa DESC
         """
@@ -1381,7 +1381,7 @@ def api_admin_placements_app_action(app_id, action):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("UPDATE placement_applications SET status=%s WHERE id=%s", (status, app_id))
+        conn.execute("UPDATE placement_applications SET status=%s WHERE sl_no=%s", (status, app_id))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1399,9 +1399,9 @@ def api_admin_placements_stats():
         stats = conn.execute("SELECT total_placed FROM placement_stats LIMIT 1").fetchone()
         high = conn.execute("SELECT MAX(package_max) as m FROM placement_drives").fetchone()
         avg = conn.execute("SELECT AVG(package_min) as a FROM placement_drives").fetchone()
-        active = conn.execute("SELECT COUNT(id) as c FROM placement_drives WHERE status IN ('Open','Upcoming')").fetchone()
+        active = conn.execute("SELECT COUNT(sl_no) as c FROM placement_drives WHERE status IN ('Open','Upcoming')").fetchone()
         
-        chart = conn.execute("SELECT company_name as company, COUNT(id) as value FROM placement_applications WHERE status='Selected' GROUP BY company").fetchall()
+        chart = conn.execute("SELECT company_name as company, COUNT(sl_no) as value FROM placement_applications WHERE status='Selected' GROUP BY company").fetchall()
 
         return jsonify({
             "total_placed": stats['total_placed'] if stats else 0,
@@ -1433,7 +1433,7 @@ def api_admin_faculty_list():
     conn = get_db_connection()
     try:
         # Assuming role 'faculty' exists in users
-        query = "SELECT id, name, department FROM users WHERE role='faculty' ORDER BY name ASC"
+        query = "SELECT sl_no, name, department FROM users WHERE role='faculty' ORDER BY name ASC"
         rows = conn.execute(query).fetchall()
         return jsonify([dict(r) for r in rows])
     except Exception:
@@ -1449,11 +1449,11 @@ def api_admin_courses_subjects():
     sem = request.args.get('semester', 'S6')
     try:
         query = """
-            SELECT s.id, s.subject_name, s.subject_code,
+            SELECT s.sl_no, s.subject_name, s.subject_code,
                    s.credits, s.subject_type, s.hours_per_week, s.exam_type,
                    s.faculty_id, f.name as faculty_name
             FROM subjects s
-            LEFT JOIN users f ON s.faculty_id = f.id
+            LEFT JOIN users f ON s.faculty_id = f.user_id
             WHERE s.semester = %s
             ORDER BY s.subject_code ASC
         """
@@ -1501,7 +1501,7 @@ def api_admin_courses_update(subj_id):
     data = request.json
     try:
         conn.execute(
-            "UPDATE subjects SET subject_name=%s, subject_type=%s, credits=%s WHERE id=%s",
+            "UPDATE subjects SET subject_name=%s, subject_type=%s, credits=%s WHERE sl_no=%s",
             (data.get('subject_name'), data.get('subject_type'), data.get('credits'), subj_id)
         )
         conn.commit()
@@ -1518,7 +1518,7 @@ def api_admin_courses_delete(subj_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM subjects WHERE id=%s", (subj_id,))
+        conn.execute("DELETE FROM subjects WHERE sl_no=%s", (subj_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1537,7 +1537,7 @@ def api_admin_courses_reassign(subj_id):
     if not fac_val or fac_val == "": fac_val = None
     
     try:
-        conn.execute("UPDATE subjects SET faculty_id=%s WHERE id=%s", (fac_val, subj_id))
+        conn.execute("UPDATE subjects SET faculty_id=%s WHERE sl_no=%s", (fac_val, subj_id))
         conn.commit()
     except Exception as e:
         conn.rollback()
@@ -1563,7 +1563,7 @@ def api_admin_labs_list():
     conn = get_db_connection()
     try:
         # Graceful fallback if table doesn't exist
-        query = "SELECT id, lab_name, capacity, equipment, current_status, available_from, category FROM labs ORDER BY current_status ASC, lab_name ASC"
+        query = "SELECT sl_no, lab_name, capacity, equipment, current_status, available_from, category FROM labs ORDER BY current_status ASC, lab_name ASC"
         rows = conn.execute(query).fetchall()
         return jsonify([dict(r) for r in rows])
     except Exception:
@@ -1601,11 +1601,11 @@ def api_admin_labs_block(lab_id):
     conn = get_db_connection()
     try:
         # Toggle block status
-        curr = conn.execute("SELECT current_status FROM labs WHERE id=%s", (lab_id,)).fetchone()
+        curr = conn.execute("SELECT current_status FROM labs WHERE sl_no=%s", (lab_id,)).fetchone()
         if not curr: return jsonify({"success": False, "error":"Not found"})
         
         new_status = 'available' if curr['current_status'] == 'blocked' else 'blocked'
-        conn.execute("UPDATE labs SET current_status=%s WHERE id=%s", (new_status, lab_id))
+        conn.execute("UPDATE labs SET current_status=%s WHERE sl_no=%s", (new_status, lab_id))
         conn.commit()
         return jsonify({"success": True, "new_status": new_status})
     except Exception as e:
@@ -1621,11 +1621,11 @@ def api_admin_labs_bookings():
     conn = get_db_connection()
     try:
         query = """
-            SELECT lb.id, lb.slot_start, lb.slot_end, lb.purpose, lb.status, lb.student_id,
+            SELECT lb.sl_no, lb.slot_start, lb.slot_end, lb.purpose, lb.status, lb.student_id,
                    l.lab_name, u.name as student_name
             FROM lab_bookings lb
-            LEFT JOIN labs l ON lb.lab_id = l.id
-            LEFT JOIN users u ON lb.student_id = u.id
+            LEFT JOIN labs l ON lb.lab_id = l.sl_no
+            LEFT JOIN users u ON lb.student_id = u.user_id
             ORDER BY lb.created_at DESC
         """
         rows = conn.execute(query).fetchall()
@@ -1642,7 +1642,7 @@ def api_admin_labs_booking_approve(book_id):
     conn = get_db_connection()
     try:
         # Approving sets the lab status temporally if it's currently available, mapped simply here
-        conn.execute("UPDATE lab_bookings SET status='approved' WHERE id=%s", (book_id,))
+        conn.execute("UPDATE lab_bookings SET status='approved' WHERE sl_no=%s", (book_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1658,7 +1658,7 @@ def api_admin_labs_booking_deny(book_id):
     conn = get_db_connection()
     reason = request.json.get('reason', 'Denied by administrator.')
     try:
-        conn.execute("UPDATE lab_bookings SET status='denied', denial_reason=%s WHERE id=%s", (reason, book_id))
+        conn.execute("UPDATE lab_bookings SET status='denied', denial_reason=%s WHERE sl_no=%s", (reason, book_id))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1692,11 +1692,11 @@ def api_admin_timetable():
 
         # Fetch Slots
         query = """
-            SELECT t.id, t.day_of_week, t.period, t.room, t.subject_id, t.faculty_id,
+            SELECT t.sl_no, t.day_of_week, t.period, t.room, t.subject_id, t.faculty_id,
                    s.subject_name, u.name as faculty_name 
             FROM timetable_slots t
-            JOIN subjects s ON t.subject_id = s.id
-            JOIN users u ON t.faculty_id = u.id
+            JOIN subjects s ON t.subject_id = s.sl_no
+            JOIN users u ON t.faculty_id = u.user_id
             WHERE t.batch = %s
         """
         slots = [dict(row) for row in conn.execute(query, (batch,)).fetchall()]
@@ -1719,7 +1719,7 @@ def api_admin_timetable_slots_post():
             conn.execute("""
                 UPDATE timetable_slots 
                 SET subject_id=%s, faculty_id=%s, room=%s 
-                WHERE id=%s
+                WHERE sl_no=%s
             """, (data['subject_id'], data['faculty_id'], data['room'], existing_id))
         else:
             conn.execute("""
@@ -1728,7 +1728,10 @@ def api_admin_timetable_slots_post():
             """, (data['batch'], data['semester'], data['day_of_week'], data['period'], data['subject_id'], data['faculty_id'], data['room']))
         
         # Implicitly revert status back to draft if a modification happens post-publish
-        conn.execute("INSERT OR REPLACE INTO timetable_status (batch, status) VALUES (%s, 'draft')", (data['batch'],))
+        conn.execute("""
+            INSERT INTO timetable_status (batch, status) VALUES (%s, 'draft')
+            ON CONFLICT (batch) DO UPDATE SET status = 'draft'
+        """, (data['batch'],))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1743,7 +1746,7 @@ def api_admin_timetable_slots_del(slot_id):
     from app import get_db_connection
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM timetable_slots WHERE id=%s", (slot_id,))
+        conn.execute("DELETE FROM timetable_slots WHERE sl_no=%s", (slot_id,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1796,7 +1799,10 @@ def api_admin_timetable_publish():
     conn = get_db_connection()
     batch = request.json.get('batch')
     try:
-        conn.execute("INSERT OR REPLACE INTO timetable_status (batch, status) VALUES (%s, 'published')", (batch,))
+        conn.execute("""
+            INSERT INTO timetable_status (batch, status) VALUES (%s, 'published')
+            ON CONFLICT (batch) DO UPDATE SET status = 'published'
+        """, (batch,))
         conn.commit()
         return jsonify({"success": True})
     except Exception as e:
@@ -1843,7 +1849,7 @@ def api_admin_fees_stats():
                    SUM(CASE WHEN fr.status='paid' THEN fr.amount ELSE fr.paid_amount END) as collected,
                    SUM(fr.amount) as total
             FROM fee_records fr 
-            JOIN users u ON fr.student_id = u.id
+            JOIN users u ON fr.student_id = u.user_id
             GROUP BY u.batch
         """
         prog_raw = conn.execute(prog_query).fetchall()
@@ -1860,7 +1866,7 @@ def api_admin_fees_stats():
         recent_query = """
             SELECT u.name, fr.paid_amount, fr.paid_date 
             FROM fee_records fr
-            JOIN users u ON fr.student_id = u.id
+            JOIN users u ON fr.student_id = u.user_id
             WHERE fr.paid_date IS NOT NULL
             ORDER BY fr.paid_date DESC LIMIT 5
         """
@@ -1891,9 +1897,9 @@ def api_admin_fees_list():
     try:
         # Match "S6 CSE A", "S6 CSE B", etc. natively
         query = """
-            SELECT fr.id, u.name, u.roll_no, fr.amount, fr.due_date, fr.paid_date, fr.status, fr.paid_amount, fr.receipt_ref, fr.semester
+            SELECT fr.sl_no, u.name, u.roll_no, fr.amount, fr.due_date, fr.paid_date, fr.status, fr.paid_amount, fr.receipt_ref, fr.semester
             FROM fee_records fr
-            JOIN users u ON fr.student_id = u.id
+            JOIN users u ON fr.student_id = u.user_id
             WHERE u.batch LIKE %s
             ORDER BY
                 CASE fr.status
@@ -1908,10 +1914,10 @@ def api_admin_fees_list():
     except Exception as e:
         # Mock Default Behavior Gracefully
         return jsonify([
-            {"id":1, "name":"Charlie Puth", "roll_no":"CSE101", "amount": 40200, "due_date":"2025-03-01T00:00:00", "paid_date":None, "status":"overdue", "paid_amount":0, "semester":"S6"},
-            {"id":2, "name":"David Guetta", "roll_no":"CSE102", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":"2025-03-10T00:00:00", "status":"partial", "paid_amount":20000, "semester":"S6"},
-            {"id":3, "name":"Ellie Goulding", "roll_no":"CSE103", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":"2025-03-05T00:00:00", "status":"paid", "paid_amount":40200, "receipt_ref":"TXN-8841", "semester":"S6"},
-            {"id":4, "name":"Frank Ocean", "roll_no":"CSE104", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":None, "status":"pending", "paid_amount":0, "semester":"S6"}
+            {"sl_no":1, "name":"Charlie Puth", "roll_no":"CSE101", "amount": 40200, "due_date":"2025-03-01T00:00:00", "paid_date":None, "status":"overdue", "paid_amount":0, "semester":"S6"},
+            {"sl_no":2, "name":"David Guetta", "roll_no":"CSE102", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":"2025-03-10T00:00:00", "status":"partial", "paid_amount":20000, "semester":"S6"},
+            {"sl_no":3, "name":"Ellie Goulding", "roll_no":"CSE103", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":"2025-03-05T00:00:00", "status":"paid", "paid_amount":40200, "receipt_ref":"TXN-8841", "semester":"S6"},
+            {"sl_no":4, "name":"Frank Ocean", "roll_no":"CSE104", "amount": 40200, "due_date":"2025-04-01T00:00:00", "paid_date":None, "status":"pending", "paid_amount":0, "semester":"S6"}
         ])
     finally:
         conn.close()
@@ -1926,7 +1932,7 @@ def api_admin_fees_update(fee_id):
         conn.execute("""
             UPDATE fee_records 
             SET amount=%s, due_date=%s, status=%s, paid_amount=%s, paid_date=%s, receipt_ref=%s
-            WHERE id=%s
+            WHERE sl_no=%s
         """, (data['amount'], data['due_date'], data['status'], data['paid_amount'], data['paid_date'], data['receipt_ref'], fee_id))
         conn.commit()
         return jsonify({"success": True})
@@ -1947,7 +1953,7 @@ def api_admin_fees_waive(fee_id):
         conn.execute("""
             UPDATE fee_records 
             SET status='paid', paid_amount=amount, notes=%s
-            WHERE id=%s
+            WHERE sl_no=%s
         """, (f"WAIVED: {reason}", fee_id))
         conn.commit()
         return jsonify({"success": True})
@@ -2200,3 +2206,33 @@ def api_admin_system_restart():
     import time
     time.sleep(3)
     return jsonify({"success": True})
+
+@admin_bp.route("/api/admin/library/payment/<int:issue_id>/approve", methods=["POST"])
+def api_admin_library_payment_approve(issue_id):
+    if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
+    from app import get_db_connection
+    conn = get_db_connection()
+    try:
+        conn.execute("UPDATE issues SET payment_status = 'approved' WHERE sl_no = %s", (issue_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Payment verified and fine locked successfully."})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        conn.close()
+
+@admin_bp.route("/api/admin/library/payment/<int:issue_id>/reject", methods=["POST"])
+def api_admin_library_payment_reject(issue_id):
+    if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
+    from app import get_db_connection
+    conn = get_db_connection()
+    try:
+        conn.execute("UPDATE issues SET payment_status = 'rejected', payment_requested_date = NULL WHERE sl_no = %s", (issue_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Payment request permanently rejected."})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        conn.close()

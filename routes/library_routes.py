@@ -22,14 +22,14 @@ def library():
         flash("Please log in to access the library.", "warning")
         return redirect(url_for("login"))
     books = Book.get_all()
-    user_id = session.get("user_id")
+    user_id = str(session.get("user_id"))
     has_active_issue = False
     if user_id and session.get("role") == "student":
-        has_active_issue = Issue.get_user_active_issued_count(user_id) >= 1
+        has_active_issue = Issue.get_user_active_issued_count(user_id) >= 3
 
     for b in books:
         if not b.get("availability", True):
-            b["current_holder"] = Issue.get_current_holder(b["id"])
+            b["current_holder"] = Issue.get_current_holder(b["sl_no"])
     return render_template("library.html", active_page="library", books=books, has_active_issue=has_active_issue)
 
 
@@ -85,7 +85,7 @@ def search_books():
     for b in books:
         holder = None
         if not b.get("availability", True):
-            holder_name = Issue.get_current_holder(b["id"])
+            holder_name = Issue.get_current_holder(b["sl_no"])
             if holder_name:
                 holder = holder_name
 
@@ -93,6 +93,41 @@ def search_books():
         results.append(b)
 
     return jsonify(results)
+
+@library_bp.route("/my-books")
+def my_books():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    user_id = str(session["user_id"])
+    role = session.get("role")
+    if role not in ["student", "faculty"]:
+        flash("Unauthorized", "danger")
+        return redirect(url_for("login"))
+
+    from app import get_db_connection
+    conn = get_db_connection()
+    
+    active_issues = conn.execute("""
+        SELECT i.sl_no, i.book_id, i.issue_date, i.due_date, 
+               i.payment_status, i.payment_requested_date, i.renewal_count, 
+               b.title, b.author 
+        FROM issues i 
+        JOIN books b ON i.book_id = b.sl_no 
+        WHERE i.user_id = %s AND i.status = 'issued'
+    """, (user_id,)).fetchall()
+    
+    history = conn.execute("""
+        SELECT i.sl_no, i.book_id, i.issue_date, i.return_date, 
+               b.title, b.author 
+        FROM issues i 
+        JOIN books b ON i.book_id = b.sl_no 
+        WHERE i.user_id = %s AND i.status = 'returned'
+        ORDER BY i.return_date DESC
+    """, (user_id,)).fetchall()
+
+    conn.close()
+
+    return render_template("my_books.html", active_issues=active_issues, history=history, role=role)
 
 
 @library_bp.route("/book/<int:book_id>")
@@ -135,7 +170,7 @@ def issue_book(book_id):
         flash("Admins cannot issue books.", "danger")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     book = Book.get_by_id(book_id)
 
     if not book:
@@ -143,8 +178,8 @@ def issue_book(book_id):
         return redirect(url_for("library_bp.library"))
 
     # Requirements check
-    if Issue.get_user_active_issued_count(user_id) >= 1:
-        flash("You must return your current book before issuing another.", "warning")
+    if Issue.get_user_active_issued_count(user_id) >= 3:
+        flash("You must return at least one book before issuing another. Maximum 3 books allowed.", "warning")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
     if Issue.has_outstanding_fines(user_id):
@@ -181,7 +216,7 @@ def return_book(book_id):
         flash("Admins cannot return books.", "danger")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     book = Book.get_by_id(book_id)
 
     if not book:
@@ -205,6 +240,54 @@ def return_book(book_id):
     return redirect(url_for("library_bp.book_details", book_id=book_id))
 
 
+@library_bp.route("/renew_book/<int:book_id>", methods=["POST"])
+def renew_book(book_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    if session.get("role") == "admin":
+        flash("Admins cannot renew books.", "danger")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+    user_id = str(session["user_id"])
+    book = Book.get_by_id(book_id)
+    if not book:
+        flash("Book not found.", "danger")
+        return redirect(url_for("library_bp.library"))
+
+    if not Issue.is_user_issuer(user_id, book_id):
+        flash("You cannot renew a book you haven't issued.", "danger")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+    if Issue.has_outstanding_fines(user_id):
+        flash("You have outstanding fines. Cannot renew until paid.", "danger")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+    from app import get_db_connection
+    conn = get_db_connection()
+    issue = conn.execute("SELECT sl_no, renewal_count, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
+    
+    if not issue:
+        conn.close()
+        flash("Active issue not found.", "danger")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+        
+    renewal_count = issue['renewal_count'] or 0
+    if renewal_count >= 3:
+        conn.close()
+        flash("Maximum renewal limit (3) reached for this book.", "warning")
+        return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+    from datetime import timedelta
+    new_due_date = issue['due_date'] + timedelta(days=14)
+    conn.execute("UPDATE issues SET renewal_count = COALESCE(renewal_count, 0) + 1, due_date = %s WHERE sl_no = %s", (new_due_date, issue['sl_no']))
+    conn.commit()
+    conn.close()
+
+    flash(f"Book renewed successfully! New due date: {new_due_date.strftime('%Y-%m-%d')}", "success")
+    return redirect(url_for("library_bp.book_details", book_id=book_id))
+
+
+
 @library_bp.route("/request_book/<int:book_id>", methods=["POST"])
 def request_book(book_id):
     if "user_id" not in session:
@@ -214,7 +297,7 @@ def request_book(book_id):
         flash("Admins cannot request books.", "danger")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     book = Book.get_by_id(book_id)
 
     if not book:
@@ -223,6 +306,8 @@ def request_book(book_id):
 
     if book.get("availability", True):
         flash("This book is already available. You can issue it.", "info")
+    elif Issue.get_user_active_issued_count(user_id) >= 3:
+        flash("You have reached the maximum limit of 3 books. Return a book before requesting a new one.", "warning")
     else:
         # Request book
         Request.create_request(book_id, user_id, 'request')
@@ -254,7 +339,7 @@ def api_library_dashboard():
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
@@ -281,7 +366,7 @@ def api_library_dashboard():
     
     # outstanding_fine
     fines = conn.execute(
-        "SELECT SUM(amount) FROM library_fines WHERE student_id = %s AND paid = false",
+        "SELECT SUM(fine_amount) FROM issues_with_fines WHERE user_id = %s AND payment_status != 'approved'",
         (user_id,)
     ).fetchone()[0] or 0
     
@@ -300,16 +385,16 @@ def api_library_my_books():
     if "user_id" not in session:
         return jsonify([]), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     loans = conn.execute("""
-        SELECT i.id, b.title, b.author, i.issue_date,
+        SELECT i.sl_no, b.title, b.author, i.issue_date,
                i.due_date, i.return_date, i.status,
                DATE_PART('day', i.due_date - NOW()) as days_remaining
         FROM issues i
-        JOIN books b ON i.book_id = b.id
+        JOIN books b ON i.book_id = b.sl_no
         WHERE i.user_id = %s
         ORDER BY
           CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
@@ -324,33 +409,31 @@ def api_library_fines():
     if "user_id" not in session:
         return jsonify({"outstanding": [], "history": []}), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Get outstanding fines
     outstanding_rows = conn.execute("""
-        SELECT f.id, b.title, b.author, 
-               ll.issue_date as issued_date, ll.due_date, 
-               DATE_PART('day', NOW() - ll.due_date) as days_overdue,
-               f.amount, f.rate_per_day
-        FROM library_fines f
-        JOIN issues ll ON f.issue_id = ll.id
-        JOIN books b ON ll.book_id = b.id
-        WHERE f.student_id = %s AND f.paid = false
-        ORDER BY days_overdue DESC
+        SELECT i.sl_no, b.title, b.author, 
+               i.issue_date as issued_date, i.due_date, 
+               i.days_overdue, i.payment_status,
+               i.fine_amount as amount, 3 as rate_per_day
+        FROM issues_with_fines i
+        JOIN books b ON i.book_id = b.sl_no
+        WHERE i.user_id = %s AND i.payment_status != 'approved' AND i.fine_amount > 0
+        ORDER BY i.days_overdue DESC
     """, (user_id,)).fetchall()
     
     # Get paid/history
     history_rows = conn.execute("""
-        SELECT f.id, f.paid_date, b.title,
-               DATE_PART('day', f.paid_date - ll.due_date) as days_overdue,
-               f.amount, f.status, f.waived_reason
-        FROM library_fines f
-        JOIN issues ll ON f.issue_id = ll.id
-        JOIN books b ON ll.book_id = b.id
-        WHERE f.student_id = %s AND f.paid = true
-        ORDER BY f.paid_date DESC
+        SELECT i.sl_no, i.payment_requested_date as paid_date, b.title,
+               i.days_overdue, 'approved' as status, 'Paid offline or online' as waived_reason,
+               i.fine_amount as amount
+        FROM issues_with_fines i
+        JOIN books b ON i.book_id = b.sl_no
+        WHERE i.user_id = %s AND i.payment_status = 'approved' AND i.fine_amount > 0
+        ORDER BY i.payment_requested_date DESC
     """, (user_id,)).fetchall()
     
     conn.close()
@@ -381,17 +464,17 @@ def api_library_reservations():
     if "user_id" not in session:
         return jsonify([]), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Get active reservations with queue position
     reservations = conn.execute("""
-        SELECT r.id, b.title, r.request_date as created_at,
+        SELECT r.sl_no, b.title, r.request_date as created_at,
                (SELECT COUNT(*) FROM requests r2 WHERE r2.book_id = r.book_id AND r2.request_date <= r.request_date AND r2.status = 'pending') as queue_position,
                (SELECT COUNT(*) FROM requests r3 WHERE r3.book_id = r.book_id AND r3.status = 'pending') as total_queue
         FROM requests r
-        JOIN books b ON r.book_id = b.id
+        JOIN books b ON r.book_id = b.sl_no
         WHERE r.requested_by = %s AND r.status = 'pending'
         ORDER BY r.request_date ASC
     """, (user_id,)).fetchall()
@@ -408,13 +491,13 @@ def api_library_renew():
     if not loan_id:
         return jsonify({"error": "Missing loan_id"}), 400
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Check if eligible for renewal (e.g. status='issued', belongs to user, and no fines?)
     loan = conn.execute(
-        "SELECT id, due_date FROM issues WHERE id = %s AND user_id = %s AND status = 'issued'",
+        "SELECT sl_no as id, due_date FROM issues WHERE sl_no = %s AND user_id = %s AND status = 'issued'",
         (loan_id, user_id)
     ).fetchone()
     
@@ -422,31 +505,56 @@ def api_library_renew():
         conn.close()
         return jsonify({"error": "Loan not found or not eligible for renewal"}), 404
         
-    # Check for fines
-    fine = conn.execute(
-        "SELECT id FROM library_fines WHERE issue_id = %s AND paid = false",
-        (loan_id,)
-    ).fetchone()
-    
-    if fine:
+    # Check for ANY unpaid fines for the user across the system
+    from models.issue import Issue
+    if Issue.has_outstanding_fines(user_id):
         conn.close()
-        return jsonify({"error": "Cannot renew with outstanding fines"}), 400
+        return jsonify({"error": "Cannot renew: You have unpaid fines"}), 400
         
-    # Check if already renewed? The prompt says "1 renewal allowed".
-    # We might need a renewal_count column. Let's add it.
+    # Check if already renewed? The prompt says cap to 14 days and check for fines. We track renewal_count.
     
-    # Perform renewal: Add 14 days to current due_date or from today? Usually from current due_date.
+    # Perform renewal: Add 14 days to current due_date
+
     from datetime import datetime, timedelta
     new_due_date = loan["due_date"] + timedelta(days=14)
     
     conn.execute(
-        "UPDATE issues SET due_date = %s WHERE id = %s",
+        "UPDATE issues SET due_date = %s, renewal_count = renewal_count + 1 WHERE sl_no = %s",
         (new_due_date, loan_id)
     )
     conn.commit()
     conn.close()
     
     return jsonify({"status": "ok", "new_due_date": new_due_date.isoformat()})
+
+@library_bp.route("/api/library/pay_fine/<int:issue_id>", methods=["POST"])
+def api_library_pay_fine_request(issue_id):
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    user_id = str(session.get("user_id"))
+    
+    from app import get_db_connection
+    conn = get_db_connection()
+    try:
+        # Check if the issue has an unpaid fine dynamically
+        issue = conn.execute("SELECT fine_amount, payment_status FROM issues_with_fines WHERE sl_no = %s AND user_id = %s", (issue_id, str(user_id))).fetchone()
+        if not issue:
+            return jsonify({"success": False, "error": "Issue not found."}), 404
+        if issue['fine_amount'] <= 0:
+            return jsonify({"success": False, "error": "No fine exists for this issue."}), 400
+        if issue['payment_status'] == 'pending':
+            return jsonify({"success": False, "error": "Payment is already under review."}), 400
+        if issue['payment_status'] == 'approved':
+            return jsonify({"success": False, "error": "Fine is already paid."}), 400
+            
+        conn.execute("UPDATE issues SET payment_requested_date = CURRENT_TIMESTAMP, payment_status = 'pending' WHERE sl_no = %s", (issue_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Payment request submitted."})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        conn.close()
 
 @library_bp.route("/api/library/categories")
 def api_library_categories():
@@ -555,7 +663,7 @@ def api_library_suggestions():
     conn = get_db_connection()
     
     q = f"%{query}%"
-    books = conn.execute("SELECT id, title, author FROM books WHERE title ILIKE %s OR author ILIKE %s LIMIT 5", (q, q)).fetchall()
+    books = conn.execute("SELECT sl_no as id, title, author FROM books WHERE title ILIKE %s OR author ILIKE %s LIMIT 5", (q, q)).fetchall()
     conn.close()
     
     return jsonify({"suggestions": [dict(row) for row in books]})
@@ -668,12 +776,12 @@ def api_library_borrow():
     if not book_id:
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Check book
-    book = conn.execute("SELECT id, available_copies, is_reference FROM books WHERE id = %s", (book_id,)).fetchone()
+    book = conn.execute("SELECT sl_no as id, available_copies, is_reference FROM books WHERE sl_no = %s", (book_id,)).fetchone()
     if not book:
         conn.close()
         return jsonify({"success": False, "error": "Book not found"}), 404
@@ -687,10 +795,16 @@ def api_library_borrow():
         return jsonify({"success": False, "error": "No copies available"}), 400
         
     # Check if user already holds this book
-    active = conn.execute("SELECT id FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
+    active = conn.execute("SELECT sl_no as id FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
     if active:
         conn.close()
         return jsonify({"success": False, "error": "You already have this book borrowed"}), 400
+        
+    # Check max limit threshold of 3
+    active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
+    if active_count >= 3:
+        conn.close()
+        return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
         
     # Borrow
     from datetime import datetime, timedelta
@@ -698,8 +812,8 @@ def api_library_borrow():
     due_date = issue_date + timedelta(days=14)
     
     try:
-        conn.execute("UPDATE books SET available_copies = available_copies - 1 WHERE id = %s", (book_id,))
-        cur = conn.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (%s, %s, %s, %s, 'issued') RETURNING id", (book_id, user_id, issue_date, due_date))
+        conn.execute("UPDATE books SET available_copies = available_copies - 1 WHERE sl_no = %s", (book_id,))
+        cur = conn.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (%s, %s, %s, %s, 'issued') RETURNING sl_no as id", (book_id, user_id, issue_date, due_date))
         loan_id = cur.fetchone()[0]
         conn.commit()
     except Exception as e:
@@ -720,25 +834,31 @@ def api_library_reserve():
     if not book_id:
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
-    book = conn.execute("SELECT id FROM books WHERE id = %s", (book_id,)).fetchone()
+    book = conn.execute("SELECT sl_no as id FROM books WHERE sl_no = %s", (book_id,)).fetchone()
     if not book:
         conn.close()
         return jsonify({"success": False, "error": "Book not found"}), 404
         
     # Check if already reserved
-    existing = conn.execute("SELECT id FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
+    existing = conn.execute("SELECT sl_no as id FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
     if existing:
         conn.close()
         return jsonify({"success": False, "error": "You have already reserved this book"}), 400
         
+    # Check max limit threshold of 3
+    active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
+    if active_count >= 3:
+        conn.close()
+        return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
+        
     try:
-        cur = conn.execute("INSERT INTO requests (book_id, requested_by, status) VALUES (%s, %s, 'pending') RETURNING id, request_date", (book_id, user_id))
+        cur = conn.execute("INSERT INTO requests (book_id, requested_by, status) VALUES (%s, %s, 'pending') RETURNING sl_no as id, request_date", (book_id, user_id))
         res = cur.fetchone()
-        reservation_id = res['id']
+        reservation_id = res['sl_no']
         req_date = res['request_date']
         
         # Calculate queue position
@@ -756,7 +876,7 @@ def api_library_reserve():
 def student_library_book_details(book_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from models.request import Request
     pending_req = Request.has_pending_request(user_id, book_id, 'issue') or Request.has_pending_request(user_id, book_id, 'reserve') if user_id else None
     return render_template("student_book_details.html", active_page="library", book_id=book_id, pending_req=pending_req)
@@ -766,12 +886,12 @@ def api_library_book_details(book_id):
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Get basic book
-    book = conn.execute("SELECT * FROM books WHERE id = %s", (book_id,)).fetchone()
+    book = conn.execute("SELECT * FROM books WHERE sl_no = %s", (book_id,)).fetchone()
     if not book:
         conn.close()
         return jsonify({"error": "Book not found"}), 404
@@ -795,19 +915,19 @@ def api_library_book_details(book_id):
     }
     
     # Student loan state
-    loan = conn.execute("SELECT id as loan_id, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
+    loan = conn.execute("SELECT sl_no as loan_id, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
     student_loan = None
     if loan:
         student_loan = {"loan_id": loan['loan_id'], "due_date": loan['due_date'].isoformat()}
         
     # Queue info
-    req = conn.execute("SELECT id, request_date FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
+    req = conn.execute("SELECT sl_no, request_date FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
     queue_info = None
     if req:
         req_date = req['request_date']
         pos = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending' AND request_date <= %s", (book_id, req_date)).fetchone()[0]
         est_days = pos * 7
-        queue_info = {"position": pos, "total": reserved, "est_days": est_days, "reservation_id": req['id']}
+        queue_info = {"position": pos, "total": reserved, "est_days": est_days, "reservation_id": req['sl_no']}
         
     # Borrow stats
     # 1 semester roughly 180 days
@@ -824,9 +944,9 @@ def api_library_book_details(book_id):
     # Related books (Same category, most borrowed in last 30 days, exclude current)
     # Since we lack complex history, we'll just pick same category, limit 5
     related = conn.execute("""
-        SELECT b.id, b.title, b.author, b.category, b.available_copies
+        SELECT b.sl_no, b.title, b.author, b.category, b.available_copies
         FROM books b
-        WHERE b.category = %s AND b.id != %s
+        WHERE b.category = %s AND b.sl_no != %s
         ORDER BY b.added_date DESC
         LIMIT 5
     """, (b_dict.get('category', ''), book_id)).fetchall()
@@ -837,7 +957,7 @@ def api_library_book_details(book_id):
     
     # Check if this user has a pending request for this book
     from models.request import Request
-    user_id = session.get("user_id")
+    user_id = str(session.get("user_id"))
     pending_req = Request.has_pending_request(user_id, book_id) if user_id else None
 
     return jsonify({
@@ -855,18 +975,18 @@ def api_library_cancel_reservation(res_id):
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
     
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     # Check ownership
-    req = conn.execute("SELECT id FROM requests WHERE id = %s AND requested_by = %s", (res_id, user_id)).fetchone()
+    req = conn.execute("SELECT sl_no FROM requests WHERE sl_no = %s AND requested_by = %s", (res_id, user_id)).fetchone()
     if not req:
         conn.close()
         return jsonify({"success": False, "error": "Reservation not found"}), 404
         
     # Technically we should update status to cancelled or delete
-    conn.execute("UPDATE requests SET status = 'cancelled' WHERE id = %s", (res_id,))
+    conn.execute("UPDATE requests SET status = 'cancelled' WHERE sl_no = %s", (res_id,))
     conn.commit()
     conn.close()
     
@@ -885,17 +1005,17 @@ def api_library_fines_mark_paid(fine_id):
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
-    fine = conn.execute("SELECT * FROM library_fines WHERE id = %s AND student_id = %s AND paid = false", (fine_id, user_id)).fetchone()
+    fine = conn.execute("SELECT * FROM library_fines WHERE sl_no = %s AND student_id = %s AND paid = false", (fine_id, user_id)).fetchone()
     if not fine:
         conn.close()
         return jsonify({"success": False, "error": "Fine not found or already paid"}), 404
         
     conn.execute(
-        "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE id = %s",
+        "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE sl_no = %s",
         (fine_id,)
     )
     conn.commit()
@@ -907,7 +1027,7 @@ def api_library_fines_mark_all_paid():
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
@@ -924,17 +1044,17 @@ def api_library_fines_receipt(fine_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
         
-    user_id = session["user_id"]
+    user_id = str(session["user_id"])
     from app import get_db_connection
     conn = get_db_connection()
     
     fine = conn.execute("""
         SELECT f.*, b.title as book_title, u.name as student_name
         FROM library_fines f
-        JOIN issues i ON f.issue_id = i.id
-        JOIN books b ON i.book_id = b.id
-        JOIN users u ON f.student_id = u.id
-        WHERE f.id = %s AND f.student_id = %s AND f.paid = true
+        JOIN issues i ON f.issue_id = i.sl_no
+        JOIN books b ON i.book_id = b.sl_no
+        JOIN users u ON f.student_id = u.user_id
+        WHERE f.sl_no = %s AND f.student_id = %s AND f.paid = true
     """, (fine_id, user_id)).fetchone()
     conn.close()
     
@@ -942,7 +1062,7 @@ def api_library_fines_receipt(fine_id):
         return "Receipt not found", 404
         
     html = f"""
-    <html><head><title>Receipt #{fine['id']}</title><style>
+    <html><head><title>Receipt #{fine['sl_no']}</title><style>
     body {{ font-family: Arial, sans-serif; padding: 40px; color: #333; }}
     .receipt {{ border: 1px solid #ccc; max-width: 600px; margin: 0 auto; padding: 30px; }}
     h1 {{ color: #8B1D1D; text-align: center; }}
@@ -954,7 +1074,7 @@ def api_library_fines_receipt(fine_id):
       <h1>CS Connect Library</h1>
       <h3 style="text-align:center;">Payment Receipt</h3>
       <br><br>
-      <div class="row"><strong>Receipt No:</strong> <span>#{fine['id']}</span></div>
+      <div class="row"><strong>Receipt No:</strong> <span>#{fine['sl_no']}</span></div>
       <div class="row"><strong>Date:</strong> <span>{fine['paid_date']}</span></div>
       <div class="row"><strong>Student:</strong> <span>{fine['student_name']}</span></div>
       <br>
