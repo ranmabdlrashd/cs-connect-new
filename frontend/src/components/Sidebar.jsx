@@ -52,14 +52,7 @@ const Sidebar = ({ user }) => {
               key={item.path}
               className={`nav-item ${isActive ? 'active' : ''}`}
               title={item.label}
-              onClick={() => {
-                const flaskRoutes = ['/dashboard/assignments', '/dashboard/library', '/dashboard/labs', '/dashboard/faculty', '/dashboard/timetable', '/dashboard/placements', '/timetable', '/placements'];
-                if (flaskRoutes.includes(item.path)) {
-                  window.location.href = item.path;
-                } else {
-                  navigate(item.path);
-                }
-              }}
+              onClick={() => navigate(item.path)}
             >
               <Icon size={20} strokeWidth={1.5} />
             </div>

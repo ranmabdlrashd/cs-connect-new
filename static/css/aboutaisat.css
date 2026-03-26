@@ -328,7 +328,77 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────── */
+/* ── Institutional Leadership ───────────────────────────────────── */
+.leadership-grid-main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.leader-card-alt {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.leader-card-alt:hover {
+  transform: translateY(-5px);
+  border-color: rgba(139,29,29,0.4);
+}
+.featured-leader {
+  background: linear-gradient(145deg, var(--bg-secondary) 0%, rgba(139,29,29,0.03) 100%);
+  border-bottom: 3px solid #8B1D1D;
+}
+.leader-avatar-box {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #8B1D1D, #2D0A0A);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 12px rgba(139,29,29,0.2);
+}
+.lead-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.lead-role {
+  font-size: 10px;
+  color: #8B1D1D;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.lead-info {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.leader-card-sm {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.leader-card-sm .lead-name { font-size: 14px; margin-bottom: 2px; }
+.leader-card-sm .lead-role { font-size: 9px; margin-bottom: 0; }
+
 @media (max-width: 768px) {
   .aisat-breadcrumb,
   .aisat-hero,

@@ -33,67 +33,35 @@ const StudentDashboard = () => {
       setLoading(true);
       setError(null);
       
-      // AUTH GUARD
-      const token = localStorage.getItem('cs_connect_token');
-      if (!token) {
-        // In a real app we'd redirect to login: navigate('/login');
-        // Setting mock user for demo if token is absent
-        setUser({
-          id: 1,
-          name: 'Sarah Connor',
-          roll_no: 'CS25001',
-          batch: '2025',
-          semester: '6'
-        });
-      } else {
-        // Decode JWT token logic would go here
-        // const decoded = jwtDecode(token);
-        // setUser(decoded);
-      }
-
-      // API CALLS ON MOUNT
-      // In a real app:
-      // const [dashRes, schedRes, noticeRes] = await Promise.all([
-      //   fetch('/api/student/dashboard'),
-      //   fetch('/api/student/schedule'),
-      //   fetch('/api/notices?limit=5')
-      // ]);
-      // const dashboard = await dashRes.json();
-      // ...
+      const response = await fetch('/api/student/dashboard');
+      if (!response.ok) throw new Error('Unauthorized or Server Error');
+      const dashboardData = await response.json();
       
-      // Mocking API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      setUser(dashboardData.user);
 
-      // Mock Data based on DB queries provided in prompt
+      const [schedRes, noticeRes] = await Promise.all([
+        fetch('/api/student/schedule'),
+        fetch('/api/notices?limit=5')
+      ]);
+      
+      const schedule = await schedRes.json();
+      const notices = await noticeRes.json();
+
       setData({
-        dashboard: {
-          attendance: { percentage: 86 },
-          cgpa: { current: 8.92, change: '+0.15', isPositive: true },
-          library: { borrowed_count: 2, nearest_due_days: 3 },
-          assignments: { pending_count: 4 },
-          grades: [
-            { subject_name: 'Database Management Systems', grade: 'A+' },
-            { subject_name: 'Computer Networks', grade: 'A' },
-            { subject_name: 'Operating Systems', grade: 'B+' },
-            { subject_name: 'Theory of Computation', grade: 'B' },
-            { subject_name: 'Software Engineering', grade: 'A-' }
-          ]
-        },
-        schedule: [
-          { time: '09:00 AM', subject: 'Database Management', room: 'LHC 102', faculty: 'Dr. Smith', status: 'past' },
-          { time: '10:30 AM', subject: 'Computer Networks', room: 'LHC 105', faculty: 'Prof. Johnson', status: 'past' },
-          { time: '12:00 PM', subject: 'Operating Systems Lab', room: 'Lab 3', faculty: 'Dr. Allen', status: 'current' },
-          { time: '02:30 PM', subject: 'Software Engineering', room: 'LHC 201', faculty: 'Dr. Wright', status: 'future' }
-        ],
-        notices: [
-          { id: 1, title: 'Mid-Semester Examination Schedule', body: 'The mid-semester exams for 6th semester will commence from April 10th.', date: 'Mar 20, 2025' },
-          { id: 2, title: 'Hackathon Registration Open', body: 'Register for the annual college hackathon before March 25th to secure early bird kits.', date: 'Mar 18, 2025' },
-          { id: 3, title: 'Library Maintenance', body: 'The central library digital portal will be down for maintenance this weekend.', date: 'Mar 15, 2025' }
-        ]
+        dashboard: dashboardData.dashboard,
+        schedule: schedule.classes.map(c => ({
+          time: `${c.time_start} - ${c.time_end}`,
+          subject: c.subject_name,
+          room: 'LHC', // Room info missing in DB, defaulting
+          faculty: c.faculty_name,
+          status: 'future' 
+        })),
+        notices: notices
       });
       
     } catch (err) {
-      setError('Failed to load dashboard data. Please try again.');
+      setError('Failed to load dashboard data. Please check your connection.');
+      console.error(err);
     } finally {
       setLoading(false);
     }

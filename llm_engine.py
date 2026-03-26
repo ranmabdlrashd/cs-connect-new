@@ -1,195 +1,366 @@
 import os
+import logging
 import json
-from typing import List
+import collections
+import time
+import re
+from typing import List, Dict, Any, Optional
 from groq import Groq
 from database import get_db_connection
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize Groq client (Llama 3.3 70B)
+logger = logging.getLogger(__name__)
+
+# Initialize Groq client
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 MODEL = "llama-3.3-70b-versatile"
 
-def analyze_intent(user_query: str, chat_history: List[dict]) -> dict:
-    """
-    Uses Claude to determine the subject of the query and extract keywords.
-    """
-    history_str = ""
-    for msg in chat_history[-3:]: # Only look at last 3 for intent
-        role = "User" if msg['role'] == 'user' else "AI"
-        history_str += f"{role}: {msg['content']}\n"
+# In-memory cache for last 10 queries
+chat_cache = collections.OrderedDict()
+MAX_CACHE_SIZE = 10
 
-    system_prompt = (
-        "You are a Search Intent Analyzer for a college department portal.\n"
-        "Your goal is to determine EXACTLY what the user wants to search for, considering conversation history.\n"
-        "Available Categories: ['faculty', 'library', 'academics', 'placements', 'events', 'notes', 'general']\n"
-        "RULES: If the user mentions a person's name (e.g. 'Who is Divya', 'Tell me about Mohan'), ALWAYS categorize as 'faculty'.\n\n"
-        "Return ONLY a JSON object with this structure (no Markdown wrap):\n"
-        "{\n"
-        "  \"intent\": \"faculty|library|academics|placements|events|notes|general\",\n"
-        "  \"subject\": \"the actual noun they are talking about\",\n"
-        "  \"keywords\": [\"list\", \"of\", \"keywords\"]\n"
-        "}"
-    )
+BASE_DIR = "static/uploads/notes"
 
-    user_prompt = f"CONVERSATION HISTORY:\n{history_str}\n\nCURRENT QUERY: {user_query}"
-
-    try:
-        completion = client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user",   "content": user_prompt},
-            ],
-            model=MODEL,
-            temperature=0.1,
-            response_format={"type": "json_object"}
-        )
-        return json.loads(completion.choices[0].message.content)
-    except Exception as e:
-        print(f"Intent Analysis Error: {e}")
-        return {"intent": "general", "subject": user_query, "keywords": [user_query]}
-
-def get_context_by_intent(analysis: dict) -> str:
+def get_safe_pdf_url(filename: str) -> Optional[str]:
     """
-    Fetches targeted context based on the analyzed intent and subject.
+    Sanitizes and validates filename to prevent path traversal and unauthorized access.
+    Returns a safe relative URL or None.
     """
-    intent = analysis.get("intent", "general")
-    subject = analysis.get("subject", "")
-    keywords = analysis.get("keywords", [])
+    if not filename:
+        return None
+        
+    # 1. Sanitize filename (extract only the basename)
+    safe_name = os.path.basename(filename)
     
+    # 2. Validate filename
+    if not safe_name or ".." in safe_name:
+        logging.warning("Blocked invalid file path attempt: %s", filename)
+        return None
+        
+    # 3. Secure path construction
+    safe_path = os.path.join(BASE_DIR, safe_name)
+    
+    # 4. Prevent path escape (critical check)
+    full_path = os.path.abspath(safe_path)
+    base_abs_dir = os.path.abspath(BASE_DIR)
+    
+    if not full_path.startswith(base_abs_dir):
+        logging.warning("Path traversal attempt detected: %s", filename)
+        return None
+        
+    # 5. Check if file exists
+    if not os.path.exists(full_path):
+        return None
+        
+    # 6. Generate safe URL
+    return f"/static/uploads/notes/{safe_name}"
+
+def extract_keywords(user_input: str) -> List[str]:
+    """
+    Pure Python keyword extraction (no LLM).
+    """
+    stop_words = {
+        'a', 'an', 'the', 'is', 'are', 'was', 'were', 'for', 'and', 'or', 'in', 'on', 'at', 
+        'about', 'how', 'what', 'where', 'when', 'why', 'who', 'tell', 'me', 'please', 
+        'give', 'show', 'can', 'you', 'find', 'search', 'get', 'help'
+    }
+    # Clean input
+    cleaned = "".join(c if c.isalnum() or c.isspace() else " " for c in user_input.lower())
+    words = cleaned.split()
+    
+    # Filter keywords
+    keywords = [w for w in words if w not in stop_words and len(w) > 2]
+    return list(set(keywords))
+
+def fetch_relevant_data(keywords: List[str]) -> List[Dict[str, Any]]:
+    """
+    Executes a single optimized SQL query to fetch relevant data across all categories.
+    Implements ranking, limiting (5), and parameterization to prevent SQL injection.
+    """
     if not keywords:
-        keywords = [subject]
+        return []
+
+    # Build patterns for ILIKE ANY
+    patterns = [f"%{kw}%" for kw in keywords]
+    first_keyword_pattern = f"%{keywords[0]}%"
 
     conn = get_db_connection()
     if not conn:
-        return "Critical Error: Could not connect to database."
+        return []
 
-    context_parts: List[str] = []
-    
+    results = []
     try:
         with conn.cursor() as cur:
-            for kw in keywords[:3]:
-                search_term = f"%{kw}%"
+            # Combined query using UNION ALL for a single database hit
+            # Unifies disparate table structures into a clean, structured format
+            query = """
+                SELECT * FROM (
+                    SELECT 'FACULTY' as category, name as title, 
+                           'Designation: ' || designation || ' | Research: ' || research as details,
+                           email as extra
+                    FROM faculty 
+                    WHERE name ILIKE ANY(%s) OR research ILIKE ANY(%s) OR designation ILIKE ANY(%s)
+                    
+                    UNION ALL
+                    
+                    SELECT 'STUDY MATERIAL' as category, document_name as title, 
+                           content as details,
+                           NULL as extra
+                    FROM document_chunks 
+                    WHERE document_name ILIKE ANY(%s) OR content ILIKE ANY(%s)
+                    
+                    UNION ALL
+                    
+                    SELECT 'LIBRARY' as category, title as title, 
+                           'Author: ' || author || ' | Category: ' || category as details,
+                           availability::text as extra
+                    FROM books 
+                    WHERE title ILIKE ANY(%s) OR author ILIKE ANY(%s)
+                    
+                    UNION ALL
+                    
+                    SELECT 'ALUMNI' as category, name as title, 
+                           'Placed at: ' || company as details,
+                           package as extra
+                    FROM alumni 
+                    WHERE name ILIKE ANY(%s) OR company ILIKE ANY(%s)
+                    
+                    UNION ALL
+                    
+                    SELECT 'SUBJECT' as category, full_name as title, 
+                           'Code: ' || code as details,
+                           faculty_name as extra
+                    FROM timetable_subjects 
+                    WHERE full_name ILIKE ANY(%s) OR code ILIKE ANY(%s)
+                    
+                    UNION ALL
+                    
+                    SELECT 'INFO' as category, title as title, 
+                           content as details,
+                           NULL as extra
+                    FROM website_content 
+                    WHERE title ILIKE ANY(%s) OR content ILIKE ANY(%s)
+                ) as search_results
+                ORDER BY 
+                    CASE 
+                        WHEN title ILIKE %s THEN 1 
+                        ELSE 2 
+                    END
+                LIMIT 5
+            """
+            
+            # Param mapping for each table's ILIKE ANY columns + the ranking pattern
+            params = [
+                patterns, patterns, patterns, # Faculty
+                patterns, patterns,           # Study Material
+                patterns, patterns,           # Library
+                patterns, patterns,           # Alumni
+                patterns, patterns,           # Subject
+                patterns, patterns,           # Info
+                first_keyword_pattern         # Rank priority for first keyword
+            ]
+            
+            cur.execute(query, params)
+            rows = cur.fetchall()
+            
+            # Convert rows to clean structured dictionaries
+            for row in rows:
+                results.append({
+                    "category": row[0],
+                    "title": row[1],
+                    "details": row[2],
+                    "extra": row[3]
+                })
                 
-                if intent == 'faculty':
-                    cur.execute("SELECT name, designation, qualification, research, email FROM faculty WHERE name ILIKE %s OR designation ILIKE %s OR research ILIKE %s", (search_term, search_term, search_term))
-                    for f in cur.fetchall():
-                        context_parts.append(f"FACULTY: {f[0]}, {f[1]}, Qual: {f[2]}, Research: {f[3]}, Email: {f[4]}")
-
-                elif intent == 'notes':
-                    # Prioritize document_name matches over content matches
-                    cur.execute("""
-                        SELECT document_name, content 
-                        FROM document_chunks 
-                        WHERE content ILIKE %s OR document_name ILIKE %s 
-                        ORDER BY (document_name ILIKE %s) DESC 
-                        LIMIT 3
-                    """, (search_term, search_term, search_term))
-                    for c in cur.fetchall():
-                        pdf_url = f"/static/uploads/notes/{c[0]}"
-                        context_parts.append(f"STUDY MATERIAL (PDF): {c[0]} | Preview: {c[1][:300]} | Download URL: {pdf_url}")
-
-                elif intent == 'library':
-                    cur.execute("SELECT title, author, subject, status, availability FROM books WHERE title ILIKE %s OR author ILIKE %s OR subject ILIKE %s", (search_term, search_term, search_term))
-                    for b in cur.fetchall():
-                        context_parts.append(f"LIBRARY BOOK: {b[0]} by {b[1]} (Subject: {b[2]}, Status: {b[3]})")
-
-                elif intent == 'placements':
-                    cur.execute("SELECT name, company, package FROM alumni WHERE name ILIKE %s OR company ILIKE %s", (search_term, search_term))
-                    for a in cur.fetchall():
-                        context_parts.append(f"ALUMNI: {a[0]} placed at {a[1]} ({a[2]})")
-
-                elif intent == 'academics':
-                    cur.execute("SELECT full_name, code, faculty_name FROM timetable_subjects WHERE full_name ILIKE %s OR code ILIKE %s", (search_term, search_term))
-                    for s in cur.fetchall():
-                        context_parts.append(f"SUBJECT: {s[0]} ({s[1]}) - Faculty: {s[2]}")
-
-        # Global Fallback: If context is still thin or intent is 'general', 
-        # search high-priority categories (Faculty & Notes) automatically.
-        if len(context_parts) < 2:
-            for kw in keywords[:2]:
-                search_term = f"%{kw}%"
-                
-                # Check faculty again as it's the most common "who is" target
-                if intent != 'faculty':
-                    cur.execute("SELECT name, designation, qualification, email FROM faculty WHERE name ILIKE %s LIMIT 2", (search_term,))
-                    for f in cur.fetchall():
-                        context_parts.append(f"POTENTIAL FACULTY MATCH: {f[0]}, {f[1]} ({f[2]}), Email: {f[3]}")
-                
-                # Check notes again in case it was a general material request
-                if intent != 'notes':
-                    cur.execute("SELECT document_name, content FROM document_chunks WHERE document_name ILIKE %s LIMIT 1", (search_term,))
-                    for c in cur.fetchall():
-                        context_parts.append(f"POTENTIAL NOTE MATCH: {c[0]} | Preview: {c[1][:100]}")
-
-                # Check general website content last
-                cur.execute("SELECT title, content FROM website_content WHERE title ILIKE %s OR content ILIKE %s LIMIT 2", (search_term, search_term))
-                for w in cur.fetchall():
-                    context_parts.append(f"INFO: {w[0]} - {w[1][:300]}")
-
     except Exception as e:
-        print(f"Retrieval Error: {e}")
+        logger.exception("Database Search Error")
     finally:
         conn.close()
 
-    return "\n".join(context_parts) if context_parts else "No specific records found for your query. Ask about faculty, library books, or department events."
+    # Optional Fallback: broader search logic can be implemented here if results are empty
+    # For now, ILIKE ANY with multiple patterns is already broad enough for context retrieval.
+    return results
 
-def generate_response(messages: List[dict], is_logged_in: bool = False) -> str:
+def fetch_db_context(keywords: List[str]) -> str:
     """
-    Response generation via Groq/Llama. Accepts full message history from frontend.
+    Fetches targeted context using optimized search and formats it for LLM consumption.
     """
-    if not messages:
-        return "I didn't receive any message."
+    results = fetch_relevant_data(keywords)
+    if not results:
+        return ""
+
+    context_parts = []
+    for r in results:
+        cat = r['category']
+        title = r['title']
+        details = r['details']
+        extra = r['extra']
         
-    user_query = messages[-1]['content']
-    chat_history = messages[:-1]
+        if cat == 'FACULTY':
+            context_parts.append(f"FACULTY: {title}, {details}, Contact: {extra}")
+        elif cat == 'STUDY MATERIAL':
+            pdf_url = get_safe_pdf_url(title)
+            if pdf_url:
+                context_parts.append(f"STUDY MATERIAL (PDF): {title} | Preview: {details[:250]} | URL: {pdf_url}")
+            else:
+                context_parts.append(f"STUDY MATERIAL: {title} | Preview: {details[:250]} | File not available")
+        elif cat == 'LIBRARY':
+            context_parts.append(f"LIBRARY BOOK: {title} | {details} (Availability: {extra})")
+        elif cat == 'ALUMNI':
+            context_parts.append(f"ALUMNI: {title} | {details} ({extra})")
+        elif cat == 'SUBJECT':
+            context_parts.append(f"SUBJECT: {title} | {details} - Faculty: {extra}")
+        elif cat == 'INFO':
+            context_parts.append(f"INFO: {title} - {details[:300]}")
 
-    # Analyze Intent
-    analysis = analyze_intent(user_query, chat_history)
+    # Deduplicate and format final context string
+    unique_context = list(dict.fromkeys(context_parts))
+    return "\n".join(unique_context)
 
-    # Targeted Context Retrieval
-    context = get_context_by_intent(analysis)
-
-    login_instruction = (
-        "The user is logged in. They can View and Download PDFs."
-        if is_logged_in else
-        "The user is NOT logged in. They can View but must be logged in to Download PDFs."
-    )
-
-    system_prompt = (
-        "You are 'CS Connect Assistant', a professional AI for AISAT CSE department.\n"
-        "RULES:\n"
-        "1. MEMORY: Use CONVERSATION HISTORY to understand context. Resolve pronouns like 'him'/'them' from previous messages.\n"
-        "3. SECURITY: Never mention internal system paths in plain text. Use ONLY relative URLs for links. The user must NOT see '/static/uploads/...' in your normal sentences.\n"
-        "4. NOTES: Provide ONLY the [View / Download PDF](/static/uploads/notes/filename.pdf) markdown button. Do NOT include ANY conversational text before or after the button (e.g., no 'Here is the note', no 'I found this'). Respond with ONLY the button. If no exact match is found, say 'No notes found for this subject.'\n"
-        "5. NO JARGON: Never mention 'database', 'intent', 'context', or 'retrieval' in your response.\n"
-        "6. DEFERMENT: For sensitive leadership/management decisions, reply: "
-        "'These are matters handled by the Management and involve institutional policy decisions.'\n"
-        f"6. {login_instruction}\n\n"
-        f"DATABASE CONTEXT:\n{context}\n"
-    )
-
-    # Build messages list for Groq: system + prior history + current user query
-    groq_messages = [{"role": "system", "content": system_prompt}]
-    for m in chat_history[-6:]:
-        if m.get('role') in ('user', 'assistant'):
-            groq_messages.append({"role": m['role'], "content": str(m['content'])})
-    groq_messages.append({"role": "user", "content": user_query})
+def safe_parse_json(text: str) -> Dict[str, Any]:
+    """
+    Safely parses JSON from LLM output, extracting it from markdown blocks if necessary.
+    Provides a fallback if parsing fails.
+    """
+    fallback = {
+        "type": "text",
+        "message": "I'm sorry, I encountered an error processing that request.",
+        "file_url": None
+    }
+    
+    if not text:
+        return fallback
 
     try:
-        completion = client.chat.completions.create(
-            messages=groq_messages,
-            model=MODEL,
-            temperature=0.4,
-            max_tokens=800,
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        print(f"Groq API Error: {e}")
-        return "I'm sorry, I'm having trouble retrieving information right now."
+        # 1. Clean whitespace and unexpected characters
+        cleaned_text = text.strip()
+        
+        # 2. Try to find JSON in markdown code blocks
+        json_match = re.search(r"```json\s*(.*?)\s*```", cleaned_text, re.DOTALL)
+        if json_match:
+            cleaned_text = json_match.group(1)
+        else:
+            # 3. Try to find the first '{' and last '}'
+            start = cleaned_text.find('{')
+            end = cleaned_text.rfind('}')
+            if start != -1 and end != -1:
+                cleaned_text = cleaned_text[start:end+1]
+
+        # 4. Final parse
+        return json.loads(cleaned_text)
+    except Exception:
+        logger.warning("Failed to parse LLM JSON output: %s", text[:200])
+        # Try to return the raw text if it looks like a simple message
+        if "{" not in text:
+             return {"type": "text", "message": text.strip(), "file_url": None}
+        return fallback
+
+def generate_chatbot_response(user_input: str, chat_history: List[dict]) -> Dict[str, Any]:
+    """
+    Core function: Returns a structured dictionary based on user input and DB context.
+    """
+    # 1. Check Cache
+    if user_input in chat_cache:
+        chat_cache.move_to_end(user_input)
+        return chat_cache[user_input]
+
+    # 2. Extract Keywords & Context
+    keywords = extract_keywords(user_input)
+    context = fetch_db_context(keywords)
+
+    # 3. Build System Prompt (STRICT JSON ONLY)
+    system_prompt = (
+        "You are the 'CS Connect Assistant', a helpful and concise college chatbot for the CSE department.\n\n"
+        "CORE RULES:\n"
+        "1. Always respond in valid JSON format ONLY.\n"
+        "2. Do NOT return plain text outside the JSON structure.\n"
+        "3. Use the following schema:\n"
+        "   {\n"
+        "     \"type\": \"text\" | \"notes_button\",\n"
+        "     \"message\": \"string content\",\n"
+        "     \"file_url\": \"relative URL or null\"\n"
+        "   }\n"
+        "4. NOTES/STUDY MATERIAL: If a relevant PDF exists in the context below, set \"type\": \"notes_button\" and provide the \"file_url\". Otherwise, use \"type\": \"text\".\n"
+        "5. If no data is found, return:\n"
+        "   {\"type\": \"text\", \"message\": \"I couldn't find relevant information.\", \"file_url\": null}\n"
+        "6. Use ONLY the provided database context. NEVER hallucinate.\n\n"
+        "DATABASE CONTEXT:\n"
+        f"{context if context else 'No relevant data found in database.'}"
+    )
+
+    # 5. Build Messages
+    messages = [{"role": "system", "content": system_prompt}]
+    # Add last few turns of history for context
+    for msg in chat_history[-5:]:
+        messages.append({"role": msg['role'], "content": msg['content']})
+    messages.append({"role": "user", "content": user_input})
+
+    # 6. Call LLM Once with Failure Handling & Timeout (3 Retries)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            logger.info("Calling Groq API (Attempt %d/%d) for user_input='%s'", attempt + 1, max_retries, user_input[:50])
+            completion = client.chat.completions.create(
+                messages=messages,
+                model=MODEL,
+                temperature=0.2, # Lower temperature for strictly formatted JSON
+                max_tokens=500,
+                timeout=20.0 
+            )
+            raw_response = completion.choices[0].message.content
+            structured_response = safe_parse_json(raw_response)
+
+            # 7. Update Cache
+            chat_cache[user_input] = structured_response
+            if len(chat_cache) > MAX_CACHE_SIZE:
+                chat_cache.popitem(last=False)
+
+            return structured_response
+
+        except Exception:
+            logger.warning("Retry %d failed for Groq API call", attempt + 1)
+            if attempt == max_retries - 1:
+                logger.exception("Persistent failure calling Groq API")
+                return {
+                    "type": "text", 
+                    "message": "AI service is temporarily unavailable. Please try again later.",
+                    "file_url": None
+                }
+            time.sleep(1)
+
+def generate_response(messages: List[dict], is_logged_in: bool = False) -> Dict[str, Any]:
+    """
+    Wrapper for compatibility with app.py. Returns a structured JSON-able dict.
+    """
+    if not messages:
+        return {"type": "text", "message": "I didn't receive any message.", "file_url": None}
+        
+    try:
+        # If passed a list of messages, extract the latest user input
+        user_input = messages[-1]['content']
+        # Convert internal history to match what LLM expects if needed,
+        # but here we just pass the history as is.
+        # Ensure we only pass text content for history, even if it was previously JSON.
+        sanitized_history = []
+        for msg in messages[:-1]:
+            content = msg.get('content', '')
+            if isinstance(content, dict):
+                content = content.get('message', '')
+            sanitized_history.append({"role": msg.get('role', 'user'), "content": content})
+            
+        return generate_chatbot_response(user_input, sanitized_history)
+    except Exception:
+        logger.exception("Unexpected error in generate_response wrapper")
+        return {
+            "type": "text", 
+            "message": "I encountered an error processing your request.",
+            "file_url": None
+        }
 
 if __name__ == "__main__":
+    logger.info("Running LLM Engine test...")
     test_msgs = [{"role": "user", "content": "What are the department stats?"}]
-    print(generate_response(test_msgs, False))
+    logger.info("Response: %s", generate_response(test_msgs, False))
 

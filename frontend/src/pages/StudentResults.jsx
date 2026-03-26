@@ -28,47 +28,18 @@ const StudentResults = () => {
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('cs_connect_token');
-      if (!token) {
-        setUser({
-          id: 1,
-          name: 'Sarah Connor',
-          roll_no: 'CS25001',
-          branch: 'CSE',
-          batch: '2025',
-          semester: '6'
-        });
-      }
+      const [resultsRes, profileRes] = await Promise.all([
+        fetch('/api/student/results'),
+        fetch('/api/student/profile')
+      ]);
 
-      // Mock API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock API Response
-      setData({
-        overall_cgpa: 8.92,
-        cgpa_improvement: 0.15,
-        prev_sem: 5,
-        earned_credits: 105,
-        total_credits: 160,
-        rank_percentile: 12,
-        semester_results: [
-          { semester: 1, sgpa: 8.5, credits: 20 },
-          { semester: 2, sgpa: 8.7, credits: 20 },
-          { semester: 3, sgpa: 9.1, credits: 24 },
-          { semester: 4, sgpa: 8.8, credits: 24 },
-          { semester: 5, sgpa: 9.2, credits: 22 },
-          { semester: 6, sgpa: 0, credits: 20, isCurrent: true }
-        ],
-        current_semester_marks: [
-          { subject_name: "Database Management Systems", subject_code: "CS302", internal: 45, external: 0, total_marks: 45, grade: "A+", grade_points: 10, credits: 4 },
-          { subject_name: "Computer Networks", subject_code: "CS304", internal: 42, external: 0, total_marks: 42, grade: "A", grade_points: 9, credits: 4 },
-          { subject_name: "Operating Systems", subject_code: "CS306", internal: 38, external: 0, total_marks: 38, grade: "B+", grade_points: 8, credits: 3 },
-          { subject_name: "Theory of Computation", subject_code: "CS308", internal: 35, external: 0, total_marks: 35, grade: "B", grade_points: 7, credits: 4 },
-          { subject_name: "Software Engineering", subject_code: "CS310", internal: 46, external: 0, total_marks: 46, grade: "A+", grade_points: 10, credits: 3 },
-          { subject_name: "Mini Project", subject_code: "CS332", internal: 48, external: 0, total_marks: 48, grade: "A+", grade_points: 10, credits: 2 }
-        ],
-        grade_distribution: { 'A+': 12, 'A': 15, 'B+': 8, 'B': 4, 'C': 1 }
-      });
+      if (!resultsRes.ok || !profileRes.ok) throw new Error('Unauthorized');
+      
+      const resultsData = await resultsRes.json();
+      const profileData = await profileRes.json();
+      
+      setUser(profileData);
+      setData(resultsData);
       
     } catch (err) {
       setError('Failed to load results data. Please try again.');

@@ -1,5 +1,8 @@
 import os
-from typing import Dict, List
+import logging
+import time
+import functools
+from typing import Dict, List, Any, Callable
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -7,9 +10,64 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Setup structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+class DatabaseError(Exception):
+    """Custom exception for database-related errors."""
+    pass
+
+class ConnectionWrapper:
+    """
+    A wrapper around psycopg2 connection to provide convenience methods
+    like execute, commit, and ensure proper cursor handling.
+    """
+    def __init__(self, conn):
+        self.conn = conn
+
+    def cursor(self, cursor_factory=None):
+        if cursor_factory is None:
+            # Default to DictCursor if possible, or use the one provided
+            try:
+                from psycopg2.extras import DictCursor
+                cursor_factory = DictCursor
+            except ImportError:
+                pass
+        return self.conn.cursor(cursor_factory=cursor_factory)
+
+    def execute(self, query, params=None):
+        """Execute a query and return the cursor."""
+        from psycopg2.extras import DictCursor
+        cur = self.conn.cursor(cursor_factory=DictCursor)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
+        return cur
+
+    def commit(self):
+        self.conn.commit()
+
+    def rollback(self):
+        self.conn.rollback()
+
+    def close(self):
+        self.conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
 def get_db_connection():
     """
-    Establish and return a connection to the PostgreSQL database with fallbacks.
+    Establish and return a connection to the PostgreSQL database with retries.
+    NEVER returns None. Raises DatabaseError if all attempts fail.
     """
     urls = [
         os.environ.get("NEON_DATABASE_URL"),
@@ -17,27 +75,51 @@ def get_db_connection():
         os.environ.get("DATABASE_URL")
     ]
     urls = [u for u in urls if u]
-    
+    max_retries = 3
+
     for db_url in urls:
+        # Mask credentials for logging
+        display_url = db_url.split('@')[-1] if '@' in db_url else "configured_url"
+        for attempt in range(max_retries):
+            try:
+                logger.info("Connecting to DB (Attempt %d/%d) - Target: %s", attempt + 1, max_retries, display_url)
+                conn = psycopg2.connect(db_url, connect_timeout=5)
+                logger.info("Database connection successful")
+                return ConnectionWrapper(conn)
+            except Exception:
+                logger.warning("Retry %d failed for database connection", attempt + 1)
+                if attempt == max_retries - 1:
+                    logger.exception("Persistent connection failure for URL: %s", display_url)
+                else:
+                    time.sleep(1)
+
+    raise DatabaseError("All database connection attempts failed across all configured URLs.")
+
+
+def with_db_connection(func: Callable):
+    """
+    Decorator that provides a database connection to the wrapped function.
+    Handles connection creation, closing, and error logging.
+    The wrapped function should accept 'conn' as its first argument.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        conn = None
         try:
-            conn = psycopg2.connect(db_url)
-            return conn
+            conn = get_db_connection()
+            return func(conn, *args, **kwargs)
+        except DatabaseError as e:
+            logger.error(f"Database error in {func.__name__}: {e}")
+            raise # Re-raise to be handled by controller if needed
         except Exception as e:
-            print(f"Connection failed for {db_url[:50]}: {e}")
-            
-    # Legacy fallback
-    try:
-        conn = psycopg2.connect(
-            host=os.environ.get("DB_HOST", "localhost"),
-            dbname=os.environ.get("DB_NAME", "csconnect"),
-            user=os.environ.get("DB_USER", "postgres"),
-            password=os.environ.get("DB_PASS", "1234"),
-            port=os.environ.get("DB_PORT", "5432")
-        )
-        return conn
-    except Exception as e:
-        print(f"All database connection attempts failed: {e}")
-        return None
+            logger.error(f"Unexpected error in {func.__name__}: {e}")
+            raise
+        finally:
+            if conn:
+                conn.close()
+                logger.debug(f"Database connection closed for {func.__name__}")
+    return wrapper
+
 
 def setup_unstructured_tables():
     """
@@ -64,23 +146,24 @@ def setup_unstructured_tables():
     );
     """
 
-    conn = get_db_connection()
-    if conn is None:
-        return False
-
+    conn = None
     try:
+        conn = get_db_connection()
         with conn.cursor() as cur:
             cur.execute(create_website_content_sql)
             cur.execute(create_document_chunks_sql)
             conn.commit()
-            print("Successfully initialized unstructured data tables.")
+            logger.info("Successfully initialized unstructured data tables.")
             return True
-    except psycopg2.Error as e:
-        print(f"Error creating unstructured tables: {e}")
-        conn.rollback()
+    except (psycopg2.Error, DatabaseError) as e:
+        logger.error(f"Error creating unstructured tables: {e}")
+        if conn:
+            conn.rollback()
         return False
     finally:
-        conn.close()
+        if conn:
+            conn.close()
+
 
 def get_schema_summary() -> Dict[str, List[str]]:
     """
@@ -88,10 +171,8 @@ def get_schema_summary() -> Dict[str, List[str]]:
     Useful for providing context to the AI chatbot.
     """
     schema_summary: Dict[str, List[str]] = {}
-    conn = get_db_connection()
-    if conn is None:
-        return schema_summary
-
+    conn = None
+    
     query = """
     SELECT 
         table_name, 
@@ -106,6 +187,7 @@ def get_schema_summary() -> Dict[str, List[str]]:
     """
 
     try:
+        conn = get_db_connection()
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(query)
             rows = cur.fetchall()
@@ -120,37 +202,39 @@ def get_schema_summary() -> Dict[str, List[str]]:
                 
                 schema_summary[table].append(f"{col} ({dtype})")
                 
-    except psycopg2.Error as e:
-        print(f"Error fetching schema summary: {e}")
+    except (psycopg2.Error, DatabaseError) as e:
+        logger.error(f"Error fetching schema summary: {e}")
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     return schema_summary
 
+
 if __name__ == "__main__":
     # Test the connection and setup tables when run directly
-    print("Testing database connection and setting up tables...")
+    logger.info("Testing database connection and setting up tables...")
     success = setup_unstructured_tables()
     
     if success:
-        print("\nFetching schema summary for validation:")
+        logger.info("Fetching schema summary for validation:")
         schema = get_schema_summary()
         
         if schema:
-            # Print a sample of the schema to verify it works
+            # Log a sample of the schema to verify it works
             for i, table in enumerate(schema):
                 if i >= 3:
                     break
                 columns = schema[table]
-                print(f"- Table: {table}")
-                # Print only first 3 columns
+                logger.info("- Table: %s", table)
+                # Log only first 3 columns
                 col_sample = []
                 for j, col in enumerate(columns):
                     if j >= 3:
                         break
                     col_sample.append(col)
                 
-                print(f"  Columns: {', '.join(col_sample)}{'...' if len(columns) > 3 else ''}")
-            print(f"... and {max(0, len(schema) - 3)} more tables.")
+                logger.info("  Columns: %s%s", ', '.join(col_sample), '...' if len(columns) > 3 else '')
+            logger.info("... and %d more tables.", max(0, len(schema) - 3))
         else:
-            print("Failed to fetch schema summary.")
+            logger.error("Failed to fetch schema summary.")

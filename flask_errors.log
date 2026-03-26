@@ -26,3 +26,1182 @@ LINE 1: SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 1
 LINE 1: SELECT text FROM news_ticker ORDER BY sl_no DESC LIMIT 1
                                               ^
  [in C:\Users\LENOVO\Desktop\Mini project\cs_connect\app.py:776]
+2026-03-27 02:47:09,112 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:47:10,069 [INFO] database: Database connection successful
+2026-03-27 02:47:12,864 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 02:47:12,866 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 02:47:12,870 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 02:47:15,013 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:47:15,365 [INFO] database: Database connection successful
+2026-03-27 02:47:17,894 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 02:47:17,902 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 02:47:22,571 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:47:22,990 [INFO] database: Database connection successful
+2026-03-27 02:47:23,009 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:47:23,055 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "GET / HTTP/1.1" 200 -
+2026-03-27 02:47:23,238 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,244 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,252 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,258 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,325 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "GET /static/js/chatbot.js HTTP/1.1" 200 -
+2026-03-27 02:47:23,326 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,355 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,376 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 02:47:23,626 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 3509, in serve_react
+    return send_from_directory('frontend/dist', 'index.html')
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\helpers.py", line 572, in send_from_directory
+    return werkzeug.utils.send_from_directory(  # type: ignore[return-value]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        directory, path, **_prepare_send_file_kwargs(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\werkzeug\utils.py", line 568, in send_from_directory
+    raise NotFound()
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:47:23,729 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-03-27 02:47:33,136 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 960, in about_cse
+    conn = get_db_connection()
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:47:33,289 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:33] "[35m[1mGET /about-cse HTTP/1.1[0m" 500 -
+2026-03-27 02:47:33,398 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:33] "GET /about-cse?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2026-03-27 02:47:33,641 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:33] "GET /about-cse?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2026-03-27 02:47:33,774 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:33] "GET /about-cse?__debugger__=yes&cmd=resource&f=console.png&s=Cvl6Q58ZzmwqW5Ce39Pr HTTP/1.1" 200 -
+2026-03-27 02:47:33,788 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:47:33] "GET /about-cse?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2026-03-27 02:48:14,132 [ERROR] __main__: Error fetching site_data for key: accreditations
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 70, in get_site_data
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:14,134 [ERROR] __main__: Error fetching site_data for key: infrastructure
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 70, in get_site_data
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:14,151 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:14,157 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "GET /about-aisat HTTP/1.1" 200 -
+2026-03-27 02:48:14,179 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:14,208 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:14,211 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "GET /static/css/aboutaisat.css HTTP/1.1" 200 -
+2026-03-27 02:48:14,234 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:48:14,254 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:14,286 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:14,447 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:14] "[35m[1mGET /api/institution-stats HTTP/1.1[0m" 500 -
+2026-03-27 02:48:17,942 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 946, in faculty
+    conn = get_db_connection()
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:18,030 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:18] "[35m[1mGET /faculty HTTP/1.1[0m" 500 -
+2026-03-27 02:48:18,055 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:18] "GET /faculty?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2026-03-27 02:48:18,119 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:18] "GET /faculty?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2026-03-27 02:48:18,379 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:18] "GET /faculty?__debugger__=yes&cmd=resource&f=console.png&s=Cvl6Q58ZzmwqW5Ce39Pr HTTP/1.1" 200 -
+2026-03-27 02:48:18,564 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:18] "GET /faculty?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2026-03-27 02:48:23,910 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 960, in about_cse
+    conn = get_db_connection()
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:23,998 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:23] "[35m[1mGET /about-cse HTTP/1.1[0m" 500 -
+2026-03-27 02:48:24,022 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:24] "[36mGET /about-cse?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:24,028 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:24] "[36mGET /about-cse?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:24,147 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:24] "[36mGET /about-cse?__debugger__=yes&cmd=resource&f=console.png&s=Cvl6Q58ZzmwqW5Ce39Pr HTTP/1.1[0m" 304 -
+2026-03-27 02:48:28,589 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 1007, in academics
+    conn = get_db_connection()
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:28,637 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:28] "[35m[1mGET /academics HTTP/1.1[0m" 500 -
+2026-03-27 02:48:28,664 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:28] "GET /academics?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2026-03-27 02:48:28,680 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:28] "GET /academics?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2026-03-27 02:48:28,739 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:28] "GET /academics?__debugger__=yes&cmd=resource&f=console.png&s=Cvl6Q58ZzmwqW5Ce39Pr HTTP/1.1" 200 -
+2026-03-27 02:48:28,758 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:28] "GET /academics?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2026-03-27 02:48:33,308 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:33,312 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "GET /placements HTTP/1.1" 200 -
+2026-03-27 02:48:33,329 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:33,349 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:33,366 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "GET /static/css/placement.css HTTP/1.1" 200 -
+2026-03-27 02:48:33,377 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:48:33,393 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:33,394 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:33,646 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[35m[1mGET /api/placements/active HTTP/1.1[0m" 500 -
+2026-03-27 02:48:33,648 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:33] "[35m[1mGET /api/placements/past HTTP/1.1[0m" 500 -
+2026-03-27 02:48:44,601 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:44,609 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "GET /contact HTTP/1.1" 200 -
+2026-03-27 02:48:44,630 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:44,652 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:44,656 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "GET /static/css/contact.css HTTP/1.1" 200 -
+2026-03-27 02:48:44,661 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:48:44,680 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:44,709 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:44] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:48,797 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:48:49,136 [INFO] database: Database connection successful
+2026-03-27 02:48:49,137 [ERROR] __main__: Error fetching news_ticker
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\project\cs_connect\app.py", line 85, in get_news_ticker
+    with get_db_connection() as conn:
+         ^^^^^^^^^^^^^^^^^
+NameError: name 'get_db_connection' is not defined
+2026-03-27 02:48:49,140 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "GET / HTTP/1.1" 200 -
+2026-03-27 02:48:49,176 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,186 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,192 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,233 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,291 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,339 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,373 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:48:49,399 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:48:49] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 02:49:01,897 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:49:02,240 [INFO] database: Database connection successful
+2026-03-27 02:49:02,525 [INFO] llm_engine: Calling Groq API (Attempt 1/3) for user_input='who is the principal'
+2026-03-27 02:49:03,230 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-27 02:49:03,242 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:49:03] "POST /api/chat HTTP/1.1" 200 -
+2026-03-27 02:49:19,257 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:49:19,592 [INFO] database: Database connection successful
+2026-03-27 02:49:19,701 [INFO] llm_engine: Calling Groq API (Attempt 1/3) for user_input='who is the chairmen'
+2026-03-27 02:49:20,068 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-27 02:49:20,070 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:49:20] "POST /api/chat HTTP/1.1" 200 -
+2026-03-27 02:49:31,505 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:49:31,840 [INFO] database: Database connection successful
+2026-03-27 02:49:31,997 [INFO] llm_engine: Calling Groq API (Attempt 1/3) for user_input='who is the chairman'
+2026-03-27 02:49:32,304 [INFO] httpx: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-27 02:49:32,307 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:49:32] "POST /api/chat HTTP/1.1" 200 -
+2026-03-27 02:51:55,008 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:51:55,356 [INFO] database: Database connection successful
+2026-03-27 02:51:57,861 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 02:51:57,862 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 02:51:57,865 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 02:52:00,312 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:00,667 [INFO] database: Database connection successful
+2026-03-27 02:52:03,178 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 02:52:03,186 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 02:52:03,821 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:04,178 [INFO] database: Database connection successful
+2026-03-27 02:52:04,195 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:04,506 [INFO] database: Database connection successful
+2026-03-27 02:52:04,648 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "GET / HTTP/1.1" 200 -
+2026-03-27 02:52:04,787 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,839 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,842 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,855 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,894 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,902 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,903 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:04,941 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:04] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 02:52:08,314 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:08,660 [INFO] database: Database connection successful
+2026-03-27 02:52:08,838 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:09,170 [INFO] database: Database connection successful
+2026-03-27 02:52:09,300 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:09,635 [INFO] database: Database connection successful
+2026-03-27 02:52:09,745 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:10,117 [INFO] database: Database connection successful
+2026-03-27 02:52:10,231 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:10,564 [INFO] database: Database connection successful
+2026-03-27 02:52:10,667 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:10,986 [INFO] database: Database connection successful
+2026-03-27 02:52:11,129 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:11,444 [INFO] database: Database connection successful
+2026-03-27 02:52:11,556 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "GET /about-cse HTTP/1.1" 200 -
+2026-03-27 02:52:11,585 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:11,599 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/css/aboutcse.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:11,603 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:11,607 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:11,609 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:11,675 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:11] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:20,040 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:20,402 [INFO] database: Database connection successful
+2026-03-27 02:52:20,568 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:20,922 [INFO] database: Database connection successful
+2026-03-27 02:52:21,037 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:21,350 [INFO] database: Database connection successful
+2026-03-27 02:52:21,458 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "GET /faculty HTTP/1.1" 200 -
+2026-03-27 02:52:21,483 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "GET /static/css/faculty.css HTTP/1.1" 200 -
+2026-03-27 02:52:21,490 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:21,495 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:21,500 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:21,502 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:21,533 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:21] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:21,595 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:21,907 [INFO] database: Database connection successful
+2026-03-27 02:52:22,063 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:22] "GET /api/faculty HTTP/1.1" 200 -
+2026-03-27 02:52:29,029 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:29,353 [INFO] database: Database connection successful
+2026-03-27 02:52:29,458 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[33mGET /faculty/ HTTP/1.1[0m" 404 -
+2026-03-27 02:52:29,483 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:29,495 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:29,498 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:29,500 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:29,530 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:29] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:32,637 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:32,971 [INFO] database: Database connection successful
+2026-03-27 02:52:32,972 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:33,300 [INFO] database: Database connection successful
+2026-03-27 02:52:33,409 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "GET / HTTP/1.1" 200 -
+2026-03-27 02:52:33,435 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,439 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,444 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,453 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,490 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,501 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,504 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:33,509 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:33] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 02:52:35,195 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:35,530 [INFO] database: Database connection successful
+2026-03-27 02:52:35,690 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:35,950 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:36,039 [INFO] database: Database connection successful
+2026-03-27 02:52:36,171 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:36,282 [INFO] database: Database connection successful
+2026-03-27 02:52:36,437 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:36,510 [INFO] database: Database connection successful
+2026-03-27 02:52:36,617 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:36] "GET /faculty HTTP/1.1" 200 -
+2026-03-27 02:52:36,762 [INFO] database: Database connection successful
+2026-03-27 02:52:36,869 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:37,202 [INFO] database: Database connection successful
+2026-03-27 02:52:37,304 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "GET /faculty HTTP/1.1" 200 -
+2026-03-27 02:52:37,329 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,345 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,355 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,358 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/css/faculty.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,385 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,417 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:37,458 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:37,787 [INFO] database: Database connection successful
+2026-03-27 02:52:37,951 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:37] "GET /api/faculty HTTP/1.1" 200 -
+2026-03-27 02:52:41,558 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:52:41,870 [INFO] database: Database connection successful
+2026-03-27 02:52:41,976 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:41] "[33mGET /faculty/undefined HTTP/1.1[0m" 404 -
+2026-03-27 02:52:42,013 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:42] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:42,023 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:42] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:52:42,032 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:42] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:52:42,043 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:52:42,055 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:52:42] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:55:47,854 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\api.py', reloading
+2026-03-27 02:55:48,269 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 02:55:50,128 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:55:50,500 [INFO] database: Database connection successful
+2026-03-27 02:55:53,179 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 02:55:53,183 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 02:56:40,083 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\tmp\\inspect_faculty.py', reloading
+2026-03-27 02:56:40,264 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 02:56:42,085 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:56:42,468 [INFO] database: Database connection successful
+2026-03-27 02:56:45,599 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 02:56:45,606 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 02:57:22,173 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:22,527 [INFO] database: Database connection successful
+2026-03-27 02:57:22,690 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[33mGET /faculty/undefined HTTP/1.1[0m" 404 -
+2026-03-27 02:57:22,875 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:22,895 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:22,895 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:22,897 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:57:22,958 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:22] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:26,285 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:26,679 [INFO] database: Database connection successful
+2026-03-27 02:57:26,841 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:27,205 [INFO] database: Database connection successful
+2026-03-27 02:57:27,333 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:27,699 [INFO] database: Database connection successful
+2026-03-27 02:57:27,819 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "GET /faculty HTTP/1.1" 200 -
+2026-03-27 02:57:27,846 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:27,855 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:27,867 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/css/faculty.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:27,886 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:57:27,898 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:27,944 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:27] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:28,004 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:28,322 [INFO] database: Database connection successful
+2026-03-27 02:57:28,477 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:28] "GET /api/faculty HTTP/1.1" 200 -
+2026-03-27 02:57:31,754 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:32,129 [INFO] database: Database connection successful
+2026-03-27 02:57:32,241 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "GET /faculty/1 HTTP/1.1" 200 -
+2026-03-27 02:57:32,268 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "GET /static/css/faculty_detail.css HTTP/1.1" 200 -
+2026-03-27 02:57:32,276 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:32,289 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:57:32,290 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:32,296 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:32,306 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:32,389 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:32,731 [INFO] database: Database connection successful
+2026-03-27 02:57:32,840 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:32] "GET /api/faculty/1 HTTP/1.1" 200 -
+2026-03-27 02:57:53,286 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:53,621 [INFO] database: Database connection successful
+2026-03-27 02:57:53,735 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "GET /faculty/2 HTTP/1.1" 200 -
+2026-03-27 02:57:53,761 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,784 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,789 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/css/faculty_detail.css HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,794 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,820 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,829 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:53] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:57:53,917 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:57:54,236 [INFO] database: Database connection successful
+2026-03-27 02:57:54,339 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:57:54] "GET /api/faculty/2 HTTP/1.1" 200 -
+2026-03-27 02:58:10,128 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:10,459 [INFO] database: Database connection successful
+2026-03-27 02:58:10,469 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:10,797 [INFO] database: Database connection successful
+2026-03-27 02:58:10,907 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:10] "GET / HTTP/1.1" 200 -
+2026-03-27 02:58:10,925 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:10] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:10,943 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:10] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:10,953 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:10] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:10,962 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:10] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:11,022 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:11] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:58:11,158 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:11] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:11,222 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:11] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:11,278 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:11] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 02:58:12,616 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:12,974 [INFO] database: Database connection successful
+2026-03-27 02:58:13,085 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:13] "GET /login HTTP/1.1" 200 -
+2026-03-27 02:58:13,107 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:13] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:13,129 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:13] "GET /static/css/login.css HTTP/1.1" 200 -
+2026-03-27 02:58:16,046 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:16,363 [INFO] database: Database connection successful
+2026-03-27 02:58:16,736 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:16] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-27 02:58:16,743 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:17,071 [INFO] database: Database connection successful
+2026-03-27 02:58:17,077 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:17,409 [INFO] database: Database connection successful
+2026-03-27 02:58:17,525 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:17,856 [INFO] database: Database connection successful
+2026-03-27 02:58:17,987 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:18,322 [INFO] database: Database connection successful
+2026-03-27 02:58:18,445 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "GET / HTTP/1.1" 200 -
+2026-03-27 02:58:18,481 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,483 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,485 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,492 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,515 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,541 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:18,567 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:18] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:24,023 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:24,354 [INFO] database: Database connection successful
+2026-03-27 02:58:24,494 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:24,822 [INFO] database: Database connection successful
+2026-03-27 02:58:24,925 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:25,243 [INFO] database: Database connection successful
+2026-03-27 02:58:25,349 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:25,668 [INFO] database: Database connection successful
+2026-03-27 02:58:25,775 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "GET /student-dashboard HTTP/1.1" 200 -
+2026-03-27 02:58:25,799 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "GET /static/css/dashboard_shared.css HTTP/1.1" 200 -
+2026-03-27 02:58:25,807 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "GET /static/css/student_dash.css HTTP/1.1" 200 -
+2026-03-27 02:58:25,809 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:25,821 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:25,836 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:25,840 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:25,876 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:25] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:32,613 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:32,943 [INFO] database: Database connection successful
+2026-03-27 02:58:33,064 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:33,392 [INFO] database: Database connection successful
+2026-03-27 02:58:33,503 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:33,829 [INFO] database: Database connection successful
+2026-03-27 02:58:33,939 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:34,253 [INFO] database: Database connection successful
+2026-03-27 02:58:34,361 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "GET /dashboard/timetable HTTP/1.1" 200 -
+2026-03-27 02:58:34,383 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:34,393 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:34,408 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:34,408 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:34,409 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:34,436 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:34] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:36,861 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:37,211 [INFO] database: Database connection successful
+2026-03-27 02:58:37,324 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:37,655 [INFO] database: Database connection successful
+2026-03-27 02:58:37,763 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:38,115 [INFO] database: Database connection successful
+2026-03-27 02:58:38,226 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:38,556 [INFO] database: Database connection successful
+2026-03-27 02:58:38,667 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "GET /student-dashboard HTTP/1.1" 200 -
+2026-03-27 02:58:38,690 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,702 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,709 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,716 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/css/student_dash.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,721 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,741 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:38,758 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:38] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:40,925 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:41,252 [INFO] database: Database connection successful
+2026-03-27 02:58:41,360 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:41,673 [INFO] database: Database connection successful
+2026-03-27 02:58:41,778 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 02:58:42,103 [INFO] database: Database connection successful
+2026-03-27 02:58:42,213 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "GET /student-dashboard/library HTTP/1.1" 200 -
+2026-03-27 02:58:42,232 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:42,253 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:42,255 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 02:58:42,258 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 02:58:42,268 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 02:58:42,314 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 02:58:42] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:05:35,049 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:36,159 [INFO] database: Database connection successful
+2026-03-27 03:05:38,924 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 03:05:38,925 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 03:05:38,929 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:05:41,361 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:41,724 [INFO] database: Database connection successful
+2026-03-27 03:05:44,250 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:05:44,254 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:05:44,776 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:45,119 [INFO] database: Database connection successful
+2026-03-27 03:05:45,132 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:45,462 [INFO] database: Database connection successful
+2026-03-27 03:05:45,594 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:45,943 [INFO] database: Database connection successful
+2026-03-27 03:05:46,064 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:46,412 [INFO] database: Database connection successful
+2026-03-27 03:05:46,578 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "GET / HTTP/1.1" 200 -
+2026-03-27 03:05:46,774 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,794 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,797 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,812 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,819 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,836 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,844 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:05:46,896 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:46] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:05:56,286 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:56,633 [INFO] database: Database connection successful
+2026-03-27 03:05:56,782 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:57,099 [INFO] database: Database connection successful
+2026-03-27 03:05:57,225 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:57,549 [INFO] database: Database connection successful
+2026-03-27 03:05:57,658 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:05:58,016 [INFO] database: Database connection successful
+2026-03-27 03:05:58,126 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "GET /student-dashboard HTTP/1.1" 200 -
+2026-03-27 03:05:58,145 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,166 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,173 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/css/student_dash.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,179 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,193 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,197 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:05:58,228 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:05:58] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:06:01,425 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:01,759 [INFO] database: Database connection successful
+2026-03-27 03:06:01,924 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:02,262 [INFO] database: Database connection successful
+2026-03-27 03:06:02,395 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:02,747 [INFO] database: Database connection successful
+2026-03-27 03:06:02,882 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:03,211 [INFO] database: Database connection successful
+2026-03-27 03:06:03,320 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:03,652 [INFO] database: Database connection successful
+2026-03-27 03:06:03,761 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:04,074 [INFO] database: Database connection successful
+2026-03-27 03:06:04,198 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:04,535 [INFO] database: Database connection successful
+2026-03-27 03:06:04,681 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:04,995 [INFO] database: Database connection successful
+2026-03-27 03:06:05,099 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:05,423 [INFO] database: Database connection successful
+2026-03-27 03:06:05,533 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:05,862 [INFO] database: Database connection successful
+2026-03-27 03:06:05,995 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:05] "GET /library HTTP/1.1" 200 -
+2026-03-27 03:06:06,015 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:06:06,030 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:06:06,033 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:06:06,037 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:06:06,066 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:06:06,069 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:06] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:06:12,247 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 44, in student_library
+    return render_template("student_library.html", active_page="library")
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\HP\Desktop\project\cs_connect\templates\student_library.html", line 71, in template
+    {% endblock %}
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'endblock'.
+2026-03-27 03:06:12,265 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:12,579 [INFO] database: Database connection successful
+2026-03-27 03:06:12,683 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:13,019 [INFO] database: Database connection successful
+2026-03-27 03:06:13,134 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:06:13,470 [INFO] database: Database connection successful
+2026-03-27 03:06:13,583 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[35m[1mGET /student-dashboard/library HTTP/1.1[0m" 500 -
+2026-03-27 03:06:13,602 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:06:13,620 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:06:13,623 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:06:13,636 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:06:13,658 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:06:13] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:10:03,899 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:10:04,110 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:10:06,627 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:06,972 [INFO] database: Database connection successful
+2026-03-27 03:10:09,518 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:10:09,525 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:10:25,766 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:10:26,068 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:10:28,484 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:28,834 [INFO] database: Database connection successful
+2026-03-27 03:10:31,650 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:10:31,672 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:10:38,039 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:38,399 [INFO] database: Database connection successful
+2026-03-27 03:10:38,501 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:38,876 [INFO] database: Database connection successful
+2026-03-27 03:10:38,997 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:39,341 [INFO] database: Database connection successful
+2026-03-27 03:10:39,459 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:39,818 [INFO] database: Database connection successful
+2026-03-27 03:10:40,045 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "GET /student-dashboard/library HTTP/1.1" 200 -
+2026-03-27 03:10:40,296 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,306 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,325 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,358 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,376 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,405 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:40] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:10:40,577 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:40,936 [INFO] database: Database connection successful
+2026-03-27 03:10:41,323 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:41] "GET /api/library/dashboard HTTP/1.1" 200 -
+2026-03-27 03:10:41,336 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:41,665 [INFO] database: Database connection successful
+2026-03-27 03:10:41,772 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 391, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:10:41,826 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:41] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:10:53,763 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:54,110 [INFO] database: Database connection successful
+2026-03-27 03:10:54,219 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 391, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:10:54,224 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:54] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:10:57,276 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:10:57,597 [INFO] database: Database connection successful
+2026-03-27 03:10:57,756 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:10:57] "GET /api/library/fines HTTP/1.1" 200 -
+2026-03-27 03:11:02,909 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:03,223 [INFO] database: Database connection successful
+2026-03-27 03:11:03,325 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 391, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:11:03,332 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:03] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:11:05,432 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:05,777 [INFO] database: Database connection successful
+2026-03-27 03:11:05,964 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:05] "GET /api/library/fines HTTP/1.1" 200 -
+2026-03-27 03:11:16,439 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:16] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-03-27 03:11:16,449 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:16,816 [INFO] database: Database connection successful
+2026-03-27 03:11:16,828 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:17,155 [INFO] database: Database connection successful
+2026-03-27 03:11:17,263 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:17,601 [INFO] database: Database connection successful
+2026-03-27 03:11:17,708 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "GET / HTTP/1.1" 200 -
+2026-03-27 03:11:17,728 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,744 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,745 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,748 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,788 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,812 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,815 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:17,826 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:17] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:11:20,907 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:21,229 [INFO] database: Database connection successful
+2026-03-27 03:11:21,338 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:21,682 [INFO] database: Database connection successful
+2026-03-27 03:11:21,796 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:21] "GET /login HTTP/1.1" 200 -
+2026-03-27 03:11:21,816 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:21] "[36mGET /static/css/login.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:21,834 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:21] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:11:26,662 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:26,989 [INFO] database: Database connection successful
+2026-03-27 03:11:27,341 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:27] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-27 03:11:27,350 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:27,668 [INFO] database: Database connection successful
+2026-03-27 03:11:27,669 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:27,984 [INFO] database: Database connection successful
+2026-03-27 03:11:28,087 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:28,406 [INFO] database: Database connection successful
+2026-03-27 03:11:28,510 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:28,886 [INFO] database: Database connection successful
+2026-03-27 03:11:29,002 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:29,328 [INFO] database: Database connection successful
+2026-03-27 03:11:29,441 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "GET / HTTP/1.1" 200 -
+2026-03-27 03:11:29,475 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,479 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,482 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,490 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,498 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,552 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,564 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:29,566 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:29] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:11:32,141 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:32,468 [INFO] database: Database connection successful
+2026-03-27 03:11:32,702 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:33,029 [INFO] database: Database connection successful
+2026-03-27 03:11:33,138 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:33,464 [INFO] database: Database connection successful
+2026-03-27 03:11:33,576 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:33,895 [INFO] database: Database connection successful
+2026-03-27 03:11:34,001 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:34,347 [INFO] database: Database connection successful
+2026-03-27 03:11:34,465 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "GET /faculty-dashboard HTTP/1.1" 200 -
+2026-03-27 03:11:34,479 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:34,503 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:34,505 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "GET /static/css/faculty_dashboard.css HTTP/1.1" 200 -
+2026-03-27 03:11:34,507 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:34,510 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "GET /static/css/notifications.css HTTP/1.1" 200 -
+2026-03-27 03:11:34,514 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:11:34,542 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:34,545 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "GET /static/js/notifications_handler.js HTTP/1.1" 200 -
+2026-03-27 03:11:34,546 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:34] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:38,221 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:38,534 [INFO] database: Database connection successful
+2026-03-27 03:11:38,718 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:39,037 [INFO] database: Database connection successful
+2026-03-27 03:11:39,145 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:39,479 [INFO] database: Database connection successful
+2026-03-27 03:11:39,586 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:39,999 [INFO] database: Database connection successful
+2026-03-27 03:11:40,119 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:11:40,480 [INFO] database: Database connection successful
+2026-03-27 03:11:40,595 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "GET /my-books HTTP/1.1" 200 -
+2026-03-27 03:11:40,624 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:40,641 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:40,647 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:11:40,656 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:11:40,680 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:11:40,686 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:11:40] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:34,483 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:34,827 [INFO] database: Database connection successful
+2026-03-27 03:16:34,988 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:35,329 [INFO] database: Database connection successful
+2026-03-27 03:16:35,440 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:35,829 [INFO] database: Database connection successful
+2026-03-27 03:16:35,944 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:36,260 [INFO] database: Database connection successful
+2026-03-27 03:16:36,363 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:36,685 [INFO] database: Database connection successful
+2026-03-27 03:16:36,795 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "GET /my-books HTTP/1.1" 200 -
+2026-03-27 03:16:36,824 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:36,834 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:36,843 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:16:36,847 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:36,852 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:36,892 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:36] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:42,252 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:42,621 [INFO] database: Database connection successful
+2026-03-27 03:16:42,784 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:43,119 [INFO] database: Database connection successful
+2026-03-27 03:16:43,226 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:43,558 [INFO] database: Database connection successful
+2026-03-27 03:16:43,667 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:43,983 [INFO] database: Database connection successful
+2026-03-27 03:16:44,087 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:44,410 [INFO] database: Database connection successful
+2026-03-27 03:16:44,523 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "GET /my-books HTTP/1.1" 200 -
+2026-03-27 03:16:44,549 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:44,602 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:44,640 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:44,685 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:16:44,762 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:44,808 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:44] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:49,324 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:49,665 [INFO] database: Database connection successful
+2026-03-27 03:16:49,830 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:50,221 [INFO] database: Database connection successful
+2026-03-27 03:16:50,341 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:50,677 [INFO] database: Database connection successful
+2026-03-27 03:16:50,795 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:51,116 [INFO] database: Database connection successful
+2026-03-27 03:16:51,229 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:16:51,540 [INFO] database: Database connection successful
+2026-03-27 03:16:51,646 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "GET /my-books HTTP/1.1" 200 -
+2026-03-27 03:16:51,671 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:51,692 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:51,692 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:16:51,692 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:16:51,695 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:16:51,729 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:16:51] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:21:33,169 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\routes\\library_routes.py', reloading
+2026-03-27 03:21:33,653 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:21:36,271 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:21:36,962 [INFO] database: Database connection successful
+2026-03-27 03:21:39,894 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:21:39,899 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:22:34,175 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:34,569 [INFO] database: Database connection successful
+2026-03-27 03:22:34,777 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:35,161 [INFO] database: Database connection successful
+2026-03-27 03:22:35,282 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:35,631 [INFO] database: Database connection successful
+2026-03-27 03:22:35,742 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:36,069 [INFO] database: Database connection successful
+2026-03-27 03:22:36,188 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:36,519 [INFO] database: Database connection successful
+2026-03-27 03:22:36,680 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "GET /my-books HTTP/1.1" 200 -
+2026-03-27 03:22:36,848 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:22:36,885 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:22:36,899 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:22:36,916 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:22:36,922 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:22:36,990 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:22:36] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:22:52,212 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:52,584 [INFO] database: Database connection successful
+2026-03-27 03:22:55,203 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 03:22:55,204 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 03:22:55,207 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:22:57,865 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:22:58,225 [INFO] database: Database connection successful
+2026-03-27 03:23:00,990 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:23:00,996 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:23:06,373 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:06,736 [INFO] database: Database connection successful
+2026-03-27 03:23:06,752 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:07,094 [INFO] database: Database connection successful
+2026-03-27 03:23:07,194 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:07,534 [INFO] database: Database connection successful
+2026-03-27 03:23:07,686 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "GET / HTTP/1.1" 200 -
+2026-03-27 03:23:07,837 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,898 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,913 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,962 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,970 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,979 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,979 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:07,990 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:07] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:23:08,336 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:08,646 [INFO] database: Database connection successful
+2026-03-27 03:23:08,749 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:09,071 [INFO] database: Database connection successful
+2026-03-27 03:23:09,215 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-03-27 03:23:11,884 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:12,222 [INFO] database: Database connection successful
+2026-03-27 03:23:12,328 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:12,657 [INFO] database: Database connection successful
+2026-03-27 03:23:12,765 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:12] "GET /login HTTP/1.1" 200 -
+2026-03-27 03:23:12,782 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:12] "[36mGET /static/css/login.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:12,808 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:12] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:15,565 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:15,876 [INFO] database: Database connection successful
+2026-03-27 03:23:16,207 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:16] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-27 03:23:16,214 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:16,524 [INFO] database: Database connection successful
+2026-03-27 03:23:16,525 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:16,844 [INFO] database: Database connection successful
+2026-03-27 03:23:16,951 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:17,313 [INFO] database: Database connection successful
+2026-03-27 03:23:17,435 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:17,803 [INFO] database: Database connection successful
+2026-03-27 03:23:17,918 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:18,237 [INFO] database: Database connection successful
+2026-03-27 03:23:18,351 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "GET / HTTP/1.1" 200 -
+2026-03-27 03:23:18,388 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,390 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,391 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,395 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,432 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,470 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:18,474 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:18] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:21,524 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:21,871 [INFO] database: Database connection successful
+2026-03-27 03:23:22,025 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:22,348 [INFO] database: Database connection successful
+2026-03-27 03:23:22,455 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:22,782 [INFO] database: Database connection successful
+2026-03-27 03:23:22,895 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:23,214 [INFO] database: Database connection successful
+2026-03-27 03:23:23,321 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:23,652 [INFO] database: Database connection successful
+2026-03-27 03:23:23,756 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:24,102 [INFO] database: Database connection successful
+2026-03-27 03:23:24,227 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:24,561 [INFO] database: Database connection successful
+2026-03-27 03:23:24,670 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:24,987 [INFO] database: Database connection successful
+2026-03-27 03:23:25,095 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:25,454 [INFO] database: Database connection successful
+2026-03-27 03:23:25,568 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:25,898 [INFO] database: Database connection successful
+2026-03-27 03:23:26,010 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "GET /library HTTP/1.1" 200 -
+2026-03-27 03:23:26,036 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:26,056 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:26,056 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:26,063 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:26,070 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:26,123 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:26] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:31,695 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:32,016 [INFO] database: Database connection successful
+2026-03-27 03:23:32,246 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:32,586 [INFO] database: Database connection successful
+2026-03-27 03:23:32,697 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:33,008 [INFO] database: Database connection successful
+2026-03-27 03:23:33,110 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:33,436 [INFO] database: Database connection successful
+2026-03-27 03:23:33,546 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:33,860 [INFO] database: Database connection successful
+2026-03-27 03:23:33,971 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:33] "GET /faculty-dashboard HTTP/1.1" 200 -
+2026-03-27 03:23:33,988 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,001 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,004 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,011 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/css/faculty_dashboard.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,040 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/css/notifications.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,082 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,091 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,115 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/js/notifications_handler.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:34,118 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:34] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:37,519 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:37,884 [INFO] database: Database connection successful
+2026-03-27 03:23:38,000 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:38,344 [INFO] database: Database connection successful
+2026-03-27 03:23:38,461 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:38,776 [INFO] database: Database connection successful
+2026-03-27 03:23:38,881 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:39,221 [INFO] database: Database connection successful
+2026-03-27 03:23:39,339 [ERROR] __main__: Unhandled exception occurred
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 55, in faculty_library
+    return render_template("faculty_library.html", active_page="library")
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\HP\Desktop\project\cs_connect\templates\faculty_library.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\HP\Desktop\project\cs_connect\templates\base.html", line 42, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\templates\faculty_library.html", line 107, in block 'content'
+    {{ session.get('user_name', 'F')[0] }}{{ session.get('user_name', ' ')[1] if session.get('user_name')|length > 1 else '' }}
+    ^^^^^^^^^^^^^^^^
+TypeError: object of type 'NoneType' has no len()
+2026-03-27 03:23:39,362 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:39,702 [INFO] database: Database connection successful
+2026-03-27 03:23:39,811 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:40,769 [INFO] database: Database connection successful
+2026-03-27 03:23:40,875 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:41,184 [INFO] database: Database connection successful
+2026-03-27 03:23:41,287 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:23:41,611 [INFO] database: Database connection successful
+2026-03-27 03:23:41,715 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[35m[1mGET /faculty-dashboard/library HTTP/1.1[0m" 500 -
+2026-03-27 03:23:41,736 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:41,741 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:23:41,760 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:23:41,762 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:23:41,802 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:23:41] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:08,034 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:08,388 [INFO] database: Database connection successful
+2026-03-27 03:27:08,494 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:08,825 [INFO] database: Database connection successful
+2026-03-27 03:27:08,929 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:09,271 [INFO] database: Database connection successful
+2026-03-27 03:27:09,388 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:09,710 [INFO] database: Database connection successful
+2026-03-27 03:27:09,817 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "GET /faculty-dashboard/library HTTP/1.1" 200 -
+2026-03-27 03:27:09,839 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:09,850 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:09,862 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:09,876 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:09,879 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:27:09,890 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:09] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:10,447 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:10,796 [INFO] database: Database connection successful
+2026-03-27 03:27:11,114 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:11] "GET /api/library/dashboard HTTP/1.1" 200 -
+2026-03-27 03:27:11,123 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:11,449 [INFO] database: Database connection successful
+2026-03-27 03:27:11,554 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 402, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:27:11,561 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:11] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:27:23,226 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:23,557 [INFO] database: Database connection successful
+2026-03-27 03:27:23,722 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:23] "GET /api/library/catalogue?q=DATA%20STRUCTURES HTTP/1.1" 200 -
+2026-03-27 03:27:34,280 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:34,604 [INFO] database: Database connection successful
+2026-03-27 03:27:34,762 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:34] "GET /api/library/catalogue?q=PROGRAMMING%20IN%20C HTTP/1.1" 200 -
+2026-03-27 03:27:40,633 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:40,970 [INFO] database: Database connection successful
+2026-03-27 03:27:41,100 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:41,435 [INFO] database: Database connection successful
+2026-03-27 03:27:41,546 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:41,870 [INFO] database: Database connection successful
+2026-03-27 03:27:41,974 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:42,301 [INFO] database: Database connection successful
+2026-03-27 03:27:42,409 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:42,749 [INFO] database: Database connection successful
+2026-03-27 03:27:42,869 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "GET /book/15 HTTP/1.1" 200 -
+2026-03-27 03:27:42,894 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:42,901 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:42,905 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:27:42,908 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:42,945 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:42] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:52,328 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:52,666 [INFO] database: Database connection successful
+2026-03-27 03:27:52,773 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:53,102 [INFO] database: Database connection successful
+2026-03-27 03:27:53,231 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:53,546 [INFO] database: Database connection successful
+2026-03-27 03:27:53,655 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:53,994 [INFO] database: Database connection successful
+2026-03-27 03:27:54,106 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:54,461 [INFO] database: Database connection successful
+2026-03-27 03:27:54,579 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "GET /book/15 HTTP/1.1" 200 -
+2026-03-27 03:27:54,602 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:54,608 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:27:54,617 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:27:54,625 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:54,673 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:54] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:27:56,678 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:57,023 [INFO] database: Database connection successful
+2026-03-27 03:27:57,135 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:57,446 [INFO] database: Database connection successful
+2026-03-27 03:27:57,551 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:57,879 [INFO] database: Database connection successful
+2026-03-27 03:27:57,992 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:58,310 [INFO] database: Database connection successful
+2026-03-27 03:27:58,496 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:58,833 [INFO] database: Database connection successful
+2026-03-27 03:27:59,009 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:59,332 [INFO] database: Database connection successful
+2026-03-27 03:27:59,542 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:27:59] "[32mPOST /issue_book/15 HTTP/1.1[0m" 302 -
+2026-03-27 03:27:59,547 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:27:59,928 [INFO] database: Database connection successful
+2026-03-27 03:28:00,028 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:00,369 [INFO] database: Database connection successful
+2026-03-27 03:28:00,481 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:00,799 [INFO] database: Database connection successful
+2026-03-27 03:28:00,908 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:01,288 [INFO] database: Database connection successful
+2026-03-27 03:28:01,432 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:01,752 [INFO] database: Database connection successful
+2026-03-27 03:28:01,859 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "GET /book/15 HTTP/1.1" 200 -
+2026-03-27 03:28:01,899 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:28:01,900 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:28:01,903 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:28:01,902 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:28:01,948 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:01] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:28:05,834 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:06,200 [INFO] database: Database connection successful
+2026-03-27 03:28:06,321 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:06,655 [INFO] database: Database connection successful
+2026-03-27 03:28:06,765 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:07,107 [INFO] database: Database connection successful
+2026-03-27 03:28:07,216 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:07,540 [INFO] database: Database connection successful
+2026-03-27 03:28:07,667 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:08,025 [INFO] database: Database connection successful
+2026-03-27 03:28:08,136 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:08] "GET /book/15 HTTP/1.1" 200 -
+2026-03-27 03:28:14,104 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:14,465 [INFO] database: Database connection successful
+2026-03-27 03:28:14,584 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 402, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:28:14,588 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:14] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:28:18,509 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:28:18,847 [INFO] database: Database connection successful
+2026-03-27 03:28:19,010 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:19] "GET /api/library/fines HTTP/1.1" 200 -

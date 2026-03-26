@@ -32,39 +32,18 @@ const StudentAttendance = () => {
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('cs_connect_token');
-      // Mock User
-      setUser({
-        id: 1,
-        name: 'Joshna',
-        roll_no: 'AIS22CS045',
-        batch: '2022-2026',
-        semester: '6'
-      });
+      const response = await fetch('/api/student/attendance');
+      if (!response.ok) throw new Error('Unauthorized');
+      const attendanceData = await response.json();
 
-      // API CALL: GET /api/student/attendance
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const profileRes = await fetch('/api/student/profile');
+      const profile = await profileRes.json();
+      setUser(profile);
       
-      // Mock Data based on exact shape and layout logic
       setData({
-        overall_percentage: 78.5,
-        classes_attended: 157,
-        classes_held: 200,
-        subjects: [
-          { subject_name: 'Database Management Systems', faculty_name: 'Dr. Smith', classes_held: 45, classes_attended: 40, percentage: 88.89 },
-          { subject_name: 'Computer Networks', faculty_name: 'Prof. Johnson', classes_held: 40, classes_attended: 30, percentage: 75.00 },
-          { subject_name: 'Operating Systems', faculty_name: 'Dr. Allen', classes_held: 42, classes_attended: 28, percentage: 66.67 },
-          { subject_name: 'Theory of Computation', faculty_name: 'Dr. Wright', classes_held: 38, classes_attended: 32, percentage: 84.21 },
-          { subject_name: 'Software Engineering', faculty_name: 'Prof. Davis', classes_held: 35, classes_attended: 27, percentage: 77.14 }
-        ],
-        monthly_trend: [
-          { month: 'Oct', percentage: 85 },
-          { month: 'Nov', percentage: 92 },
-          { month: 'Dec', percentage: 78 },
-          { month: 'Jan', percentage: 65 },
-          { month: 'Feb', percentage: 80 },
-          { month: 'Mar', percentage: 72 }
-        ]
+        ...attendanceData,
+        classes_attended: attendanceData.subjects.reduce((a, b) => a + (b.classes_attended || 0), 0),
+        classes_held: attendanceData.subjects.reduce((a, b) => a + (b.classes_held || 0), 0)
       });
       
     } catch (err) {
