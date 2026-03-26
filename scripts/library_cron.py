@@ -20,8 +20,8 @@ def run_library_cron():
     """
     print(f"[{datetime.now()}] Running Library Cron Notifications...")
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Fetch all open issues where fine mapping matters
             issues = conn.execute('''

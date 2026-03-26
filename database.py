@@ -2,7 +2,8 @@ import os
 import logging
 import time
 import functools
-from typing import Dict, List, Any, Callable
+from contextlib import contextmanager
+from typing import Dict, List, Any, Callable, Generator
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -11,10 +12,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Setup structured logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 class DatabaseError(Exception):
@@ -67,7 +64,7 @@ class ConnectionWrapper:
 def get_db_connection():
     """
     Establish and return a connection to the PostgreSQL database with retries.
-    NEVER returns None. Raises DatabaseError if all attempts fail.
+    NEVER returns None. Raises RuntimeError if all attempts fail.
     """
     urls = [
         os.environ.get("NEON_DATABASE_URL"),
@@ -86,14 +83,28 @@ def get_db_connection():
                 conn = psycopg2.connect(db_url, connect_timeout=5)
                 logger.info("Database connection successful")
                 return ConnectionWrapper(conn)
-            except Exception:
-                logger.warning("Retry %d failed for database connection", attempt + 1)
+            except Exception as e:
+                logger.warning("Retry %d failed for database connection: %s", attempt + 1, e)
                 if attempt == max_retries - 1:
-                    logger.exception("Persistent connection failure for URL: %s", display_url)
+                    logger.error("Persistent connection failure for URL: %s", display_url, exc_info=True)
                 else:
                     time.sleep(1)
 
-    raise DatabaseError("All database connection attempts failed across all configured URLs.")
+    raise RuntimeError("Database connection failed")
+
+@contextmanager
+def db_connection() -> Generator[ConnectionWrapper, None, None]:
+    """
+    Context manager for safe database connection handling.
+    Ensures connection is always closed properly.
+    """
+    conn = None
+    try:
+        conn = get_db_connection()
+        yield conn
+    finally:
+        if conn:
+            conn.close()
 
 
 def with_db_connection(func: Callable):
@@ -146,23 +157,17 @@ def setup_unstructured_tables():
     );
     """
 
-    conn = None
     try:
-        conn = get_db_connection()
-        with conn.cursor() as cur:
-            cur.execute(create_website_content_sql)
-            cur.execute(create_document_chunks_sql)
-            conn.commit()
-            logger.info("Successfully initialized unstructured data tables.")
-            return True
-    except (psycopg2.Error, DatabaseError) as e:
+        with db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(create_website_content_sql)
+                cur.execute(create_document_chunks_sql)
+                conn.commit()
+                logger.info("Successfully initialized unstructured data tables.")
+                return True
+    except (psycopg2.Error, RuntimeError) as e:
         logger.error(f"Error creating unstructured tables: {e}")
-        if conn:
-            conn.rollback()
         return False
-    finally:
-        if conn:
-            conn.close()
 
 
 def get_schema_summary() -> Dict[str, List[str]]:
@@ -171,7 +176,6 @@ def get_schema_summary() -> Dict[str, List[str]]:
     Useful for providing context to the AI chatbot.
     """
     schema_summary: Dict[str, List[str]] = {}
-    conn = None
     
     query = """
     SELECT 
@@ -187,26 +191,23 @@ def get_schema_summary() -> Dict[str, List[str]]:
     """
 
     try:
-        conn = get_db_connection()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-            
-            for row in rows:
-                table = str(row['table_name'])
-                col = str(row['column_name'])
-                dtype = str(row['data_type'])
+        with db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                rows = cur.fetchall()
                 
-                if table not in schema_summary:
-                    schema_summary[table] = []
+                for row in rows:
+                    table = str(row['table_name'])
+                    col = str(row['column_name'])
+                    dtype = str(row['data_type'])
+                    
+                    if table not in schema_summary:
+                        schema_summary[table] = []
+                    
+                    schema_summary[table].append(f"{col} ({dtype})")
                 
-                schema_summary[table].append(f"{col} ({dtype})")
-                
-    except (psycopg2.Error, DatabaseError) as e:
+    except (psycopg2.Error, RuntimeError) as e:
         logger.error(f"Error fetching schema summary: {e}")
-    finally:
-        if conn:
-            conn.close()
 
     return schema_summary
 

@@ -1,11 +1,11 @@
-from database import get_db_connection
+from database import db_connection
 
 
 
 class Request:
     @staticmethod
     def create_request(book_id, user_id, request_type='reserve'):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             req = conn.execute(
                 "INSERT INTO requests (book_id, requested_by, request_type, status) VALUES (%s, %s, %s, 'pending') RETURNING sl_no",
                 (book_id, str(user_id), request_type),
@@ -16,7 +16,7 @@ class Request:
 
     @staticmethod
     def get_by_id(request_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             req = conn.execute(
                 "SELECT * FROM requests WHERE sl_no = %s", (request_id,)
             ).fetchone()
@@ -25,7 +25,7 @@ class Request:
 
     @staticmethod
     def mark_processed(request_id, feedback=None):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             conn.execute(
                 "UPDATE requests SET status = 'processed', admin_feedback = %s WHERE sl_no = %s", (feedback, request_id)
             )
@@ -34,7 +34,7 @@ class Request:
 
     @staticmethod
     def reject(request_id, feedback=None):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             conn.execute(
                 "UPDATE requests SET status = 'rejected', admin_feedback = %s WHERE sl_no = %s", (feedback, request_id)
             )
@@ -43,7 +43,7 @@ class Request:
 
     @staticmethod
     def get_all_pending_requests():
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             reqs = conn.execute("""
                 SELECT r.sl_no, r.request_date, b.title as book_title, u.name as user_name, r.book_id, r.request_type, r.requested_by
                 FROM requests r
@@ -57,7 +57,7 @@ class Request:
 
     @staticmethod
     def get_pending_requests_by_book(book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             reqs = conn.execute("""
                 SELECT r.sl_no, r.request_date, b.title as book_title, u.name as user_name, r.book_id
                 FROM requests r
@@ -72,7 +72,7 @@ class Request:
 
     @staticmethod
     def get_all_requests():
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             reqs = conn.execute("""
                 SELECT r.sl_no, r.request_date, b.title as book_title, u.name as user_name, r.status, r.book_id, r.request_type
                 FROM requests r
@@ -85,7 +85,7 @@ class Request:
 
     @staticmethod
     def has_pending_request(user_id, book_id, request_type):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             req = conn.execute(
                 "SELECT sl_no FROM requests WHERE requested_by = %s AND book_id = %s AND request_type = %s AND status = 'pending'",
                 (str(user_id), book_id, request_type),

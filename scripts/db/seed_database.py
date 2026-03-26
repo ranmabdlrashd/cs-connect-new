@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from database import get_db_connection
+from database import db_connection
 
 def seed():
-    conn = get_db_connection()
-    cur = conn.cursor()
+    with db_connection() as conn:
+        cur = conn.cursor()
     
     print("Checking essential records in site_data...")
     
@@ -57,8 +57,7 @@ def seed():
     else:
         print("'home_stats' already exists.")
 
-    conn.commit()
-    conn.close()
+        conn.commit()
     print("Database seeding completed.")
 
 if __name__ == "__main__":

@@ -4,17 +4,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_db_connection():
-    db_url = os.environ.get("NEON_DATABASE_URL") or os.environ.get("LOCAL_DATABASE_URL") or os.environ.get("DATABASE_URL")
-    return psycopg2.connect(db_url) if db_url else None
+import sys
+# Add project root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from database import db_connection
 
 def migrate():
-    conn = get_db_connection()
-    if not conn:
-        print("No DB connection")
-        return
-
-    cur = conn.cursor()
+    try:
+        with db_connection() as conn:
+            cur = conn.cursor()
 
     try:
         # Update requests table
@@ -54,10 +52,6 @@ def migrate():
 
     except Exception as e:
         print(f"Error during migration: {e}")
-        conn.rollback()
-    finally:
-        cur.close()
-        conn.close()
 
 if __name__ == "__main__":
     migrate()

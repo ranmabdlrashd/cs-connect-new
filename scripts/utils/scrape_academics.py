@@ -29,7 +29,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='repla
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 load_dotenv()
 
-from database import get_db_connection
+from database import db_connection
 
 # ─────────────────────────────────────────────
 # Config
@@ -139,8 +139,8 @@ def save_to_db(conn, title: str, url: str, content: str):
 # Main scraping jobs
 # ─────────────────────────────────────────────
 def scrape_all():
-    conn = get_db_connection()
-    print("\n=== AISAT Academics Scraper ===\n")
+    with db_connection() as conn:
+        print("\n=== AISAT Academics Scraper ===\n")
 
     # 1. CSE Department Page
     print("[1/5] CSE Department Overview")
@@ -186,8 +186,7 @@ def scrape_all():
                "https://aisat.ac.in/wp-content/uploads/2025/11/CSE_Handout.pdf",
                handout_text)
 
-    conn.close()
-    print("\n=== Scraping Complete! ===\n")
+        print("\n=== Scraping Complete! ===\n")
 
 
 if __name__ == "__main__":

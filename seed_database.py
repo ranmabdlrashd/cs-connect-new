@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def seed():
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         with conn.cursor() as cur:
             print("Checking essential records in site_data...")
             

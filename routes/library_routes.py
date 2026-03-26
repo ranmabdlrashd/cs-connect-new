@@ -118,8 +118,8 @@ def my_books():
         flash("Unauthorized", "danger")
         return redirect(url_for("login"))
 
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         active_issues = conn.execute("""
             SELECT i.sl_no, i.book_id, i.issue_date, i.due_date, 
                    i.payment_status, i.payment_requested_date, i.renewal_count, 
@@ -274,8 +274,8 @@ def renew_book(book_id):
         flash("You have outstanding fines. Cannot renew until paid.", "danger")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         issue = conn.execute("SELECT sl_no, renewal_count, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
         
         if not issue:
@@ -350,8 +350,8 @@ def api_library_dashboard():
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # active_loans_count
         active_loans = conn.execute(
             "SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'",
@@ -397,8 +397,8 @@ def api_library_my_books():
         return jsonify([]), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         loans = conn.execute("""
             SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
                    i.due_date, i.return_date, i.status,
@@ -427,8 +427,8 @@ def api_library_fines():
         return jsonify({"outstanding": [], "history": []}), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Get outstanding fines
         outstanding_rows = conn.execute("""
             SELECT i.sl_no, b.title, b.author, 
@@ -482,8 +482,8 @@ def api_library_reservations():
         return jsonify([]), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Get active reservations with queue position
         reservations = conn.execute("""
             SELECT r.sl_no, b.title, r.request_date as created_at,
@@ -508,8 +508,8 @@ def api_library_renew():
         return jsonify({"error": "Missing loan_id"}), 400
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Check if eligible for renewal (e.g. status='issued', belongs to user, and no fines?)
         loan = conn.execute(
             "SELECT sl_no as id, due_date FROM issues WHERE sl_no = %s AND user_id = %s AND status = 'issued'",
@@ -546,8 +546,8 @@ def api_library_pay_fine_request(issue_id):
         return jsonify({"error": "Unauthorized"}), 401
     user_id = str(session.get("user_id"))
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Check if the issue has an unpaid fine dynamically
             issue = conn.execute("SELECT fine_amount, payment_status FROM issues_with_fines WHERE sl_no = %s AND user_id = %s", (issue_id, str(user_id))).fetchone()
@@ -570,8 +570,8 @@ def api_library_pay_fine_request(issue_id):
 
 @library_bp.route("/api/library/categories")
 def api_library_categories():
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Category counts
         counts = conn.execute("""
             SELECT category, COUNT(*) as count 
@@ -598,8 +598,8 @@ def api_library_search_full():
         
     offset = (page - 1) * limit
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         
         sql = "SELECT * FROM books WHERE 1=1"
         count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
@@ -672,8 +672,8 @@ def api_library_suggestions():
     if len(query) < 2:
         return jsonify({"suggestions": []})
         
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         q = f"%{query}%"
         books = conn.execute("SELECT sl_no as id, title, author FROM books WHERE title ILIKE %s OR author ILIKE %s LIMIT 5", (q, q)).fetchall()
         return jsonify({"success": True, "data": {"suggestions": [dict(row) for row in books]}})
@@ -707,8 +707,8 @@ def catalogue_search():
         
     offset = (page - 1) * limit
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         
         sql = "SELECT * FROM books WHERE 1=1"
         count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
@@ -790,8 +790,8 @@ def api_library_borrow():
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Check book
         book = conn.execute("SELECT sl_no as id, available_copies, is_reference FROM books WHERE sl_no = %s", (book_id,)).fetchone()
         if not book:
@@ -840,8 +840,8 @@ def api_library_reserve():
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         book = conn.execute("SELECT sl_no as id FROM books WHERE sl_no = %s", (book_id,)).fetchone()
         if not book:
             return jsonify({"success": False, "error": "Book not found"}), 404
@@ -886,8 +886,8 @@ def api_library_book_details(book_id):
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Get basic book
         book = conn.execute("SELECT * FROM books WHERE sl_no = %s", (book_id,)).fetchone()
         if not book:
@@ -972,8 +972,8 @@ def api_library_cancel_reservation(res_id):
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # Check ownership
         req = conn.execute("SELECT sl_no FROM requests WHERE sl_no = %s AND requested_by = %s", (res_id, user_id)).fetchone()
         if not req:
@@ -999,8 +999,8 @@ def api_library_fines_mark_paid(fine_id):
         return jsonify({"error": "Unauthorized"}), 401
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         fine = conn.execute("SELECT * FROM library_fines WHERE sl_no = %s AND student_id = %s AND paid = false", (fine_id, user_id)).fetchone()
         if not fine:
             return jsonify({"success": False, "error": "Fine not found or already paid"}), 404
@@ -1019,8 +1019,8 @@ def api_library_fines_mark_all_paid():
         return jsonify({"error": "Unauthorized"}), 401
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         conn.execute(
             "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE student_id = %s AND paid = false",
             (user_id,)
@@ -1035,8 +1035,8 @@ def api_library_fines_receipt(fine_id):
         return redirect(url_for("login"))
         
     user_id = str(session["user_id"])
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         fine = conn.execute("""
             SELECT f.*, b.title as book_title, u.name as student_name
             FROM library_fines f

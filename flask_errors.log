@@ -1205,3 +1205,508 @@ LINE 10:
 2026-03-27 03:28:18,509 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 2026-03-27 03:28:18,847 [INFO] database: Database connection successful
 2026-03-27 03:28:19,010 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:28:19] "GET /api/library/fines HTTP/1.1" 200 -
+2026-03-27 03:32:02,886 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:03,325 [INFO] database: Database connection successful
+2026-03-27 03:32:06,120 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 03:32:06,121 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 03:32:06,124 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:32:07,831 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:08,230 [INFO] database: Database connection successful
+2026-03-27 03:32:10,817 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:32:10,823 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:32:11,907 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:12,243 [INFO] database: Database connection successful
+2026-03-27 03:32:12,295 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:12,691 [INFO] database: Database connection successful
+2026-03-27 03:32:12,802 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:13,148 [INFO] database: Database connection successful
+2026-03-27 03:32:13,291 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "GET / HTTP/1.1" 200 -
+2026-03-27 03:32:13,513 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,523 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,547 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,558 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,561 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,602 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,604 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,641 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:13] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:32:13,994 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:14,310 [INFO] database: Database connection successful
+2026-03-27 03:32:14,415 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:14,757 [INFO] database: Database connection successful
+2026-03-27 03:32:14,867 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:14] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-03-27 03:32:19,057 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:19] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:19,060 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:19] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:19,062 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:19] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:19,134 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:19,480 [INFO] database: Database connection successful
+2026-03-27 03:32:19,593 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:19,992 [INFO] database: Database connection successful
+2026-03-27 03:32:20,128 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:20] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:32:38,640 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:39,024 [INFO] database: Database connection successful
+2026-03-27 03:32:39,132 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:39,456 [INFO] database: Database connection successful
+2026-03-27 03:32:39,578 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:39] "GET /login HTTP/1.1" 200 -
+2026-03-27 03:32:39,652 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:39,675 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:39] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:32:39,727 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:39] "[36mGET /static/css/login.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:40,013 [INFO] database: Database connection successful
+2026-03-27 03:32:40,123 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:40,462 [INFO] database: Database connection successful
+2026-03-27 03:32:40,571 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:40] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:32:42,685 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:43,025 [INFO] database: Database connection successful
+2026-03-27 03:32:43,379 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:43] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-27 03:32:43,390 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:43,750 [INFO] database: Database connection successful
+2026-03-27 03:32:43,751 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:44,120 [INFO] database: Database connection successful
+2026-03-27 03:32:44,239 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:44,561 [INFO] database: Database connection successful
+2026-03-27 03:32:44,674 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:45,019 [INFO] database: Database connection successful
+2026-03-27 03:32:45,135 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:45,450 [INFO] database: Database connection successful
+2026-03-27 03:32:45,566 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "GET / HTTP/1.1" 200 -
+2026-03-27 03:32:45,672 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,676 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,739 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,746 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,790 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,792 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:45,836 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,839 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:32:45,856 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:45] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:32:46,166 [INFO] database: Database connection successful
+2026-03-27 03:32:46,276 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:46,603 [INFO] database: Database connection successful
+2026-03-27 03:32:46,710 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:47,054 [INFO] database: Database connection successful
+2026-03-27 03:32:47,168 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:32:47,483 [INFO] database: Database connection successful
+2026-03-27 03:32:47,616 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:32:47] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:33:24,114 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:24,455 [INFO] database: Database connection successful
+2026-03-27 03:33:24,706 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:25,025 [INFO] database: Database connection successful
+2026-03-27 03:33:25,149 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:25,491 [INFO] database: Database connection successful
+2026-03-27 03:33:25,604 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:25,926 [INFO] database: Database connection successful
+2026-03-27 03:33:26,034 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:26,348 [INFO] database: Database connection successful
+2026-03-27 03:33:26,454 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "GET /faculty-dashboard HTTP/1.1" 200 -
+2026-03-27 03:33:26,512 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,552 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,575 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,629 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/css/faculty_dashboard.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,668 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/css/notifications.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,715 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,733 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:26,737 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,768 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:26,840 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:26] "[36mGET /static/js/notifications_handler.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:27,072 [INFO] database: Database connection successful
+2026-03-27 03:33:27,183 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:27,500 [INFO] database: Database connection successful
+2026-03-27 03:33:27,606 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:27,951 [INFO] database: Database connection successful
+2026-03-27 03:33:28,066 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:28,404 [INFO] database: Database connection successful
+2026-03-27 03:33:28,512 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:28] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:33:32,806 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:33,122 [INFO] database: Database connection successful
+2026-03-27 03:33:33,232 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:33,569 [INFO] database: Database connection successful
+2026-03-27 03:33:33,683 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:34,017 [INFO] database: Database connection successful
+2026-03-27 03:33:34,126 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:34,449 [INFO] database: Database connection successful
+2026-03-27 03:33:34,559 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "GET /faculty-dashboard/library HTTP/1.1" 200 -
+2026-03-27 03:33:34,621 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:34,664 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:34,668 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/css/dashboard_shared.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:34,681 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:33:34,684 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:34,685 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:34,936 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:34] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:35,008 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:35,023 [INFO] database: Database connection successful
+2026-03-27 03:33:35,132 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:35,333 [INFO] database: Database connection successful
+2026-03-27 03:33:35,455 [INFO] database: Database connection successful
+2026-03-27 03:33:35,560 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:35,643 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:35] "GET /api/library/dashboard HTTP/1.1" 200 -
+2026-03-27 03:33:35,655 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:35,914 [INFO] database: Database connection successful
+2026-03-27 03:33:35,989 [INFO] database: Database connection successful
+2026-03-27 03:33:36,026 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:36,098 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 402, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:33:36,110 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:36] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:33:36,377 [INFO] database: Database connection successful
+2026-03-27 03:33:36,491 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:36] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:33:45,768 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:46,083 [INFO] database: Database connection successful
+2026-03-27 03:33:46,188 [ERROR] __main__: Database error caught at controller level
+Traceback (most recent call last):
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\routes\library_routes.py", line 402, in api_library_my_books
+    loans = conn.execute("""
+            ~~~~~~~~~~~~^^^^
+        SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    """, (user_id,)).fetchall()
+    ^^^^^^^^^^^^^^^^
+  File "C:\Users\HP\Desktop\project\cs_connect\database.py", line 47, in execute
+    cur.execute(query, params)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\psycopg2\extras.py", line 146, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.SyntaxError: syntax error at end of input
+LINE 10:         
+                 ^
+
+2026-03-27 03:33:46,192 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:46] "[35m[1mGET /api/library/my-books HTTP/1.1[0m" 503 -
+2026-03-27 03:33:50,220 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:50,539 [INFO] database: Database connection successful
+2026-03-27 03:33:50,695 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:50] "GET /api/library/fines HTTP/1.1" 200 -
+2026-03-27 03:33:53,132 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:53] "[32mGET /logout HTTP/1.1[0m" 302 -
+2026-03-27 03:33:53,149 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:53,475 [INFO] database: Database connection successful
+2026-03-27 03:33:53,475 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:53,817 [INFO] database: Database connection successful
+2026-03-27 03:33:53,931 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:54,257 [INFO] database: Database connection successful
+2026-03-27 03:33:54,367 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "GET / HTTP/1.1" 200 -
+2026-03-27 03:33:54,420 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,449 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/css/chatbot.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,462 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/images/aisat-logo-300x300.png HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,462 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/css/home.css HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,465 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/media/hod.jpg HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,475 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:54,494 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,497 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/js/chatbot.js HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,527 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:54] "[36mGET /static/images/aisat_building.jpeg HTTP/1.1[0m" 304 -
+2026-03-27 03:33:54,821 [INFO] database: Database connection successful
+2026-03-27 03:33:54,998 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:33:55,317 [INFO] database: Database connection successful
+2026-03-27 03:33:55,423 [INFO] werkzeug: 127.0.0.1 - - [27/Mar/2026 03:33:55] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2026-03-27 03:40:51,714 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:40:52,086 [INFO] database: Database connection successful
+2026-03-27 03:40:54,637 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 03:40:54,638 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 03:40:54,643 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:40:57,299 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:40:57,671 [INFO] database: Database connection successful
+2026-03-27 03:41:00,345 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:41:00,354 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:43:59,985 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 03:44:00,828 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:44:03,717 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:44:04,110 [INFO] database: Database connection successful
+2026-03-27 03:44:07,577 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:44:07,586 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:44:34,748 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\tmp\\test_validation.py', reloading
+2026-03-27 03:44:34,951 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:44:37,648 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:44:38,024 [INFO] database: Database connection successful
+2026-03-27 03:44:40,756 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:44:40,763 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:45:08,140 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:45:08,540 [INFO] database: Database connection successful
+2026-03-27 03:45:11,347 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-03-27 03:45:11,405 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-27 03:45:11,480 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:45:15,974 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:45:16,321 [INFO] database: Database connection successful
+2026-03-27 03:45:18,814 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:45:18,826 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:47:41,897 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 03:47:42,371 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:47:45,196 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:47:45,566 [INFO] database: Database connection successful
+2026-03-27 03:47:48,100 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:47:48,106 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:49:55,563 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\database.py', reloading
+2026-03-27 03:49:55,811 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:49:58,735 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:49:59,078 [INFO] database: Database connection successful
+2026-03-27 03:50:01,588 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:50:01,633 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:50:08,486 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 03:50:08,732 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:50:11,871 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:50:12,256 [INFO] database: Database connection successful
+2026-03-27 03:50:14,842 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:50:14,848 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:50:22,519 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\api.py', reloading
+2026-03-27 03:50:22,735 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:50:25,659 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:50:26,041 [INFO] database: Database connection successful
+2026-03-27 03:50:28,609 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:50:28,615 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:50:34,553 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:50:34,750 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:50:36,754 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:50:37,076 [INFO] database: Database connection successful
+2026-03-27 03:50:39,488 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:50:39,493 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:50:41,536 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:50:41,757 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:50:44,525 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:50:44,887 [INFO] database: Database connection successful
+2026-03-27 03:50:47,627 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:50:47,632 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:51:26,891 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 03:51:27,165 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:51:30,247 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:51:30,601 [INFO] database: Database connection successful
+2026-03-27 03:51:33,163 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:51:33,169 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:51:39,279 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\routes\\library_routes.py', reloading
+2026-03-27 03:51:39,520 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:51:41,690 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:51:42,067 [INFO] database: Database connection successful
+2026-03-27 03:51:44,751 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:51:44,756 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:51:49,483 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\routes\\admin_routes.py', reloading
+2026-03-27 03:51:49,723 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:51:52,584 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:51:52,929 [INFO] database: Database connection successful
+2026-03-27 03:51:55,765 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:51:55,769 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:51:59,174 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\book.py', reloading
+2026-03-27 03:51:59,413 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:02,301 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:02,646 [INFO] database: Database connection successful
+2026-03-27 03:52:05,069 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:05,075 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:52:09,698 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\issue.py', reloading
+2026-03-27 03:52:10,035 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:12,077 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:12,419 [INFO] database: Database connection successful
+2026-03-27 03:52:14,949 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:14,955 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:52:19,947 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\notification.py', reloading
+2026-03-27 03:52:20,164 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:22,926 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:23,272 [INFO] database: Database connection successful
+2026-03-27 03:52:25,844 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:25,850 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:52:29,287 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\request.py', reloading
+2026-03-27 03:52:29,534 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:33,303 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:33,652 [INFO] database: Database connection successful
+2026-03-27 03:52:36,148 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:36,156 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:52:40,982 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\internal_mark.py', reloading
+2026-03-27 03:52:41,241 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:43,954 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:44,298 [INFO] database: Database connection successful
+2026-03-27 03:52:46,846 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:46,852 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:52:51,513 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\models\\placement.py', reloading
+2026-03-27 03:52:51,735 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:52:54,030 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:52:54,371 [INFO] database: Database connection successful
+2026-03-27 03:52:56,829 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:52:56,835 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:53:02,820 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\seed_database.py', reloading
+2026-03-27 03:53:03,089 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:53:05,599 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:53:05,942 [INFO] database: Database connection successful
+2026-03-27 03:53:08,508 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:53:08,512 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:53:10,313 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scraper.py', reloading
+2026-03-27 03:53:10,642 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:53:13,008 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:53:13,346 [INFO] database: Database connection successful
+2026-03-27 03:53:15,810 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:53:15,818 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:53:26,872 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\library_cron.py', reloading
+2026-03-27 03:53:27,179 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:53:31,223 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:53:31,609 [INFO] database: Database connection successful
+2026-03-27 03:53:34,426 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:53:34,433 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:53:56,785 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:53:57,066 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:53:59,141 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:53:59,497 [INFO] database: Database connection successful
+2026-03-27 03:54:02,184 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:54:02,190 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:54:16,350 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:54:16,637 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:54:18,647 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:54:18,980 [INFO] database: Database connection successful
+2026-03-27 03:54:21,476 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:54:21,498 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:54:31,672 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:54:31,898 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:54:34,382 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:54:34,762 [INFO] database: Database connection successful
+2026-03-27 03:54:37,464 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:54:37,469 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:54:48,711 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:54:48,956 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:54:51,346 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:54:51,716 [INFO] database: Database connection successful
+2026-03-27 03:54:54,437 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:54:54,442 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:55:19,042 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:55:19,262 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:55:21,543 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:55:21,929 [INFO] database: Database connection successful
+2026-03-27 03:55:24,378 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:55:24,385 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:55:29,045 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:55:29,306 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:55:32,064 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:55:32,450 [INFO] database: Database connection successful
+2026-03-27 03:55:35,261 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:55:35,285 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:55:49,338 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 03:55:49,589 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:55:53,100 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:55:53,468 [INFO] database: Database connection successful
+2026-03-27 03:55:55,972 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:55:55,977 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:56:07,173 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\utils\\scraper.py', reloading
+2026-03-27 03:56:07,385 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:56:09,579 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:56:09,953 [INFO] database: Database connection successful
+2026-03-27 03:56:12,501 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:56:12,506 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:56:15,841 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\utils\\scrape_academics.py', reloading
+2026-03-27 03:56:16,063 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:56:18,572 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:56:18,915 [INFO] database: Database connection successful
+2026-03-27 03:56:21,370 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:56:21,377 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:56:24,427 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\seed_database.py', reloading
+2026-03-27 03:56:24,665 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:56:26,922 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:56:27,256 [INFO] database: Database connection successful
+2026-03-27 03:56:29,742 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:56:29,748 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:56:31,907 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\seed_database.py', reloading
+2026-03-27 03:56:32,160 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:56:34,576 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:56:34,925 [INFO] database: Database connection successful
+2026-03-27 03:56:37,391 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:56:37,397 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:56:43,388 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\import_books.py', reloading
+2026-03-27 03:56:43,650 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:56:46,041 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:56:46,376 [INFO] database: Database connection successful
+2026-03-27 03:56:48,777 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:56:48,783 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:57:01,728 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\migrate_notifications.py', reloading
+2026-03-27 03:57:01,995 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:57:05,063 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:57:05,407 [INFO] database: Database connection successful
+2026-03-27 03:57:07,952 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:57:07,956 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:57:12,659 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\migrate_library_v2.py', reloading
+2026-03-27 03:57:12,907 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:57:15,792 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:57:16,154 [INFO] database: Database connection successful
+2026-03-27 03:57:18,705 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:57:18,711 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:57:24,703 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\scripts\\db\\migrate_library_v2.py', reloading
+2026-03-27 03:57:24,904 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:57:27,003 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:57:27,387 [INFO] database: Database connection successful
+2026-03-27 03:57:30,451 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:57:30,456 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 03:59:30,693 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 03:59:30,919 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 03:59:33,558 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 03:59:33,966 [INFO] database: Database connection successful
+2026-03-27 03:59:36,694 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 03:59:36,700 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:04:43,818 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 04:04:44,088 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:04:46,649 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:04:47,621 [INFO] database: Database connection successful
+2026-03-27 04:04:50,422 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:04:50,428 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:05:19,403 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\tmp\\verify_prompt.py', reloading
+2026-03-27 04:05:19,751 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:05:22,270 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:05:22,650 [INFO] database: Database connection successful
+2026-03-27 04:05:25,259 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:05:25,264 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:07:32,408 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 04:07:32,739 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:07:35,863 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:07:36,210 [INFO] database: Database connection successful
+2026-03-27 04:07:38,680 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:07:38,686 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:10:15,448 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 04:10:15,710 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:10:18,367 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:10:19,053 [INFO] database: Database connection successful
+2026-03-27 04:10:21,537 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:10:21,542 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:13:07,336 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\llm_engine.py', reloading
+2026-03-27 04:13:08,181 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:13:10,785 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:13:11,197 [INFO] database: Database connection successful
+2026-03-27 04:13:14,240 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:13:14,247 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:14:15,728 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\tests\\test_security.py', reloading
+2026-03-27 04:14:15,923 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:14:18,239 [INFO] database: Connecting to DB (Attempt 1/3) - Target: ep-long-water-a1yyxfck-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+2026-03-27 04:14:18,597 [INFO] database: Database connection successful
+2026-03-27 04:14:21,184 [WARNING] werkzeug:  * Debugger is active!
+2026-03-27 04:14:21,191 [INFO] werkzeug:  * Debugger PIN: 126-480-854
+2026-03-27 04:16:07,729 [INFO] werkzeug:  * Detected change in 'C:\\Users\\HP\\Desktop\\project\\cs_connect\\app.py', reloading
+2026-03-27 04:16:08,038 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:16:28,860 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:17:00,272 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:17:15,587 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:17:26,061 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:17:47,518 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:17:58,062 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:18:05,927 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:18:19,198 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:18:31,634 [INFO] werkzeug:  * Restarting with stat
+2026-03-27 04:18:51,132 [INFO] werkzeug:  * Restarting with stat

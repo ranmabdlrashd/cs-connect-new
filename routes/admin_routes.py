@@ -224,8 +224,8 @@ def admin_command_center():
 @admin_bp.route("/api/admin/dashboard")
 def api_admin_dashboard():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         total_students = conn.execute("SELECT COUNT(*) FROM users WHERE role='student'").fetchone()[0] or 0
         total_faculty = conn.execute("SELECT COUNT(*) FROM users WHERE role='faculty'").fetchone()[0] or 0
         active_sessions = conn.execute("SELECT COUNT(*) FROM portal_sessions WHERE created_at >= NOW() - INTERVAL '1 hour'").fetchone()[0] or 0
@@ -246,8 +246,8 @@ def api_admin_dashboard():
 @admin_bp.route("/api/admin/recent-users")
 def api_admin_recent_users():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         users = conn.execute("""
             SELECT id, name, role, user_id as roll_no, email,
                    COALESCE(status, 'Active') as status,
@@ -272,8 +272,8 @@ def api_admin_recent_users():
 @admin_bp.route("/api/admin/activity-chart")
 def api_admin_activity_chart():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         rows = conn.execute("""
             SELECT DATE(created_at) as date, COUNT(*) as sessions
             FROM portal_sessions
@@ -300,8 +300,8 @@ def api_admin_activity_chart():
 @admin_bp.route("/api/admin/pending-approvals")
 def api_admin_pending_approvals():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         rows = conn.execute("""
             SELECT * FROM pending_approvals
             WHERE status = 'pending'
@@ -339,9 +339,9 @@ def api_admin_system_status():
 @admin_bp.route("/api/notices")
 def api_notices():
     # Public notices API
-    from database import get_db_connection
+    from database import db_connection
     limit = int(request.args.get('limit', 4))
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             notices = conn.execute("SELECT * FROM notifications WHERE category='Academic' ORDER BY sl_no DESC LIMIT %s", (limit,)).fetchall()
             res = []
@@ -358,7 +358,7 @@ def api_notices():
 @admin_bp.route("/api/admin/notices", methods=["POST"])
 def api_admin_post_notice():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     from models.notification import Notification
 
     data = request.json or {}
@@ -367,7 +367,7 @@ def api_admin_post_notice():
     category = data.get('category', 'Academic')
 
     # Post to all students
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             student_ids = conn.execute("SELECT user_id FROM users WHERE role='student'").fetchall()
             for s in student_ids:
@@ -392,8 +392,8 @@ def api_admin_library_requests():
 @admin_bp.route("/api/admin/users/<string:user_id>", methods=["DELETE"])
 def api_admin_delete_user(user_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
             conn.commit()
@@ -419,8 +419,8 @@ def admin_library_management():
     from models.book import Book
     books = Book.get_all()
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         total_books = conn.execute("SELECT COUNT(*) FROM books").fetchone()[0] or 0
         active_loans = conn.execute("SELECT COUNT(*) FROM issues WHERE status = 'active'").fetchone()[0] or 0
     
@@ -430,8 +430,8 @@ def admin_library_management():
 @admin_bp.route("/api/admin/library/stats")
 def api_admin_library_stats():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         metrics = {
             "total_books": conn.execute("SELECT SUM(total_copies) FROM books").fetchone()[0] or 0,
             "available_books": conn.execute("SELECT SUM(available_copies) FROM books").fetchone()[0] or 0,
@@ -460,16 +460,16 @@ def api_admin_library_stats():
 @admin_bp.route("/api/admin/library/books", methods=["GET", "POST"])
 def api_admin_library_books():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     
     if request.method == "GET":
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             books = conn.execute("SELECT * FROM books ORDER BY title ASC").fetchall()
             return jsonify([dict(r) for r in books])
         
     if request.method == "POST":
         data = request.json
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             cur = conn.execute("""
                 INSERT INTO books (title, author, isbn, publisher, year, edition, category, 
                                    description, subject, total_copies, available_copies, 
@@ -489,11 +489,11 @@ def api_admin_library_books():
 @admin_bp.route("/api/admin/library/books/<int:book_id>", methods=["PUT", "DELETE"])
 def api_admin_library_book_detail(book_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     
     if request.method == "PUT":
         data = request.json
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             old = conn.execute("SELECT total_copies, available_copies FROM books WHERE sl_no = %s", (book_id,)).fetchone()
             if not old: 
                 return jsonify({"error": "Not Found"}), 404
@@ -516,7 +516,7 @@ def api_admin_library_book_detail(book_id):
             return jsonify({"success": True})
         
     if request.method == "DELETE":
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             try:
                 conn.execute("DELETE FROM books WHERE sl_no = %s", (book_id,))
                 conn.commit()
@@ -529,8 +529,8 @@ def api_admin_library_book_detail(book_id):
 @admin_bp.route("/api/admin/library/loans", methods=["GET"])
 def api_admin_library_loans():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         loans = conn.execute("""
             SELECT ll.sl_no, u.name as student_name, u.roll_no, b.title as book_title,
                    ll.issue_date as issued_date, ll.due_date, ll.return_date as returned_date, ll.status,
@@ -555,8 +555,8 @@ def api_admin_library_loans():
 @admin_bp.route("/api/admin/library/loans/<int:loan_id>/return", methods=["PATCH"])
 def api_admin_library_loans_return(loan_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         loan = conn.execute("SELECT * FROM issues WHERE sl_no = %s AND status = 'active'", (loan_id,)).fetchone()
         if loan:
             conn.execute("UPDATE issues SET status = 'returned', return_date = NOW() WHERE sl_no = %s", (loan_id,))
@@ -567,9 +567,9 @@ def api_admin_library_loans_return(loan_id):
 
 @admin_bp.route("/api/admin/library/loans/<int:loan_id>/remind", methods=["POST"])
 def api_admin_library_loans_remind(loan_id):
-    from database import get_db_connection
+    from database import db_connection
     from models.notification import Notification
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         loan = conn.execute("""
             SELECT ll.student_id, b.title, ll.due_date 
             FROM issues ll JOIN books b ON ll.book_id = b.sl_no WHERE ll.sl_no = %s
@@ -585,8 +585,8 @@ def api_admin_library_loans_remind(loan_id):
 @admin_bp.route("/api/admin/library/fines", methods=["GET"])
 def api_admin_library_fines():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         fines = conn.execute("""
             SELECT f.sl_no, f.paid_date, f.amount, f.paid, f.status, f.waived_reason,
                    u.name as student_name, b.title as book_title,
@@ -611,8 +611,8 @@ def api_admin_library_fines():
 @admin_bp.route("/api/admin/library/fines/<int:fine_id>/<action>", methods=["PATCH"])
 def api_admin_library_fines_action(fine_id, action):
     if not admin_required() or action not in ['paid', 'waive']: return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         if action == 'paid':
             conn.execute("UPDATE library_fines SET paid=true, paid_date=NOW(), status='Paid' WHERE sl_no=%s", (fine_id,))
         elif action == 'waive':
@@ -627,8 +627,8 @@ def api_admin_library_fines_action(fine_id, action):
 def api_admin_library_fines_send_reminders():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     from models.notification import Notification
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         users = conn.execute("SELECT DISTINCT student_id FROM library_fines WHERE paid = false").fetchall()
         
         for u in users:
@@ -651,8 +651,8 @@ def admin_users():
 def api_admin_users():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         role = request.args.get('role', 'all')
         status = request.args.get('status', 'all')
         search = request.args.get('search', '')
@@ -719,11 +719,11 @@ def api_admin_create_user():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     
     data = request.json
-    from database import get_db_connection
+    from database import db_connection
     from werkzeug.security import generate_password_hash
     import uuid
     
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # Default user_id as roll_no if student, or uuid otherwise
             user_id = data.get('roll_no') or str(uuid.uuid4())[:8]
@@ -746,9 +746,9 @@ def api_admin_create_user():
 @admin_bp.route("/api/admin/users/<int:user_id>", methods=["PATCH"])
 def api_admin_update_user(user_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         
         # Build dynamic update
         fields = []
@@ -770,9 +770,9 @@ def api_admin_update_user(user_id):
 @admin_bp.route("/api/admin/users/<int:user_id>/status", methods=["PATCH"])
 def api_admin_update_user_status(user_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     status = request.json.get('status')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         conn.execute("UPDATE users SET status = %s WHERE sl_no = %s", (status, user_id))
         conn.commit()
     return jsonify({"success": True})
@@ -781,14 +781,14 @@ def api_admin_update_user_status(user_id):
 @admin_bp.route("/api/admin/users/bulk", methods=["POST"])
 def api_admin_users_bulk():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
     action = data.get('action')
     user_ids = data.get('user_ids', [])
     
     if not user_ids: return jsonify({"success": True})
     
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         placeholders = ','.join(['%s']*len(user_ids))
         
         if action == 'approve':
@@ -804,12 +804,12 @@ def api_admin_users_bulk():
 def api_admin_users_export():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     # Simple CSV export logic avoiding pandas to be clean
-    from database import get_db_connection
+    from database import db_connection
     import io
     import csv
     from flask import Response
     
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         users = conn.execute("SELECT name, email, role, user_id, batch, department, status, created_at FROM users ORDER BY created_at DESC").fetchall()
     
     output = io.StringIO()
@@ -839,8 +839,8 @@ def admin_results_overview():
 @admin_bp.route("/api/admin/results/overview")
 def api_admin_results_overview():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         # We will wrap the exact query logic requested.
         # Fallback to 0 if tables are empty/don't exist.
         try:
@@ -869,8 +869,8 @@ def api_admin_results_overview():
 @admin_bp.route("/api/admin/results/submissions")
 def api_admin_results_submissions():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = """
                 SELECT s.subject_name, f.name as faculty_name,
@@ -897,8 +897,8 @@ def api_admin_results_submissions():
 @admin_bp.route("/api/admin/results/publish/<int:submission_id>", methods=["POST"])
 def api_admin_results_publish(submission_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE mark_submissions SET status='published', published_at=NOW() WHERE sl_no=%s", (submission_id,))
             conn.commit()
@@ -911,9 +911,9 @@ def api_admin_results_publish(submission_id):
 @admin_bp.route("/api/admin/results/send-reminders", methods=["POST"])
 def api_admin_results_send_reminders():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     from models.notification import Notification
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # notify faculties with pending submissions
             rows = conn.execute("SELECT faculty_id FROM mark_submissions WHERE status='pending'").fetchall()
@@ -929,8 +929,8 @@ def api_admin_results_send_reminders():
 @admin_bp.route("/api/admin/results/grades")
 def api_admin_results_grades():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Note: SQLite/Postgres FIELD equivalent is a bit complex, we just fetch grouping and sort in JS/Python.
             query = """
@@ -950,8 +950,8 @@ def api_admin_results_export():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
     import io, csv
     from flask import Response
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Example query, will fallback if tables missing
             rows = conn.execute("SELECT * FROM results").fetchall()
@@ -980,8 +980,8 @@ def admin_notices():
 @admin_bp.route("/api/admin/notices", methods=["GET"])
 def api_admin_notices_list():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # We assume the `notices` table exists as per prompts.
             # Fallback to empty list gracefully if table is missing.
@@ -1009,8 +1009,8 @@ def api_admin_notices_list():
 @admin_bp.route("/api/admin/notices", methods=["POST"])
 def api_admin_notices_create():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         data = request.json
         try:
             query = """
@@ -1031,8 +1031,8 @@ def api_admin_notices_create():
 @admin_bp.route("/api/admin/notices/<int:notice_id>", methods=["PUT"])
 def api_admin_notices_update(notice_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         data = request.json
         try:
             query = """
@@ -1054,8 +1054,8 @@ def api_admin_notices_update(notice_id):
 @admin_bp.route("/api/admin/notices/<int:notice_id>", methods=["DELETE"])
 def api_admin_notices_delete(notice_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("DELETE FROM notices WHERE sl_no=%s", (notice_id,))
             conn.commit()
@@ -1068,8 +1068,8 @@ def api_admin_notices_delete(notice_id):
 @admin_bp.route("/api/admin/notices/stats", methods=["GET"])
 def api_admin_notices_stats():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = """
                 SELECT title, views_count, category, created_at
@@ -1104,8 +1104,8 @@ def admin_events():
 @admin_bp.route("/api/admin/events", methods=["GET"])
 def api_admin_events_list():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = """
                 SELECT sl_no, title, category, event_date, venue,
@@ -1124,9 +1124,9 @@ def api_admin_events_list():
 @admin_bp.route("/api/admin/events", methods=["POST"])
 def api_admin_events_create():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 INSERT INTO events (title, category, event_date, venue, description, icon_name, registration_link, show_on_homepage, created_at)
@@ -1147,9 +1147,9 @@ def api_admin_events_create():
 @admin_bp.route("/api/admin/events/<int:event_id>", methods=["PUT"])
 def api_admin_events_update(event_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 UPDATE events 
@@ -1171,8 +1171,8 @@ def api_admin_events_update(event_id):
 @admin_bp.route("/api/admin/events/<int:event_id>", methods=["DELETE"])
 def api_admin_events_delete(event_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("DELETE FROM events WHERE sl_no=%s", (event_id,))
             conn.commit()
@@ -1185,8 +1185,8 @@ def api_admin_events_delete(event_id):
 @admin_bp.route("/api/admin/events/<int:event_id>/toggle-homepage", methods=["PATCH"])
 def api_admin_events_toggle(event_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = "UPDATE events SET show_on_homepage = NOT show_on_homepage WHERE sl_no=%s"
             conn.execute(query, (event_id,))
@@ -1200,10 +1200,10 @@ def api_admin_events_toggle(event_id):
 @admin_bp.route("/api/admin/events/homepage-order", methods=["PUT"])
 def api_admin_events_order():
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
     order_list = data.get('order', [])
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # We assume sequence order doesn't actually exist in the table columns 
             # based on the provided prompt schema snippet. 
@@ -1235,8 +1235,8 @@ def admin_placement_applicants(drive_id):
 @admin_bp.route("/api/admin/placements/drives", methods=["GET"])
 def api_admin_placements_drives():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = """
                 SELECT pd.sl_no, pd.company_name, pd.role, 
@@ -1258,9 +1258,9 @@ def api_admin_placements_drives():
 @admin_bp.route("/api/admin/placements/drives", methods=["POST"])
 def api_admin_placements_create():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 INSERT INTO placement_drives 
@@ -1286,9 +1286,9 @@ def api_admin_placements_create():
 @admin_bp.route("/api/admin/placements/drives/<int:drive_id>", methods=["PUT"])
 def api_admin_placements_update(drive_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = "UPDATE placement_drives SET role=%s, status=%s WHERE sl_no=%s"
             conn.execute(query, (data.get('role'), data.get('status'), drive_id))
@@ -1302,8 +1302,8 @@ def api_admin_placements_update(drive_id):
 @admin_bp.route("/api/admin/placements/drives/<int:drive_id>/close", methods=["PATCH"])
 def api_admin_placements_close(drive_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE placement_drives SET status='Closed' WHERE sl_no=%s", (drive_id,))
             conn.commit()
@@ -1316,8 +1316,8 @@ def api_admin_placements_close(drive_id):
 @admin_bp.route("/api/admin/placements/drives/<int:drive_id>/applicants", methods=["GET"])
 def api_admin_placements_applicants(drive_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             drive = conn.execute("SELECT * FROM placement_drives WHERE sl_no=%s", (drive_id,)).fetchone()
             
@@ -1351,8 +1351,8 @@ def api_admin_placements_app_action(app_id, action):
     status = action_map.get(action)
     if not status: return jsonify({"success": False, "error": "Invalid action"})
     
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE placement_applications SET status=%s WHERE sl_no=%s", (status, app_id))
             conn.commit()
@@ -1366,8 +1366,8 @@ def api_admin_placements_app_action(app_id, action):
 @admin_bp.route("/api/admin/placements/stats", methods=["GET"])
 def api_admin_placements_stats():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             stats = conn.execute("SELECT total_placed FROM placement_stats LIMIT 1").fetchone()
             high = conn.execute("SELECT MAX(package_max) as m FROM placement_drives").fetchone()
@@ -1401,8 +1401,8 @@ def admin_courses():
 @admin_bp.route("/api/admin/users/faculty-list", methods=["GET"])
 def api_admin_faculty_list():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Assuming role 'faculty' exists in users
             query = "SELECT sl_no, name, department FROM users WHERE role='faculty' ORDER BY name ASC"
@@ -1416,9 +1416,9 @@ def api_admin_faculty_list():
 def api_admin_courses_subjects():
 
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     sem = request.args.get('semester', 'S6')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 SELECT s.sl_no, s.subject_name, s.subject_code,
@@ -1439,9 +1439,9 @@ def api_admin_courses_subjects():
 @admin_bp.route("/api/admin/courses/subjects", methods=["POST"])
 def api_admin_courses_create():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 INSERT INTO subjects 
@@ -1466,9 +1466,9 @@ def api_admin_courses_create():
 @admin_bp.route("/api/admin/courses/subjects/<int:subj_id>", methods=["PUT"])
 def api_admin_courses_update(subj_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             conn.execute(
                 "UPDATE subjects SET subject_name=%s, subject_type=%s, credits=%s WHERE sl_no=%s",
@@ -1484,8 +1484,8 @@ def api_admin_courses_update(subj_id):
 @admin_bp.route("/api/admin/courses/subjects/<int:subj_id>", methods=["DELETE"])
 def api_admin_courses_delete(subj_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("DELETE FROM subjects WHERE sl_no=%s", (subj_id,))
             conn.commit()
@@ -1498,12 +1498,12 @@ def api_admin_courses_delete(subj_id):
 @admin_bp.route("/api/admin/courses/subjects/<int:subj_id>/faculty", methods=["PATCH"])
 def api_admin_courses_reassign(subj_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
     fac_val = data.get('faculty_id')
     if not fac_val or fac_val == "": fac_val = None
     
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE subjects SET faculty_id=%s WHERE sl_no=%s", (fac_val, subj_id))
             conn.commit()
@@ -1527,8 +1527,8 @@ def admin_labs():
 @admin_bp.route("/api/admin/labs", methods=["GET"])
 def api_admin_labs_list():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Graceful fallback if table doesn't exist
             query = "SELECT sl_no, lab_name, capacity, equipment, current_status, available_from, category FROM labs ORDER BY current_status ASC, lab_name ASC"
@@ -1541,9 +1541,9 @@ def api_admin_labs_list():
 @admin_bp.route("/api/admin/labs", methods=["POST"])
 def api_admin_labs_create():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             query = """
                 INSERT INTO labs (lab_name, room_number, capacity, category, equipment, current_status)
@@ -1563,8 +1563,8 @@ def api_admin_labs_create():
 @admin_bp.route("/api/admin/labs/<int:lab_id>/block", methods=["PATCH"])
 def api_admin_labs_block(lab_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Toggle block status
             curr = conn.execute("SELECT current_status FROM labs WHERE sl_no=%s", (lab_id,)).fetchone()
@@ -1582,8 +1582,8 @@ def api_admin_labs_block(lab_id):
 @admin_bp.route("/api/admin/labs/bookings", methods=["GET"])
 def api_admin_labs_bookings():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             query = """
                 SELECT lb.sl_no, lb.slot_start, lb.slot_end, lb.purpose, lb.status, lb.student_id,
@@ -1602,8 +1602,8 @@ def api_admin_labs_bookings():
 @admin_bp.route("/api/admin/labs/bookings/<int:book_id>/approve", methods=["PATCH"])
 def api_admin_labs_booking_approve(book_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Approving sets the lab status temporally if it's currently available, mapped simply here
             conn.execute("UPDATE lab_bookings SET status='approved' WHERE sl_no=%s", (book_id,))
@@ -1617,9 +1617,9 @@ def api_admin_labs_booking_approve(book_id):
 @admin_bp.route("/api/admin/labs/bookings/<int:book_id>/deny", methods=["PATCH"])
 def api_admin_labs_booking_deny(book_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     reason = request.json.get('reason', 'Denied by administrator.')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE lab_bookings SET status='denied', denial_reason=%s WHERE sl_no=%s", (reason, book_id))
             conn.commit()
@@ -1644,9 +1644,9 @@ def admin_timetable():
 def api_admin_timetable():
     """Returns grid slots + publish status for a batch"""
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     batch = request.args.get('batch', 'S6 CSE A')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # Check Status (mock implementation via timetable_status table)
             stat = conn.execute("SELECT status FROM timetable_status WHERE batch=%s", (batch,)).fetchone()
@@ -1671,9 +1671,9 @@ def api_admin_timetable():
 @admin_bp.route("/api/admin/timetable/slots", methods=["POST"])
 def api_admin_timetable_slots_post():
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             existing_id = data.get('existing_id')
             if existing_id:
@@ -1703,8 +1703,8 @@ def api_admin_timetable_slots_post():
 @admin_bp.route("/api/admin/timetable/slots/<int:slot_id>", methods=["DELETE"])
 def api_admin_timetable_slots_del(slot_id):
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("DELETE FROM timetable_slots WHERE sl_no=%s", (slot_id,))
             conn.commit()
@@ -1717,9 +1717,9 @@ def api_admin_timetable_slots_del(slot_id):
 @admin_bp.route("/api/admin/timetable/check-conflict", methods=["POST"])
 def api_admin_timetable_check_conflict():
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # Check Faculty Conflict independently of the target batch
             fac_conflict = conn.execute("""
@@ -1753,9 +1753,9 @@ def api_admin_timetable_autogen():
 @admin_bp.route("/api/admin/timetable/publish", methods=["PUT"])
 def api_admin_timetable_publish():
     if not admin_required(): return jsonify({"error":"Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     batch = request.json.get('batch')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             conn.execute("""
                 INSERT INTO timetable_status (batch, status) VALUES (%s, 'published')
@@ -1782,9 +1782,9 @@ def admin_fees():
 @admin_bp.route("/api/admin/fees/stats", methods=["GET"])
 def api_admin_fees_stats():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     current_semester = 'S6' # Hardcoded mockup for demonstration context
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # KPI Math Logic
             kpi_query = """
@@ -1853,9 +1853,9 @@ def api_admin_fees_stats():
 @admin_bp.route("/api/admin/fees", methods=["GET"])
 def api_admin_fees_list():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     batch_prefix = request.args.get('batch', 'S6')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # Match "S6 CSE A", "S6 CSE B", etc. natively
             query = """
@@ -1886,9 +1886,9 @@ def api_admin_fees_list():
 @admin_bp.route("/api/admin/fees/<int:fee_id>", methods=["PUT"])
 def api_admin_fees_update(fee_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     data = request.json
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             conn.execute("""
                 UPDATE fee_records 
@@ -1905,9 +1905,9 @@ def api_admin_fees_update(fee_id):
 @admin_bp.route("/api/admin/fees/<int:fee_id>/waive", methods=["PATCH"])
 def api_admin_fees_waive(fee_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
+    from database import db_connection
     reason = request.json.get('reason')
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         try:
             # Override implicitly mimicking "Paid" status via explicit zeroing
             conn.execute("""
@@ -1925,8 +1925,8 @@ def api_admin_fees_waive(fee_id):
 @admin_bp.route("/api/admin/fees/send-reminders", methods=["POST"])
 def api_admin_fees_reminders():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Get users with pending/overdue/partial and insert Notification seamlessly
             # Example logic
@@ -1949,8 +1949,8 @@ def admin_analytics():
 @admin_bp.route("/api/admin/analytics/overview", methods=["GET"])
 def api_admin_analytics_overview():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Mocking robust KPI responses securely validating Frontend mapping configurations
             import random
@@ -1999,8 +1999,8 @@ def api_admin_analytics_activity():
 @admin_bp.route("/api/admin/analytics/cgpa", methods=["GET"])
 def api_admin_analytics_cgpa():
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             # Mapping explicit conditional aggregation boundaries precisely distributing elements horizontally
             query = """
@@ -2171,8 +2171,8 @@ def api_admin_system_restart():
 @admin_bp.route("/api/admin/library/payment/<int:issue_id>/approve", methods=["POST"])
 def api_admin_library_payment_approve(issue_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE issues SET payment_status = 'approved' WHERE sl_no = %s", (issue_id,))
             conn.commit()
@@ -2185,8 +2185,8 @@ def api_admin_library_payment_approve(issue_id):
 @admin_bp.route("/api/admin/library/payment/<int:issue_id>/reject", methods=["POST"])
 def api_admin_library_payment_reject(issue_id):
     if not admin_required(): return jsonify({"error": "Unauthorized"}), 401
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         try:
             conn.execute("UPDATE issues SET payment_status = 'rejected', payment_requested_date = NULL WHERE sl_no = %s", (issue_id,))
             conn.commit()

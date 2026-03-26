@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from database import get_db_connection
+from database import db_connection
 import json
 import logging
 
@@ -15,7 +15,7 @@ def get_student_dashboard_data(user_id):
     Fetches student performance data and enrolled subjects from the database.
     Does NOT contain raw SQL inside the route.
     """
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         # Get the internal primary key (sl_no) for the given user_id (roll_no)
         user = conn.execute("SELECT sl_no FROM users WHERE user_id = %s", (user_id,)).fetchone()
         if not user:
@@ -48,7 +48,7 @@ def get_student_attendance_data(user_id):
     """
     Fetches subject-wise attendance percentages for a specific student.
     """
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         user = conn.execute("SELECT sl_no FROM users WHERE user_id = %s", (user_id,)).fetchone()
         if not user:
             return []
@@ -67,7 +67,7 @@ def get_all_notes_data():
     """
     Retrieves all available study materials/notes from the semesters subjects catalog.
     """
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         rows = conn.execute("SELECT subjects FROM semesters").fetchall()
         all_notes = []
         for row in rows:
@@ -88,7 +88,7 @@ def get_faculty_list_data():
     """
     Fetches a list of faculty members with their research interests and contact emails.
     """
-    with get_db_connection() as conn:
+    with db_connection() as conn:
         rows = conn.execute("SELECT sl_no, name, designation, designation_key, qualification, research, email, photo FROM faculty ORDER BY sl_no ASC").fetchall()
         return [dict(row) for row in rows]
 

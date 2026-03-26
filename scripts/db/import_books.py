@@ -130,8 +130,8 @@ books_data = [
 
 
 def import_data():
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         with conn.cursor() as cur:
             # 1. Delete existing books and relate tables to start fresh
             print("Clearing existing books and issues/requests...")

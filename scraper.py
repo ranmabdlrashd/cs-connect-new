@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-from database import get_db_connection
 import re
 
 # List of URLs to scrape for the CS Connect chatbot's knowledge base
@@ -77,30 +76,24 @@ def save_to_database(url, title, content):
     if not content:
         return 0
         
-    conn = get_db_connection()
-    if conn is None:
-        print("Database connection failed. Cannot save data.")
-        return 0
-        
+    from database import db_connection
     try:
-        with conn.cursor() as cur:
-            upsert_query = """
-            INSERT INTO website_content (url, title, content)
-            VALUES (%s, %s, %s)
-            ON CONFLICT (url) DO UPDATE 
-            SET title = EXCLUDED.title,
-                content = EXCLUDED.content,
-                scraped_at = CURRENT_TIMESTAMP;
-            """
-            cur.execute(upsert_query, (url, title, content))
-            conn.commit()
-            return len(content)
+        with db_connection() as conn:
+            with conn.cursor() as cur:
+                upsert_query = """
+                INSERT INTO website_content (url, title, content)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (url) DO UPDATE 
+                SET title = EXCLUDED.title,
+                    content = EXCLUDED.content,
+                    scraped_at = CURRENT_TIMESTAMP;
+                """
+                cur.execute(upsert_query, (url, title, content))
+                conn.commit()
+                return len(content)
     except Exception as e:
         print(f"Error saving data for {url} to database: {e}")
-        conn.rollback()
         return 0
-    finally:
-        conn.close()
 
 def main():
     print("Starting CS Connect Data Ingestion Phase 2...\n")

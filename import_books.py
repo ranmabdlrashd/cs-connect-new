@@ -1,7 +1,11 @@
 import os
+import logging
 from dotenv import load_dotenv
 
-# We need to make sure we're in the app context or just use get_db_connection directly.
+load_dotenv()
+
+# Setup module-level logger
+logger = logging.getLogger(__name__)
 
 
 books_data = [
@@ -130,18 +134,18 @@ books_data = [
 
 
 def import_data():
-    from database import get_db_connection
-    with get_db_connection() as conn:
+    from database import db_connection
+    with db_connection() as conn:
         with conn.cursor() as cur:
             # 1. Delete existing books and relate tables to start fresh
-            print("Clearing existing books and issues/requests...")
+            logger.info("Clearing existing books and issues/requests...")
             cur.execute("TRUNCATE TABLE issues CASCADE")
             cur.execute("TRUNCATE TABLE requests CASCADE")
             # Resetting books table id sequence as well
             cur.execute("TRUNCATE TABLE books RESTART IDENTITY CASCADE")
         
             # 2. Insert new books
-            print("Inserting new books...")
+            logger.info("Inserting new books...")
             for idx, (title, author, publisher, year) in enumerate(books_data):
                 acc_no = idx + 1
                 shelf_str = f"ACC-{acc_no}"
@@ -175,10 +179,11 @@ def import_data():
                 )
         
             conn.commit()
-    print("Success! Inserted 21 books from spreadsheet image.")
+    logger.info("Success! Inserted %d books.", len(books_data))
 
 
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     import_data()

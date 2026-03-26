@@ -1,10 +1,10 @@
-from database import get_db_connection
+from database import db_connection
 
 
 class Placement:
     @staticmethod
     def get_user_profile(user_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             user = conn.execute("SELECT u.branch, u.batch, r.cgpa FROM users u LEFT JOIN results r ON u.user_id = r.student_id WHERE u.user_id = %s", (user_id,)).fetchone()
             return dict(user) if user else None
 
@@ -12,7 +12,7 @@ class Placement:
 
     @staticmethod
     def get_active_drives(user_cgpa, user_branch, user_batch):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             drives_cursor = conn.execute("""
                 SELECT *, 
                        CASE 
@@ -32,7 +32,7 @@ class Placement:
 
     @staticmethod
     def get_applied_drive_ids(student_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             applied_cursor = conn.execute("SELECT drive_id FROM placement_applications WHERE student_id = %s", (student_id,))
             rows = applied_cursor.fetchall()
             ids = [row[0] for row in rows]
@@ -41,7 +41,7 @@ class Placement:
 
     @staticmethod
     def apply(drive_id, student_id, data):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             conn.execute("""
                 INSERT INTO placement_applications 
                 (drive_id, student_id, contact_number, cover_letter, resume_url, linkedin_url)
@@ -52,7 +52,7 @@ class Placement:
 
     @staticmethod
     def get_user_applications(student_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             apps_cursor = conn.execute("""
                 SELECT pd.company_name, pd.role, pa.applied_date, pa.status
                 FROM placement_applications pa
@@ -67,7 +67,7 @@ class Placement:
 
     @staticmethod
     def get_drive_by_id(drive_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             drive = conn.execute("SELECT * FROM placement_drives WHERE sl_no = %s", (drive_id,)).fetchone()
             return dict(drive) if drive else None
 

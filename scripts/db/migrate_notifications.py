@@ -4,23 +4,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_db_connection():
-    db_url = os.environ.get("NEON_DATABASE_URL") or os.environ.get("LOCAL_DATABASE_URL") or os.environ.get("DATABASE_URL")
-    if db_url:
-        return psycopg2.connect(db_url)
-    else:
-        DB_HOST = os.environ.get("DB_HOST", "localhost")
-        DB_NAME = os.environ.get("DB_NAME", "csconnect")
-        DB_USER = os.environ.get("DB_USER", "postgres")
-        DB_PASS = os.environ.get("DB_PASS", "1234")
-        return psycopg2.connect(
-            host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASS
-        )
+import sys
+# Add project root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from database import db_connection
 
 def migrate():
     try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+        with db_connection() as conn:
+            cur = conn.cursor()
         
         # Check if table exists
         cur.execute("SELECT to_regclass('public.notifications')")
@@ -45,8 +37,6 @@ def migrate():
             print("Successfully migrated notifications table.")
         else:
             print("Table notifications does not exist yet. It will be created on app startup.")
-            
-        conn.close()
     except Exception as e:
         print(f"Error during migration: {e}")
 

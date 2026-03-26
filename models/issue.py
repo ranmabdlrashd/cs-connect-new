@@ -1,11 +1,11 @@
-from database import get_db_connection
+from database import db_connection
 
 
 
 class Issue:
     @staticmethod
     def create_issue(book_id, user_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             from datetime import datetime, timedelta
             issue_date = datetime.now()
             due_date = issue_date + timedelta(days=14)
@@ -18,7 +18,7 @@ class Issue:
 
     @staticmethod
     def return_book(book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             conn.execute(
                 "UPDATE issues SET status = 'returned', return_date = CURRENT_TIMESTAMP WHERE book_id = %s AND status = 'issued'",
                 (book_id,),
@@ -28,7 +28,7 @@ class Issue:
 
     @staticmethod
     def has_user_issued_book(user_id, book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             issue = conn.execute(
                 "SELECT sl_no FROM issues WHERE user_id = %s AND book_id = %s AND status = 'issued'",
                 (str(user_id), book_id),
@@ -38,7 +38,7 @@ class Issue:
 
     @staticmethod
     def get_user_active_issued_count(user_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             count = conn.execute(
                 "SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'",
                 (str(user_id),),
@@ -48,7 +48,7 @@ class Issue:
 
     @staticmethod
     def has_outstanding_fines(user_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             fine = conn.execute(
                 "SELECT sl_no FROM issues_with_fines WHERE user_id = %s AND fine_amount > 0 AND payment_status != 'approved'",
                 (str(user_id),),
@@ -62,7 +62,7 @@ class Issue:
 
     @staticmethod
     def get_current_holder(book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             holder = conn.execute(
                 """
                 SELECT u.name 
@@ -77,7 +77,7 @@ class Issue:
 
     @staticmethod
     def get_current_holder_id(book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             holder = conn.execute(
                 "SELECT user_id FROM issues WHERE book_id = %s AND status = 'issued'",
                 (book_id,),
@@ -87,7 +87,7 @@ class Issue:
 
     @staticmethod
     def get_all_active_issues():
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             # Ensure we have these columns selected
             issues = conn.execute("""
                 SELECT i.sl_no, i.issue_date, b.title as book_title, u.name as user_name
@@ -102,7 +102,7 @@ class Issue:
 
     @staticmethod
     def get_all_issues():
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             issues = conn.execute("""
                 SELECT i.sl_no, i.issue_date, i.return_date, b.title as book_title, u.name as user_name, i.status, i.book_id
                 FROM issues i
@@ -117,7 +117,7 @@ class Issue:
 
     @staticmethod
     def get_history_by_book(book_id):
-        with get_db_connection() as conn:
+        with db_connection() as conn:
             history = conn.execute("""
                 SELECT i.sl_no, i.issue_date, i.return_date, i.status, u.name as user_name, u.user_id as admission_num
                 FROM issues i
