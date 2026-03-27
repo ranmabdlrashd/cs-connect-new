@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faculty & Staff | AISAT CSE</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/faculty.css" />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- News Ticker -->
+    <div class="news-ticker">
+      <div class="ticker-content">
+        📢 Admissions Open for 2026 Batch | 🎉 CSE Student Wins National
+        Hackathon | 📅 Next Workshop: AI in Healthcare - Feb 20th | 🏆 AISAT
+        Ranked Top 10 in Innovation
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+      <div class="logo">
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            background: var(--primary-red);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 10px;
+          "
+        >
+          AISAT
+        </div>
+        AISAT CSE
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="academics.html">Academics</a></li>
+        <li><a href="faculty.html" class="active">Faculty</a></li>
+        <li><a href="placements.html">Placements</a></li>
+        <li><a href="library.html">Library</a></li>
+      </ul>
+      <a href="login.html" class="btn-login">Login</a>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="header-overlay">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a> / <span>Faculty & Staff</span>
+        </div>
+        <h1 class="page-title">Our Expert Faculty</h1>
+        <p class="page-subtitle">
+          Meet the brilliant minds shaping the future of technology
+        </p>
+      </div>
+    </section>
+
+    <!-- HOD Section -->
+    <section class="hod-section">
+      <div class="container">
+        <div class="hod-card reveal">
+          <div class="hod-image">
+            <img
+              src="images/faculty/hod-placeholder.jpg"
+              alt="Dr. Jeswin Roy Decouth"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/250x300/A41F13/FFFFFF?text=HOD'
+              "
+            />
+            <div class="hod-badge">Head of Department</div>
+          </div>
+          <div class="hod-info">
+            <h2>Dr. Jeswin Roy Decouth</h2>
+            <p class="hod-designation">Associate Professor & HOD</p>
+            <div class="hod-qualifications">
+              <span class="qual-badge">Ph.D. in Computer Science</span>
+              <span class="qual-badge">M.Tech CSE</span>
+              <span class="qual-badge">B.Tech CSE</span>
+            </div>
+            <div class="hod-stats">
+              <div class="stat">
+                <i class="fas fa-briefcase"></i>
+                <span><strong>15+</strong> Years Experience</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-book"></i>
+                <span><strong>45+</strong> Publications</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-award"></i>
+                <span><strong>10+</strong> Research Projects</span>
+              </div>
+            </div>
+            <div class="hod-research">
+              <h4>Research Interests:</h4>
+              <p>
+                Machine Learning, Artificial Intelligence, Deep Learning,
+                Computer Vision, Natural Language Processing
+              </p>
+            </div>
+            <div class="hod-contact">
+              <a href="mailto:hod@aisat.ac.in"
+                ><i class="fas fa-envelope"></i> hod@aisat.ac.in</a
+              >
+              <a href="tel:+919876543210"
+                ><i class="fas fa-phone"></i> +91 98765 43210</a
+              >
+            </div>
+            <div class="hod-links">
+              <a href="#" class="social-link" title="Google Scholar"
+                ><i class="fab fa-google"></i
+              ></a>
+              <a href="#" class="social-link" title="ORCID"
+                ><i class="fab fa-orcid"></i
+              ></a>
+              <a href="#" class="social-link" title="ResearchGate"
+                ><i class="fab fa-researchgate"></i
+              ></a>
+              <a href="#" class="social-link" title="LinkedIn"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Faculty Section -->
+    <section class="faculty-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Our Distinguished Faculty</h2>
+          <div class="header-line"></div>
+          <p class="section-desc">
+            Experienced educators dedicated to academic excellence
+          </p>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="filter-controls reveal">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="facultySearch"
+              placeholder="Search by name or specialization..."
+            />
+          </div>
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+              All Faculty
+            </button>
+            <button class="filter-btn" data-filter="professor">
+              Professors
+            </button>
+            <button class="filter-btn" data-filter="associate">
+              Associate Professors
+            </button>
+            <button class="filter-btn" data-filter="assistant">
+              Assistant Professors
+            </button>
+          </div>
+        </div>
+
+        <!-- Faculty Grid -->
+        <div class="faculty-grid" id="facultyGrid">
+          <!-- Faculty Card 1 - Professor -->
+          <div class="faculty-card reveal" data-category="professor">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Dr.+A.+Kumar"
+                alt="Dr. Arun Kumar"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty1')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Dr. Arun Kumar</h3>
+              <p class="faculty-designation">Professor</p>
+              <div class="faculty-qualification">Ph.D., M.Tech, B.Tech</div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>18 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>Data Structures, Algorithms</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Machine Learning</span>
+                <span class="tag">AI</span>
+                <span class="tag">Data Mining</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>38</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>12</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Mon-Fri: 10:00 AM - 12:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:arun.kumar@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543211" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Faculty Card 2 - Associate Professor -->
+          <div class="faculty-card reveal" data-category="associate">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Dr.+P.+Sharma"
+                alt="Dr. Priya Sharma"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty2')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Dr. Priya Sharma</h3>
+              <p class="faculty-designation">Associate Professor</p>
+              <div class="faculty-qualification">Ph.D., M.Tech, B.E.</div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>12 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>DBMS, Cloud Computing</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Cloud Computing</span>
+                <span class="tag">Big Data</span>
+                <span class="tag">IoT</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>28</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>8</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Tue-Thu: 2:00 PM - 4:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:priya.sharma@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543212" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Faculty Card 3 - Assistant Professor -->
+          <div class="faculty-card reveal" data-category="assistant">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Mr.+R.+Nair"
+                alt="Mr. Rahul Nair"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty3')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Mr. Rahul Nair</h3>
+              <p class="faculty-designation">Assistant Professor</p>
+              <div class="faculty-qualification">M.Tech, B.Tech</div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>7 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>Web Technologies, OS</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Web Development</span>
+                <span class="tag">Blockchain</span>
+                <span class="tag">Cybersecurity</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>15</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>5</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Mon-Wed: 3:00 PM - 5:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:rahul.nair@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543213" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Faculty Card 4 -->
+          <div class="faculty-card reveal" data-category="associate">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Dr.+S.+Menon"
+                alt="Dr. Sandeep Menon"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty4')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Dr. Sandeep Menon</h3>
+              <p class="faculty-designation">Associate Professor</p>
+              <div class="faculty-qualification">Ph.D., M.Tech, B.Tech</div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>14 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>Computer Networks, Security</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Network Security</span>
+                <span class="tag">Cryptography</span>
+                <span class="tag">Ethical Hacking</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>32</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>10</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Mon-Fri: 11:00 AM - 1:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:sandeep.menon@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543214" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Faculty Card 5 -->
+          <div class="faculty-card reveal" data-category="assistant">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Ms.+A.+Thomas"
+                alt="Ms. Anjali Thomas"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty5')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Ms. Anjali Thomas</h3>
+              <p class="faculty-designation">Assistant Professor</p>
+              <div class="faculty-qualification">
+                M.Tech (Pursuing Ph.D.), B.Tech
+              </div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>6 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>Software Engineering, Python</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Software Testing</span>
+                <span class="tag">DevOps</span>
+                <span class="tag">Agile</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>12</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>4</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Tue-Thu: 1:00 PM - 3:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:anjali.thomas@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543215" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Faculty Card 6 -->
+          <div class="faculty-card reveal" data-category="assistant">
+            <div class="faculty-image-container">
+              <img
+                src="https://via.placeholder.com/300x350/8F7A6E/FFFFFF?text=Mr.+V.+Pillai"
+                alt="Mr. Vivek Pillai"
+              />
+              <div class="faculty-overlay">
+                <button
+                  class="btn-view-profile"
+                  onclick="openProfileModal('faculty6')"
+                >
+                  View Full Profile
+                </button>
+              </div>
+            </div>
+            <div class="faculty-info">
+              <h3>Mr. Vivek Pillai</h3>
+              <p class="faculty-designation">Assistant Professor</p>
+              <div class="faculty-qualification">M.Tech, B.Tech</div>
+
+              <div class="faculty-details">
+                <div class="detail-row">
+                  <i class="fas fa-briefcase"></i>
+                  <span>5 Years Experience</span>
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-book-open"></i>
+                  <span>AI, Machine Learning</span>
+                </div>
+              </div>
+
+              <div class="research-tags">
+                <span class="tag">Deep Learning</span>
+                <span class="tag">NLP</span>
+                <span class="tag">Computer Vision</span>
+              </div>
+
+              <div class="faculty-stats-mini">
+                <div class="stat-mini">
+                  <strong>10</strong>
+                  <span>Publications</span>
+                </div>
+                <div class="stat-mini">
+                  <strong>3</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+
+              <div class="office-hours">
+                <i class="far fa-clock"></i>
+                <span>Wed-Fri: 2:00 PM - 4:00 PM</span>
+              </div>
+
+              <div class="faculty-contact-icons">
+                <a href="mailto:vivek.pillai@aisat.ac.in" title="Email"
+                  ><i class="fas fa-envelope"></i
+                ></a>
+                <a href="tel:+919876543216" title="Phone"
+                  ><i class="fas fa-phone"></i
+                ></a>
+                <a href="#" title="Google Scholar"
+                  ><i class="fab fa-google"></i
+                ></a>
+                <a href="#" title="ORCID"><i class="fab fa-orcid"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults" style="display: none">
+          <i class="fas fa-search"></i>
+          <h3>No faculty members found</h3>
+          <p>Try adjusting your search or filter criteria</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Supporting Staff Section -->
+    <section class="staff-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Supporting Staff</h2>
+          <div class="header-line"></div>
+          <p class="section-desc">
+            Dedicated professionals supporting our academic mission
+          </p>
+        </div>
+
+        <!-- Lab Instructors -->
+        <div class="staff-category">
+          <h3 class="category-title reveal">
+            <i class="fas fa-flask"></i> Lab Instructors
+          </h3>
+          <div class="staff-grid">
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Mr. Ajay Krishna</h4>
+                <p class="staff-role">Senior Lab Instructor</p>
+                <p class="staff-lab">Programming Lab & AI Lab</p>
+                <div class="staff-contact">
+                  <a href="mailto:ajay.lab@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543220"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Ms. Deepa Mohan</h4>
+                <p class="staff-role">Lab Instructor</p>
+                <p class="staff-lab">Network Lab & Hardware Lab</p>
+                <div class="staff-contact">
+                  <a href="mailto:deepa.lab@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543221"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Mr. Sanjay Varma</h4>
+                <p class="staff-role">Lab Instructor</p>
+                <p class="staff-lab">Database Lab & Web Tech Lab</p>
+                <div class="staff-contact">
+                  <a href="mailto:sanjay.lab@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543222"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Office Staff -->
+        <div class="staff-category">
+          <h3 class="category-title reveal">
+            <i class="fas fa-briefcase"></i> Office Staff
+          </h3>
+          <div class="staff-grid">
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Mrs. Lakshmi Nair</h4>
+                <p class="staff-role">Office Administrator</p>
+                <p class="staff-lab">Department Office</p>
+                <div class="staff-contact">
+                  <a href="mailto:lakshmi.office@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543225"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Mr. Rajesh Kumar</h4>
+                <p class="staff-role">Technical Assistant</p>
+                <p class="staff-lab">IT Support & Maintenance</p>
+                <div class="staff-contact">
+                  <a href="mailto:rajesh.tech@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543226"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <div class="staff-card reveal">
+              <div class="staff-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="staff-info">
+                <h4>Ms. Preethi Soman</h4>
+                <p class="staff-role">Library Assistant</p>
+                <p class="staff-lab">Departmental Library</p>
+                <div class="staff-contact">
+                  <a href="mailto:preethi.lib@aisat.ac.in"
+                    ><i class="fas fa-envelope"></i
+                  ></a>
+                  <a href="tel:+919876543227"><i class="fas fa-phone"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Faculty Achievements Timeline -->
+    <section class="achievements-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Faculty Achievements</h2>
+          <div class="header-line"></div>
+          <p class="section-desc">Recent milestones and recognitions</p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item reveal">
+            <div class="timeline-date">Feb 2026</div>
+            <div class="timeline-content">
+              <h4>Best Paper Award</h4>
+              <p>
+                Dr. Arun Kumar received Best Paper Award at International
+                Conference on AI & ML in Singapore
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-date">Jan 2026</div>
+            <div class="timeline-content">
+              <h4>Research Grant</h4>
+              <p>
+                Dr. Priya Sharma secured ₹25 Lakhs research grant from DST for
+                Cloud Computing project
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-date">Dec 2025</div>
+            <div class="timeline-content">
+              <h4>Patent Published</h4>
+              <p>
+                Dr. Sandeep Menon's patent on "Advanced Network Security
+                Protocol" published
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-date">Nov 2025</div>
+            <div class="timeline-content">
+              <h4>International Collaboration</h4>
+              <p>Department signed MoU with MIT for joint research program</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Modal (Hidden by default) -->
+    <div class="profile-modal" id="profileModal">
+      <div class="modal-overlay" onclick="closeProfileModal()"></div>
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeProfileModal()">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-body" id="modalBody">
+          <!-- Dynamic content will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <h4>AISAT CSE</h4>
+        <p style="font-size: 0.9rem; color: var(--neutral-gray)">
+          Albertian Institute of Science and Technology,<br />
+          Kalamassery, Kochi.<br />
+          Kerala, India.
+        </p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="admissions.html">Admissions</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="login.html">Student Portal</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Twitter</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <!-- Floating Chatbot -->
+    <div class="chatbot-float" onclick="toggleChat()">💬</div>
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-header">AISAT Assistant</div>
+      <div class="chat-body">
+        <p>Hello! Need help finding a faculty member?</p>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/faculty.js"></script>
+  </body>
+</html>

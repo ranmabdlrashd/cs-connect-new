@@ -13,6 +13,9 @@ from models.issue import Issue
 from models.request import Request
 from models.notification import Notification
 
+import logging
+logger = logging.getLogger(__name__)
+
 library_bp = Blueprint("library_bp", __name__)
 
 
@@ -39,6 +42,17 @@ def student_library():
         flash("Please log in to access your library dashboard.", "warning")
         return redirect(url_for("login"))
     return render_template("student_library.html", active_page="library")
+
+
+@library_bp.route("/faculty-dashboard/library")
+def faculty_library():
+    if "user_id" not in session:
+        flash("Please log in to access your library dashboard.", "warning")
+        return redirect(url_for("login"))
+    if session.get("role") not in ["faculty", "admin"]:
+        flash("Unauthorized access.", "danger")
+        return redirect(url_for("home"))
+    return render_template("faculty_library.html", active_page="library")
 
 
 @library_bp.route("/student-dashboard/library/search")
@@ -92,7 +106,7 @@ def search_books():
         b["current_holder"] = holder
         results.append(b)
 
-    return jsonify(results)
+    return jsonify({"success": True, "data": results})
 
 @library_bp.route("/my-books")
 def my_books():
@@ -104,28 +118,26 @@ def my_books():
         flash("Unauthorized", "danger")
         return redirect(url_for("login"))
 
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    active_issues = conn.execute("""
-        SELECT i.sl_no, i.book_id, i.issue_date, i.due_date, 
-               i.payment_status, i.payment_requested_date, i.renewal_count, 
-               b.title, b.author 
-        FROM issues i 
-        JOIN books b ON i.book_id = b.sl_no 
-        WHERE i.user_id = %s AND i.status = 'issued'
-    """, (user_id,)).fetchall()
-    
-    history = conn.execute("""
-        SELECT i.sl_no, i.book_id, i.issue_date, i.return_date, 
-               b.title, b.author 
-        FROM issues i 
-        JOIN books b ON i.book_id = b.sl_no 
-        WHERE i.user_id = %s AND i.status = 'returned'
-        ORDER BY i.return_date DESC
-    """, (user_id,)).fetchall()
+    from database import db_connection
+    with db_connection() as conn:
+        active_issues = conn.execute("""
+            SELECT i.sl_no, i.book_id, i.issue_date, i.due_date, 
+                   i.payment_status, i.payment_requested_date, i.renewal_count, 
+                   b.title, b.author 
+            FROM issues i 
+            JOIN books b ON i.book_id = b.sl_no 
+            WHERE i.user_id = %s AND i.status = 'issued'
+        """, (user_id,)).fetchall()
+        
+        history = conn.execute("""
+            SELECT i.sl_no, i.book_id, i.issue_date, i.return_date, 
+                   b.title, b.author 
+            FROM issues i 
+            JOIN books b ON i.book_id = b.sl_no 
+            WHERE i.user_id = %s AND i.status = 'returned'
+            ORDER BY i.return_date DESC
+        """, (user_id,)).fetchall()
 
-    conn.close()
 
     return render_template("my_books.html", active_issues=active_issues, history=history, role=role)
 
@@ -262,26 +274,24 @@ def renew_book(book_id):
         flash("You have outstanding fines. Cannot renew until paid.", "danger")
         return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    from app import get_db_connection
-    conn = get_db_connection()
-    issue = conn.execute("SELECT sl_no, renewal_count, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
-    
-    if not issue:
-        conn.close()
-        flash("Active issue not found.", "danger")
-        return redirect(url_for("library_bp.book_details", book_id=book_id))
+    from database import db_connection
+    with db_connection() as conn:
+        issue = conn.execute("SELECT sl_no, renewal_count, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
         
-    renewal_count = issue['renewal_count'] or 0
-    if renewal_count >= 3:
-        conn.close()
-        flash("Maximum renewal limit (3) reached for this book.", "warning")
-        return redirect(url_for("library_bp.book_details", book_id=book_id))
+        if not issue:
+            flash("Active issue not found.", "danger")
+            return redirect(url_for("library_bp.book_details", book_id=book_id))
+            
+        renewal_count = issue['renewal_count'] or 0
+        if renewal_count >= 3:
+            flash("Maximum renewal limit (3) reached for this book.", "warning")
+            return redirect(url_for("library_bp.book_details", book_id=book_id))
 
-    from datetime import timedelta
-    new_due_date = issue['due_date'] + timedelta(days=14)
-    conn.execute("UPDATE issues SET renewal_count = COALESCE(renewal_count, 0) + 1, due_date = %s WHERE sl_no = %s", (new_due_date, issue['sl_no']))
-    conn.commit()
-    conn.close()
+        from datetime import timedelta
+        new_due_date = issue['due_date'] + timedelta(days=14)
+        conn.execute("UPDATE issues SET renewal_count = COALESCE(renewal_count, 0) + 1, due_date = %s WHERE sl_no = %s", (new_due_date, issue['sl_no']))
+        conn.commit()
+
 
     flash(f"Book renewed successfully! New due date: {new_due_date.strftime('%Y-%m-%d')}", "success")
     return redirect(url_for("library_bp.book_details", book_id=book_id))
@@ -340,44 +350,45 @@ def api_library_dashboard():
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # active_loans_count
-    active_loans = conn.execute(
-        "SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'",
-        (user_id,)
-    ).fetchone()[0]
-    
-    # nearest_due_days
-    nearest_due = conn.execute(
-        "SELECT MIN(DATE_PART('day', due_date - NOW())) FROM issues WHERE user_id = %s AND status = 'issued'",
-        (user_id,)
-    ).fetchone()[0]
-    
-    # lifetime_count
-    lifetime_count = conn.execute(
-        "SELECT COUNT(*) FROM issues WHERE user_id = %s",
-        (user_id,)
-    ).fetchone()[0]
-    
-    # catalogue_count
-    catalogue_count = conn.execute("SELECT COUNT(*) FROM books").fetchone()[0]
-    
-    # outstanding_fine
-    fines = conn.execute(
-        "SELECT SUM(fine_amount) FROM issues_with_fines WHERE user_id = %s AND payment_status != 'approved'",
-        (user_id,)
-    ).fetchone()[0] or 0
-    
-    conn.close()
+    from database import db_connection
+    with db_connection() as conn:
+        # active_loans_count
+        active_loans = conn.execute(
+            "SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'",
+            (user_id,)
+        ).fetchone()[0]
+        
+        # nearest_due_days
+        nearest_due = conn.execute(
+            "SELECT MIN(DATE_PART('day', due_date - NOW())) FROM issues WHERE user_id = %s AND status = 'issued'",
+            (user_id,)
+        ).fetchone()[0]
+        
+        # lifetime_count
+        lifetime_count = conn.execute(
+            "SELECT COUNT(*) FROM issues WHERE user_id = %s",
+            (user_id,)
+        ).fetchone()[0]
+        
+        # catalogue_count
+        catalogue_count = conn.execute("SELECT COUNT(*) FROM books").fetchone()[0]
+        
+        # outstanding_fine
+        fines = conn.execute(
+            "SELECT SUM(fine_amount) FROM issues_with_fines WHERE user_id = %s AND payment_status != 'approved'",
+            (user_id,)
+        ).fetchone()[0] or 0
+
     
     return jsonify({
-        "active_loans_count": active_loans,
-        "nearest_due_days": int(nearest_due) if nearest_due is not None else None,
-        "lifetime_count": lifetime_count,
-        "catalogue_count": catalogue_count,
-        "outstanding_fine": float(fines)
+        "success": True,
+        "data": {
+            "active_loans_count": active_loans,
+            "nearest_due_days": int(nearest_due) if nearest_due is not None else None,
+            "lifetime_count": lifetime_count,
+            "catalogue_count": catalogue_count,
+            "outstanding_fine": float(fines)
+        }
     })
 
 @library_bp.route("/api/library/my-books")
@@ -386,23 +397,29 @@ def api_library_my_books():
         return jsonify([]), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    loans = conn.execute("""
-        SELECT i.sl_no, b.title, b.author, i.issue_date,
-               i.due_date, i.return_date, i.status,
-               DATE_PART('day', i.due_date - NOW()) as days_remaining
-        FROM issues i
-        JOIN books b ON i.book_id = b.sl_no
-        WHERE i.user_id = %s
-        ORDER BY
-          CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
-          i.due_date ASC
-    """, (user_id,)).fetchall()
-    
-    conn.close()
-    return jsonify([dict(row) for row in loans])
+    from database import db_connection
+    with db_connection() as conn:
+        loans = conn.execute("""
+            SELECT i.sl_no, b.sl_no as book_id, b.title, b.author, i.issue_date,
+                   i.due_date, i.return_date, i.status,
+                   DATE_PART('day', i.due_date - NOW()) as days_remaining
+            FROM issues i
+            JOIN books b ON i.book_id = b.sl_no
+            WHERE i.user_id = %s
+            ORDER BY
+              CASE i.status WHEN 'issued' THEN 1 WHEN 'returned' THEN 2 END,
+        """, (user_id,)).fetchall()
+        
+        results = []
+        for row in loans:
+            d = dict(row)
+            if d.get('issue_date'): d['issue_date'] = d['issue_date'].isoformat()
+            if d.get('due_date'): d['due_date'] = d['due_date'].isoformat()
+            if d.get('return_date'): d['return_date'] = d['return_date'].isoformat()
+            results.append(d)
+            
+        return jsonify({"success": True, "data": results})
+
 
 @library_bp.route("/api/library/fines")
 def api_library_fines():
@@ -410,33 +427,30 @@ def api_library_fines():
         return jsonify({"outstanding": [], "history": []}), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Get outstanding fines
-    outstanding_rows = conn.execute("""
-        SELECT i.sl_no, b.title, b.author, 
-               i.issue_date as issued_date, i.due_date, 
-               i.days_overdue, i.payment_status,
-               i.fine_amount as amount, 3 as rate_per_day
-        FROM issues_with_fines i
-        JOIN books b ON i.book_id = b.sl_no
-        WHERE i.user_id = %s AND i.payment_status != 'approved' AND i.fine_amount > 0
-        ORDER BY i.days_overdue DESC
-    """, (user_id,)).fetchall()
-    
-    # Get paid/history
-    history_rows = conn.execute("""
-        SELECT i.sl_no, i.payment_requested_date as paid_date, b.title,
-               i.days_overdue, 'approved' as status, 'Paid offline or online' as waived_reason,
-               i.fine_amount as amount
-        FROM issues_with_fines i
-        JOIN books b ON i.book_id = b.sl_no
-        WHERE i.user_id = %s AND i.payment_status = 'approved' AND i.fine_amount > 0
-        ORDER BY i.payment_requested_date DESC
-    """, (user_id,)).fetchall()
-    
-    conn.close()
+    from database import db_connection
+    with db_connection() as conn:
+        # Get outstanding fines
+        outstanding_rows = conn.execute("""
+            SELECT i.sl_no, b.title, b.author, 
+                   i.issue_date as issued_date, i.due_date, 
+                   i.days_overdue, i.payment_status,
+                   i.fine_amount as amount, 3 as rate_per_day
+            FROM issues_with_fines i
+            JOIN books b ON i.book_id = b.sl_no
+            WHERE i.user_id = %s AND i.payment_status != 'approved' AND i.fine_amount > 0
+            ORDER BY i.days_overdue DESC
+        """, (user_id,)).fetchall()
+        
+        # Get paid/history
+        history_rows = conn.execute("""
+            SELECT i.sl_no, i.payment_requested_date as paid_date, b.title,
+                   i.days_overdue, 'approved' as status, 'Paid offline or online' as waived_reason,
+                   i.fine_amount as amount
+            FROM issues_with_fines i
+            JOIN books b ON i.book_id = b.sl_no
+            WHERE i.user_id = %s AND i.payment_status = 'approved' AND i.fine_amount > 0
+            ORDER BY i.payment_requested_date DESC
+        """, (user_id,)).fetchall()
     
     # Convert dates for JSON
     outstanding = []
@@ -455,8 +469,11 @@ def api_library_fines():
         history.append(d)
         
     return jsonify({
-        "outstanding": outstanding,
-        "history": history
+        "success": True,
+        "data": {
+            "outstanding": outstanding,
+            "history": history
+        }
     })
 
 @library_bp.route("/api/library/reservations")
@@ -465,22 +482,21 @@ def api_library_reservations():
         return jsonify([]), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Get active reservations with queue position
-    reservations = conn.execute("""
-        SELECT r.sl_no, b.title, r.request_date as created_at,
-               (SELECT COUNT(*) FROM requests r2 WHERE r2.book_id = r.book_id AND r2.request_date <= r.request_date AND r2.status = 'pending') as queue_position,
-               (SELECT COUNT(*) FROM requests r3 WHERE r3.book_id = r.book_id AND r3.status = 'pending') as total_queue
-        FROM requests r
-        JOIN books b ON r.book_id = b.sl_no
-        WHERE r.requested_by = %s AND r.status = 'pending'
-        ORDER BY r.request_date ASC
-    """, (user_id,)).fetchall()
-    
-    conn.close()
-    return jsonify([dict(row) for row in reservations])
+    from database import db_connection
+    with db_connection() as conn:
+        # Get active reservations with queue position
+        reservations = conn.execute("""
+            SELECT r.sl_no, b.title, r.request_date as created_at,
+                   (SELECT COUNT(*) FROM requests r2 WHERE r2.book_id = r.book_id AND r2.request_date <= r.request_date AND r2.status = 'pending') as queue_position,
+                   (SELECT COUNT(*) FROM requests r3 WHERE r3.book_id = r.book_id AND r3.status = 'pending') as total_queue
+            FROM requests r
+            JOIN books b ON r.book_id = b.sl_no
+            WHERE r.requested_by = %s AND r.status = 'pending'
+            ORDER BY r.request_date ASC
+        """, (user_id,)).fetchall()
+        
+        return jsonify({"success": True, "data": [dict(row) for row in reservations]})
+
 
 @library_bp.route("/api/library/renew", methods=["POST"])
 def api_library_renew():
@@ -492,40 +508,37 @@ def api_library_renew():
         return jsonify({"error": "Missing loan_id"}), 400
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Check if eligible for renewal (e.g. status='issued', belongs to user, and no fines?)
-    loan = conn.execute(
-        "SELECT sl_no as id, due_date FROM issues WHERE sl_no = %s AND user_id = %s AND status = 'issued'",
-        (loan_id, user_id)
-    ).fetchone()
-    
-    if not loan:
-        conn.close()
-        return jsonify({"error": "Loan not found or not eligible for renewal"}), 404
+    from database import db_connection
+    with db_connection() as conn:
+        # Check if eligible for renewal (e.g. status='issued', belongs to user, and no fines?)
+        loan = conn.execute(
+            "SELECT sl_no as id, due_date FROM issues WHERE sl_no = %s AND user_id = %s AND status = 'issued'",
+            (loan_id, user_id)
+        ).fetchone()
         
-    # Check for ANY unpaid fines for the user across the system
-    from models.issue import Issue
-    if Issue.has_outstanding_fines(user_id):
-        conn.close()
-        return jsonify({"error": "Cannot renew: You have unpaid fines"}), 400
+        if not loan:
+            return jsonify({"error": "Loan not found or not eligible for renewal"}), 404
+            
+        # Check for ANY unpaid fines for the user across the system
+        from models.issue import Issue
+        if Issue.has_outstanding_fines(user_id):
+            return jsonify({"error": "Cannot renew: You have unpaid fines"}), 400
+            
+        # Check if already renewed? The prompt says cap to 14 days and check for fines. We track renewal_count.
         
-    # Check if already renewed? The prompt says cap to 14 days and check for fines. We track renewal_count.
-    
-    # Perform renewal: Add 14 days to current due_date
+        # Perform renewal: Add 14 days to current due_date
 
-    from datetime import datetime, timedelta
-    new_due_date = loan["due_date"] + timedelta(days=14)
+        from datetime import datetime, timedelta
+        new_due_date = loan["due_date"] + timedelta(days=14)
+        
+        conn.execute(
+            "UPDATE issues SET due_date = %s, renewal_count = renewal_count + 1 WHERE sl_no = %s",
+            (new_due_date, loan_id)
+        )
+        conn.commit()
+
     
-    conn.execute(
-        "UPDATE issues SET due_date = %s, renewal_count = renewal_count + 1 WHERE sl_no = %s",
-        (new_due_date, loan_id)
-    )
-    conn.commit()
-    conn.close()
-    
-    return jsonify({"status": "ok", "new_due_date": new_due_date.isoformat()})
+    return jsonify({"success": True, "data": {"status": "ok", "new_due_date": new_due_date.isoformat()}})
 
 @library_bp.route("/api/library/pay_fine/<int:issue_id>", methods=["POST"])
 def api_library_pay_fine_request(issue_id):
@@ -533,43 +546,41 @@ def api_library_pay_fine_request(issue_id):
         return jsonify({"error": "Unauthorized"}), 401
     user_id = str(session.get("user_id"))
     
-    from app import get_db_connection
-    conn = get_db_connection()
-    try:
-        # Check if the issue has an unpaid fine dynamically
-        issue = conn.execute("SELECT fine_amount, payment_status FROM issues_with_fines WHERE sl_no = %s AND user_id = %s", (issue_id, str(user_id))).fetchone()
-        if not issue:
-            return jsonify({"success": False, "error": "Issue not found."}), 404
-        if issue['fine_amount'] <= 0:
-            return jsonify({"success": False, "error": "No fine exists for this issue."}), 400
-        if issue['payment_status'] == 'pending':
-            return jsonify({"success": False, "error": "Payment is already under review."}), 400
-        if issue['payment_status'] == 'approved':
-            return jsonify({"success": False, "error": "Fine is already paid."}), 400
-            
-        conn.execute("UPDATE issues SET payment_requested_date = CURRENT_TIMESTAMP, payment_status = 'pending' WHERE sl_no = %s", (issue_id,))
-        conn.commit()
-        return jsonify({"success": True, "message": "Payment request submitted."})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
-    finally:
-        conn.close()
+    from database import db_connection
+    with db_connection() as conn:
+        try:
+            # Check if the issue has an unpaid fine dynamically
+            issue = conn.execute("SELECT fine_amount, payment_status FROM issues_with_fines WHERE sl_no = %s AND user_id = %s", (issue_id, str(user_id))).fetchone()
+            if not issue:
+                return jsonify({"success": False, "error": "Issue not found."}), 404
+            if issue['fine_amount'] <= 0:
+                return jsonify({"success": False, "error": "No fine exists for this issue."}), 400
+            if issue['payment_status'] == 'pending':
+                return jsonify({"success": False, "error": "Payment is already under review."}), 400
+            if issue['payment_status'] == 'approved':
+                return jsonify({"success": False, "error": "Fine is already paid."}), 400
+                
+            conn.execute("UPDATE issues SET payment_requested_date = CURRENT_TIMESTAMP, payment_status = 'pending' WHERE sl_no = %s", (issue_id,))
+            conn.commit()
+            return jsonify({"success": True, "message": "Payment request submitted."})
+        except Exception as e:
+            conn.rollback()
+            return jsonify({"success": False, "error": str(e)}), 500
+
 
 @library_bp.route("/api/library/categories")
 def api_library_categories():
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Category counts
-    counts = conn.execute("""
-        SELECT category, COUNT(*) as count 
-        FROM books 
-        GROUP BY category
-    """).fetchall()
-    
-    conn.close()
-    return jsonify([dict(row) for row in counts])
+    from database import db_connection
+    with db_connection() as conn:
+        # Category counts
+        counts = conn.execute("""
+            SELECT category, COUNT(*) as count 
+            FROM books 
+            GROUP BY category
+        """).fetchall()
+        
+        return jsonify({"success": True, "data": [dict(row) for row in counts]})
+
 
 @library_bp.route("/api/library/search")
 def api_library_search_full():
@@ -587,71 +598,73 @@ def api_library_search_full():
         
     offset = (page - 1) * limit
     
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    sql = "SELECT * FROM books WHERE 1=1"
-    count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
-    params = []
-    
-    if query:
-        cond = " AND (title ILIKE %s OR author ILIKE %s OR subject ILIKE %s OR isbn ILIKE %s)"
-        sql += cond
-        count_sql += cond
-        q = f"%{query}%"
-        params.extend([q, q, q, q])
+    from database import db_connection
+    with db_connection() as conn:
         
-    if category and category != "All Categories" and category.lower() != "all":
-        cond = " AND category = %s"
-        sql += cond
-        count_sql += cond
-        params.append(category)
+        sql = "SELECT * FROM books WHERE 1=1"
+        count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
+        params = []
         
-    if availability:
-        if availability == "Available Now":
-            cond = " AND available_copies > 0"
+        if query:
+            cond = " AND (title ILIKE %s OR author ILIKE %s OR subject ILIKE %s OR isbn ILIKE %s)"
             sql += cond
             count_sql += cond
-        elif availability == "Issued" or availability == "Issued / All Copies Out":
-            cond = " AND available_copies = 0 AND is_reference = false"
-            sql += cond
-            count_sql += cond
-        elif availability == "Reference Only":
-            cond = " AND is_reference = true"
-            sql += cond
-            count_sql += cond
+            q = f"%{query}%"
+            params.extend([q, q, q, q])
             
-    total = conn.execute(count_sql, tuple(params)).fetchone()[0]
-    
-    # Sorting
-    if sort == "Title Z-A":
-        sql += " ORDER BY title DESC"
-    elif sort == "Recently Added":
-        sql += " ORDER BY added_date DESC"
-    else:
-        sql += " ORDER BY title ASC"
+        if category and category != "All Categories" and category.lower() != "all":
+            cond = " AND category = %s"
+            sql += cond
+            count_sql += cond
+            params.append(category)
+            
+        if availability:
+            if availability == "Available Now":
+                cond = " AND available_copies > 0"
+                sql += cond
+                count_sql += cond
+            elif availability == "Issued" or availability == "Issued / All Copies Out":
+                cond = " AND available_copies = 0 AND is_reference = false"
+                sql += cond
+                count_sql += cond
+            elif availability == "Reference Only":
+                cond = " AND is_reference = true"
+                sql += cond
+                count_sql += cond
+                
+        total = conn.execute(count_sql, tuple(params)).fetchone()[0]
         
-    sql += " LIMIT %s OFFSET %s"
-    params.extend([limit, offset])
-    
-    books = conn.execute(sql, tuple(params)).fetchall()
-    
-    result_books = []
-    for b in books:
-        b_dict = dict(b)
-        if b_dict.get('added_date'):
-            b_dict['added_date'] = b_dict['added_date'].isoformat()
-        result_books.append(b_dict)
+        # Sorting
+        if sort == "Title Z-A":
+            sql += " ORDER BY title DESC"
+        elif sort == "Recently Added":
+            sql += " ORDER BY added_date DESC"
+        else:
+            sql += " ORDER BY title ASC"
+            
+        sql += " LIMIT %s OFFSET %s"
+        params.extend([limit, offset])
         
-    conn.close()
-    
-    return jsonify({
-        "results": result_books,
-        "total": total,
-        "query": query,
-        "page": page,
-        "per_page": limit
-    })
+        books = conn.execute(sql, tuple(params)).fetchall()
+        
+        result_books = []
+        for b in books:
+            b_dict = dict(b)
+            if b_dict.get('added_date'):
+                b_dict['added_date'] = b_dict['added_date'].isoformat()
+            result_books.append(b_dict)
+            
+        return jsonify({
+            "success": True,
+            "data": {
+                "results": result_books,
+                "total": total,
+                "query": query,
+                "page": page,
+                "per_page": limit
+            }
+        })
+
 
 @library_bp.route("/api/library/suggestions")
 def api_library_suggestions():
@@ -659,14 +672,12 @@ def api_library_suggestions():
     if len(query) < 2:
         return jsonify({"suggestions": []})
         
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    q = f"%{query}%"
-    books = conn.execute("SELECT sl_no as id, title, author FROM books WHERE title ILIKE %s OR author ILIKE %s LIMIT 5", (q, q)).fetchall()
-    conn.close()
-    
-    return jsonify({"suggestions": [dict(row) for row in books]})
+    from database import db_connection
+    with db_connection() as conn:
+        q = f"%{query}%"
+        books = conn.execute("SELECT sl_no as id, title, author FROM books WHERE title ILIKE %s OR author ILIKE %s LIMIT 5", (q, q)).fetchall()
+        return jsonify({"success": True, "data": {"suggestions": [dict(row) for row in books]}})
+
 
 
 # ── NEW CATALOGUE ENDPOINTS ──
@@ -696,75 +707,77 @@ def catalogue_search():
         
     offset = (page - 1) * limit
     
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    sql = "SELECT * FROM books WHERE 1=1"
-    count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
-    params = []
-    
-    if query:
-        cond = " AND (title ILIKE %s OR author ILIKE %s OR subject ILIKE %s OR isbn ILIKE %s)"
-        sql += cond
-        count_sql += cond
-        q = f"%{query}%"
-        params.extend([q, q, q, q])
+    from database import db_connection
+    with db_connection() as conn:
         
-    if category and category.lower() != "all" and category.lower() != "all categories":
-        cond = " AND category = %s"
-        sql += cond
-        count_sql += cond
-        params.append(category)
+        sql = "SELECT * FROM books WHERE 1=1"
+        count_sql = "SELECT COUNT(*) FROM books WHERE 1=1"
+        params = []
         
-    if availability:
-        if availability == "Available Now":
-            cond = " AND available_copies > 0"
+        if query:
+            cond = " AND (title ILIKE %s OR author ILIKE %s OR subject ILIKE %s OR isbn ILIKE %s)"
             sql += cond
             count_sql += cond
-        elif availability == "Issued / All Copies Out":
-            cond = " AND available_copies = 0 AND is_reference = false"
-            sql += cond
-            count_sql += cond
-        elif availability == "Reference Only":
-            cond = " AND is_reference = true"
-            sql += cond
-            count_sql += cond
+            q = f"%{query}%"
+            params.extend([q, q, q, q])
             
-    # Count total matching records
-    total = conn.execute(count_sql, tuple(params)).fetchone()[0]
-    
-    # Sorting
-    if sort == "Title Z-A":
-        sql += " ORDER BY title DESC"
-    elif sort == "Recently Added":
-        sql += " ORDER BY added_date DESC"
-    elif sort == "Most Borrowed":
-        # We don't have borrow count easily, fallback to title
-        sql += " ORDER BY title ASC" 
-    else:
-        sql += " ORDER BY title ASC"
+        if category and category.lower() != "all" and category.lower() != "all categories":
+            cond = " AND category = %s"
+            sql += cond
+            count_sql += cond
+            params.append(category)
+            
+        if availability:
+            if availability == "Available Now":
+                cond = " AND available_copies > 0"
+                sql += cond
+                count_sql += cond
+            elif availability == "Issued / All Copies Out":
+                cond = " AND available_copies = 0 AND is_reference = false"
+                sql += cond
+                count_sql += cond
+            elif availability == "Reference Only":
+                cond = " AND is_reference = true"
+                sql += cond
+                count_sql += cond
+                
+        # Count total matching records
+        total = conn.execute(count_sql, tuple(params)).fetchone()[0]
         
-    sql += " LIMIT %s OFFSET %s"
-    params.extend([limit, offset])
-    
-    books = conn.execute(sql, tuple(params)).fetchall()
-    
-    # Convert dates to string so JSON serializable
-    result_books = []
-    for b in books:
-        b_dict = dict(b)
-        if b_dict.get('added_date'):
-            b_dict['added_date'] = b_dict['added_date'].isoformat()
-        result_books.append(b_dict)
+        # Sorting
+        if sort == "Title Z-A":
+            sql += " ORDER BY title DESC"
+        elif sort == "Recently Added":
+            sql += " ORDER BY added_date DESC"
+        elif sort == "Most Borrowed":
+            # We don't have borrow count easily, fallback to title
+            sql += " ORDER BY title ASC" 
+        else:
+            sql += " ORDER BY title ASC"
+            
+        sql += " LIMIT %s OFFSET %s"
+        params.extend([limit, offset])
         
-    conn.close()
-    
-    return jsonify({
-        "books": result_books,
-        "total": total,
-        "page": page,
-        "per_page": limit
-    })
+        books = conn.execute(sql, tuple(params)).fetchall()
+        
+        # Convert dates to string so JSON serializable
+        result_books = []
+        for b in books:
+            b_dict = dict(b)
+            if b_dict.get('added_date'):
+                b_dict['added_date'] = b_dict['added_date'].isoformat()
+            result_books.append(b_dict)
+            
+        return jsonify({
+            "success": True,
+            "data": {
+                "books": result_books,
+                "total": total,
+                "page": page,
+                "per_page": limit
+            }
+        })
+
 
 @library_bp.route("/api/library/borrow", methods=["POST"])
 def api_library_borrow():
@@ -777,52 +790,44 @@ def api_library_borrow():
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Check book
-    book = conn.execute("SELECT sl_no as id, available_copies, is_reference FROM books WHERE sl_no = %s", (book_id,)).fetchone()
-    if not book:
-        conn.close()
-        return jsonify({"success": False, "error": "Book not found"}), 404
+    from database import db_connection
+    with db_connection() as conn:
+        # Check book
+        book = conn.execute("SELECT sl_no as id, available_copies, is_reference FROM books WHERE sl_no = %s", (book_id,)).fetchone()
+        if not book:
+            return jsonify({"success": False, "error": "Book not found"}), 404
+            
+        if book["is_reference"]:
+            return jsonify({"success": False, "error": "Reference books cannot be borrowed"}), 400
+            
+        if book["available_copies"] <= 0:
+            return jsonify({"success": False, "error": "No copies available"}), 400
+            
+        # Check if user already holds this book
+        active = conn.execute("SELECT sl_no as id FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
+        if active:
+            return jsonify({"success": False, "error": "You already have this book borrowed"}), 400
+            
+        # Check max limit threshold of 3
+        active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
+        if active_count >= 3:
+            return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
+            
+        # Borrow
+        from datetime import datetime, timedelta
+        issue_date = datetime.now()
+        due_date = issue_date + timedelta(days=14)
         
-    if book["is_reference"]:
-        conn.close()
-        return jsonify({"success": False, "error": "Reference books cannot be borrowed"}), 400
-        
-    if book["available_copies"] <= 0:
-        conn.close()
-        return jsonify({"success": False, "error": "No copies available"}), 400
-        
-    # Check if user already holds this book
-    active = conn.execute("SELECT sl_no as id FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
-    if active:
-        conn.close()
-        return jsonify({"success": False, "error": "You already have this book borrowed"}), 400
-        
-    # Check max limit threshold of 3
-    active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
-    if active_count >= 3:
-        conn.close()
-        return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
-        
-    # Borrow
-    from datetime import datetime, timedelta
-    issue_date = datetime.now()
-    due_date = issue_date + timedelta(days=14)
-    
-    try:
-        conn.execute("UPDATE books SET available_copies = available_copies - 1 WHERE sl_no = %s", (book_id,))
-        cur = conn.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (%s, %s, %s, %s, 'issued') RETURNING sl_no as id", (book_id, user_id, issue_date, due_date))
-        loan_id = cur.fetchone()[0]
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        return jsonify({"success": False, "error": str(e)}), 500
-        
-    conn.close()
-    return jsonify({"success": True, "loan_id": loan_id, "due_date": due_date.isoformat()})
+        try:
+            conn.execute("UPDATE books SET available_copies = available_copies - 1 WHERE sl_no = %s", (book_id,))
+            cur = conn.execute("INSERT INTO issues (book_id, user_id, issue_date, due_date, status) VALUES (%s, %s, %s, %s, 'issued') RETURNING sl_no as id", (book_id, user_id, issue_date, due_date))
+            loan_id = cur.fetchone()[0]
+            conn.commit()
+            return jsonify({"success": True, "loan_id": loan_id, "due_date": due_date.isoformat()})
+        except Exception as e:
+            conn.rollback()
+            return jsonify({"success": False, "error": str(e)}), 500
+
 
 @library_bp.route("/api/library/reserve", methods=["POST"])
 def api_library_reserve():
@@ -835,42 +840,36 @@ def api_library_reserve():
         return jsonify({"success": False, "error": "Missing book_id"}), 400
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    book = conn.execute("SELECT sl_no as id FROM books WHERE sl_no = %s", (book_id,)).fetchone()
-    if not book:
-        conn.close()
-        return jsonify({"success": False, "error": "Book not found"}), 404
-        
-    # Check if already reserved
-    existing = conn.execute("SELECT sl_no as id FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
-    if existing:
-        conn.close()
-        return jsonify({"success": False, "error": "You have already reserved this book"}), 400
-        
-    # Check max limit threshold of 3
-    active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
-    if active_count >= 3:
-        conn.close()
-        return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
-        
-    try:
-        cur = conn.execute("INSERT INTO requests (book_id, requested_by, status) VALUES (%s, %s, 'pending') RETURNING sl_no as id, request_date", (book_id, user_id))
-        res = cur.fetchone()
-        reservation_id = res['sl_no']
-        req_date = res['request_date']
-        
-        # Calculate queue position
-        pos = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending' AND request_date <= %s", (book_id, req_date)).fetchone()[0]
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        conn.close()
-        return jsonify({"success": False, "error": str(e)}), 500
-        
-    conn.close()
-    return jsonify({"success": True, "reservation_id": reservation_id, "queue_position": pos})
+    from database import db_connection
+    with db_connection() as conn:
+        book = conn.execute("SELECT sl_no as id FROM books WHERE sl_no = %s", (book_id,)).fetchone()
+        if not book:
+            return jsonify({"success": False, "error": "Book not found"}), 404
+            
+        # Check if already reserved
+        existing = conn.execute("SELECT sl_no as id FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
+        if existing:
+            return jsonify({"success": False, "error": "You have already reserved this book"}), 400
+            
+        # Check max limit threshold of 3
+        active_count = conn.execute("SELECT COUNT(*) FROM issues WHERE user_id = %s AND status = 'issued'", (user_id,)).fetchone()[0]
+        if active_count >= 3:
+            return jsonify({"success": False, "error": "Maximum limit of 3 books reached."}), 400
+            
+        try:
+            cur = conn.execute("INSERT INTO requests (book_id, requested_by, status) VALUES (%s, %s, 'pending') RETURNING sl_no as id, request_date", (book_id, user_id))
+            res = cur.fetchone()
+            reservation_id = res['sl_no']
+            req_date = res['request_date']
+            
+            # Calculate queue position
+            pos = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending' AND request_date <= %s", (book_id, req_date)).fetchone()[0]
+            conn.commit()
+            return jsonify({"success": True, "reservation_id": reservation_id, "queue_position": pos})
+        except Exception as e:
+            conn.rollback()
+            return jsonify({"success": False, "error": str(e)}), 500
+
 
 @library_bp.route("/student-dashboard/library/books/<int:book_id>")
 def student_library_book_details(book_id):
@@ -887,73 +886,70 @@ def api_library_book_details(book_id):
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Get basic book
-    book = conn.execute("SELECT * FROM books WHERE sl_no = %s", (book_id,)).fetchone()
-    if not book:
-        conn.close()
-        return jsonify({"error": "Book not found"}), 404
+    from database import db_connection
+    with db_connection() as conn:
+        # Get basic book
+        book = conn.execute("SELECT * FROM books WHERE sl_no = %s", (book_id,)).fetchone()
+        if not book:
+            return jsonify({"error": "Book not found"}), 404
+            
+        b_dict = dict(book)
+        if b_dict.get('added_date'):
+            b_dict['added_date'] = b_dict['added_date'].isoformat()
+            
+        # Availability info
+        total = b_dict.get('total_copies', 1)
+        available = b_dict.get('available_copies', total)
         
-    b_dict = dict(book)
-    if b_dict.get('added_date'):
-        b_dict['added_date'] = b_dict['added_date'].isoformat()
+        issued = conn.execute("SELECT COUNT(*) FROM issues WHERE book_id = %s AND status = 'issued'", (book_id,)).fetchone()[0]
+        reserved = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending'", (book_id,)).fetchone()[0]
         
-    # Availability info
-    total = b_dict.get('total_copies', 1)
-    available = b_dict.get('available_copies', total)
-    
-    issued = conn.execute("SELECT COUNT(*) FROM issues WHERE book_id = %s AND status = 'issued'", (book_id,)).fetchone()[0]
-    reserved = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending'", (book_id,)).fetchone()[0]
-    
-    availability = {
-        "available": available,
-        "issued": issued,
-        "reserved": reserved,
-        "total": total
-    }
-    
-    # Student loan state
-    loan = conn.execute("SELECT sl_no as loan_id, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
-    student_loan = None
-    if loan:
-        student_loan = {"loan_id": loan['loan_id'], "due_date": loan['due_date'].isoformat()}
+        availability = {
+            "available": available,
+            "issued": issued,
+            "reserved": reserved,
+            "total": total
+        }
         
-    # Queue info
-    req = conn.execute("SELECT sl_no, request_date FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
-    queue_info = None
-    if req:
-        req_date = req['request_date']
-        pos = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending' AND request_date <= %s", (book_id, req_date)).fetchone()[0]
-        est_days = pos * 7
-        queue_info = {"position": pos, "total": reserved, "est_days": est_days, "reservation_id": req['sl_no']}
+        # Student loan state
+        loan = conn.execute("SELECT sl_no as loan_id, due_date FROM issues WHERE book_id = %s AND user_id = %s AND status = 'issued'", (book_id, user_id)).fetchone()
+        student_loan = None
+        if loan:
+            student_loan = {"loan_id": loan['loan_id'], "due_date": loan['due_date'].isoformat()}
+            
+        # Queue info
+        req = conn.execute("SELECT sl_no, request_date FROM requests WHERE book_id = %s AND requested_by = %s AND status = 'pending'", (book_id, user_id)).fetchone()
+        queue_info = None
+        if req:
+            req_date = req['request_date']
+            pos = conn.execute("SELECT COUNT(*) FROM requests WHERE book_id = %s AND status = 'pending' AND request_date <= %s", (book_id, req_date)).fetchone()[0]
+            est_days = pos * 7
+            queue_info = {"position": pos, "total": reserved, "est_days": est_days, "reservation_id": req['sl_no']}
+            
+        # Borrow stats
+        # 1 semester roughly 180 days
+        borrowed_sem = conn.execute("SELECT COUNT(*) FROM issues WHERE book_id = %s AND issue_date >= CURRENT_DATE - INTERVAL '180 days'", (book_id,)).fetchone()[0]
         
-    # Borrow stats
-    # 1 semester roughly 180 days
-    borrowed_sem = conn.execute("SELECT COUNT(*) FROM issues WHERE book_id = %s AND issue_date >= CURRENT_DATE - INTERVAL '180 days'", (book_id,)).fetchone()[0]
-    
-    # We might not have a ratings table, mock avg_rating if necessary, else 0
-    # The prompt says: "If rating system exists" - Since we didn't add one, we'll mock it statically or return None
-    borrow_stats = {
-        "borrowed_this_sem": borrowed_sem,
-        "avg_rating": 4.5,
-        "review_count": borrowed_sem * 2
-    }
-    
-    # Related books (Same category, most borrowed in last 30 days, exclude current)
-    # Since we lack complex history, we'll just pick same category, limit 5
-    related = conn.execute("""
-        SELECT b.sl_no, b.title, b.author, b.category, b.available_copies
-        FROM books b
-        WHERE b.category = %s AND b.sl_no != %s
-        ORDER BY b.added_date DESC
-        LIMIT 5
-    """, (b_dict.get('category', ''), book_id)).fetchall()
-    
-    related_books = [dict(r) for r in related]
-    
-    conn.close()
+        # We might not have a ratings table, mock avg_rating if necessary, else 0
+        # The prompt says: "If rating system exists" - Since we didn't add one, we'll mock it statically or return None
+        borrow_stats = {
+            "borrowed_this_sem": borrowed_sem,
+            "avg_rating": 4.5,
+            "review_count": borrowed_sem * 2
+        }
+        
+        # Related books (Same category, most borrowed in last 30 days, exclude current)
+        # Since we lack complex history, we'll just pick same category, limit 5
+        related = conn.execute("""
+            SELECT b.sl_no, b.title, b.author, b.category, b.available_copies
+            FROM books b
+            WHERE b.category = %s AND b.sl_no != %s
+            ORDER BY b.added_date DESC
+            LIMIT 5
+        """, (b_dict.get('category', ''), book_id)).fetchall()
+        
+        related_books = [dict(r) for r in related]
+
     
     # Check if this user has a pending request for this book
     from models.request import Request
@@ -976,21 +972,18 @@ def api_library_cancel_reservation(res_id):
         return jsonify({"error": "Unauthorized"}), 401
     
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    # Check ownership
-    req = conn.execute("SELECT sl_no FROM requests WHERE sl_no = %s AND requested_by = %s", (res_id, user_id)).fetchone()
-    if not req:
-        conn.close()
-        return jsonify({"success": False, "error": "Reservation not found"}), 404
-        
-    # Technically we should update status to cancelled or delete
-    conn.execute("UPDATE requests SET status = 'cancelled' WHERE sl_no = %s", (res_id,))
-    conn.commit()
-    conn.close()
-    
-    return jsonify({"success": True})
+    from database import db_connection
+    with db_connection() as conn:
+        # Check ownership
+        req = conn.execute("SELECT sl_no FROM requests WHERE sl_no = %s AND requested_by = %s", (res_id, user_id)).fetchone()
+        if not req:
+            return jsonify({"success": False, "error": "Reservation not found"}), 404
+            
+        # Technically we should update status to cancelled or delete
+        conn.execute("UPDATE requests SET status = 'cancelled' WHERE sl_no = %s", (res_id,))
+        conn.commit()
+        return jsonify({"success": True})
+
 
 # ── LIBRARY FINES PAGE ──
 
@@ -1006,21 +999,19 @@ def api_library_fines_mark_paid(fine_id):
         return jsonify({"error": "Unauthorized"}), 401
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    fine = conn.execute("SELECT * FROM library_fines WHERE sl_no = %s AND student_id = %s AND paid = false", (fine_id, user_id)).fetchone()
-    if not fine:
-        conn.close()
-        return jsonify({"success": False, "error": "Fine not found or already paid"}), 404
-        
-    conn.execute(
-        "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE sl_no = %s",
-        (fine_id,)
-    )
-    conn.commit()
-    conn.close()
-    return jsonify({"success": True})
+    from database import db_connection
+    with db_connection() as conn:
+        fine = conn.execute("SELECT * FROM library_fines WHERE sl_no = %s AND student_id = %s AND paid = false", (fine_id, user_id)).fetchone()
+        if not fine:
+            return jsonify({"success": False, "error": "Fine not found or already paid"}), 404
+            
+        conn.execute(
+            "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE sl_no = %s",
+            (fine_id,)
+        )
+        conn.commit()
+        return jsonify({"success": True})
+
 
 @library_bp.route("/api/library/fines/mark-all-paid", methods=["PATCH"])
 def api_library_fines_mark_all_paid():
@@ -1028,16 +1019,15 @@ def api_library_fines_mark_all_paid():
         return jsonify({"error": "Unauthorized"}), 401
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    conn.execute(
-        "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE student_id = %s AND paid = false",
-        (user_id,)
-    )
-    conn.commit()
-    conn.close()
-    return jsonify({"success": True})
+    from database import db_connection
+    with db_connection() as conn:
+        conn.execute(
+            "UPDATE library_fines SET paid = true, paid_date = NOW(), status = 'Paid' WHERE student_id = %s AND paid = false",
+            (user_id,)
+        )
+        conn.commit()
+        return jsonify({"success": True})
+
 
 @library_bp.route("/api/library/fines/<int:fine_id>/receipt")
 def api_library_fines_receipt(fine_id):
@@ -1045,21 +1035,20 @@ def api_library_fines_receipt(fine_id):
         return redirect(url_for("login"))
         
     user_id = str(session["user_id"])
-    from app import get_db_connection
-    conn = get_db_connection()
-    
-    fine = conn.execute("""
-        SELECT f.*, b.title as book_title, u.name as student_name
-        FROM library_fines f
-        JOIN issues i ON f.issue_id = i.sl_no
-        JOIN books b ON i.book_id = b.sl_no
-        JOIN users u ON f.student_id = u.user_id
-        WHERE f.sl_no = %s AND f.student_id = %s AND f.paid = true
-    """, (fine_id, user_id)).fetchone()
-    conn.close()
-    
-    if not fine:
-        return "Receipt not found", 404
+    from database import db_connection
+    with db_connection() as conn:
+        fine = conn.execute("""
+            SELECT f.*, b.title as book_title, u.name as student_name
+            FROM library_fines f
+            JOIN issues i ON f.issue_id = i.sl_no
+            JOIN books b ON i.book_id = b.sl_no
+            JOIN users u ON f.student_id = u.user_id
+            WHERE f.sl_no = %s AND f.student_id = %s AND f.paid = true
+        """, (fine_id, user_id)).fetchone()
+        
+        if not fine:
+            return "Receipt not found", 404
+
         
     html = f"""
     <html><head><title>Receipt #{fine['sl_no']}</title><style>

@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 
 # We need to make sure we're in the app context or just use get_db_connection directly.
-from app import get_db_connection
 
 books_data = [
     (
@@ -110,6 +109,7 @@ books_data = [
     ),
     (
         "Linear Algebra and Calculus",
+        "Linear Algebra and Calculus",
         "Dr. Rajesh Kumar T.J; Prof. G. Aravindakshan",
         "Phasor Books",
         "2019",
@@ -130,53 +130,53 @@ books_data = [
 
 
 def import_data():
-    conn = get_db_connection()
-    cur = conn.cursor()
+    from database import db_connection
+    with db_connection() as conn:
+        with conn.cursor() as cur:
+            # 1. Delete existing books and relate tables to start fresh
+            print("Clearing existing books and issues/requests...")
+            cur.execute("TRUNCATE TABLE issues CASCADE")
+            cur.execute("TRUNCATE TABLE requests CASCADE")
+            # Resetting books table id sequence as well
+            cur.execute("TRUNCATE TABLE books RESTART IDENTITY CASCADE")
 
-    # 1. Delete existing books and relate tables to start fresh
-    print("Clearing existing books and issues/requests...")
-    cur.execute("TRUNCATE TABLE issues CASCADE")
-    cur.execute("TRUNCATE TABLE requests CASCADE")
-    # Resetting books table id sequence as well
-    cur.execute("TRUNCATE TABLE books RESTART IDENTITY CASCADE")
+            # 2. Insert new books
+            print("Inserting new books...")
+            for idx, (title, author, publisher, year) in enumerate(books_data):
+                acc_no = idx + 1
+                shelf_str = f"ACC-{acc_no}"
+                desc = f"Publisher: {publisher}, Edition & Year: {year}"
 
-    # 2. Insert new books
-    print("Inserting new books...")
-    for idx, (title, author, publisher, year) in enumerate(books_data):
-        acc_no = idx + 1
-        shelf_str = f"ACC-{acc_no}"
-        desc = f"Publisher: {publisher}, Edition & Year: {year}"
+                cur.execute(
+                    """
+                    INSERT INTO books (
+                        title, author, category, status, shelf, 
+                        cover_gradient, cover_icon, subject, description, 
+                        shelf_location, availability
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, 
+                        %s, %s, %s, %s, 
+                        %s, %s
+                    )
+                """,
+                    (
+                        title,
+                        author,
+                        "textbook",  # default category
+                        "available",  # default status
+                        shelf_str,
+                        "linear-gradient(135deg, #667eea, #764ba2)",  # default gradient
+                        "fas fa-book",  # default icon
+                        "Computer Science",  # default subject
+                        desc,
+                        shelf_str,  # shelf_location
+                        True,  # availability
+                    ),
+                )
 
-        cur.execute(
-            """
-            INSERT INTO books (
-                title, author, category, status, shelf, 
-                cover_gradient, cover_icon, subject, description, 
-                shelf_location, availability
-            ) VALUES (
-                %s, %s, %s, %s, %s, 
-                %s, %s, %s, %s, 
-                %s, %s
-            )
-        """,
-            (
-                title,
-                author,
-                "textbook",  # default category
-                "available",  # default status
-                shelf_str,
-                "linear-gradient(135deg, #667eea, #764ba2)",  # default gradient
-                "fas fa-book",  # default icon
-                "Computer Science",  # default subject
-                desc,
-                shelf_str,  # shelf_location
-                True,  # availability
-            ),
-        )
-
-    conn.commit()
-    conn.close()
+            conn.commit()
     print("Success! Inserted 21 books from spreadsheet image.")
+
 
 
 if __name__ == "__main__":

@@ -81,55 +81,55 @@
 
   const FALLBACK_DATA = [
     {
-      id: 101,
+      sl_no: 1,
       name: "Dr. Jeswin Roy Dcouth",
       designation: "HoD & Associate Professor",
       designation_key: "hod",
       qualification: "Ph.D. CSE, PGDCL",
       research: "Cyber Security, Digital Forensics",
       email: "jeswinroy@aisat.ac.in",
-      photo: null
+      photo: "https://aisat.ac.in/wp-content/uploads/2024/01/dr.-jeswin-300x287.jpg"
     },
     {
-      id: 102,
+      sl_no: 2,
       name: "Prof. Divya Mohan",
       designation: "Associate Professor",
       designation_key: "prof",
       qualification: "M.Tech, Ph.D Researcher",
       research: "Data Science, Machine Learning",
       email: "divyamohan@aisat.ac.in",
-      photo: null
+      photo: "https://aisat.ac.in/wp-content/uploads/2024/01/Ms.-Divya-Mohan-e1706040948144.jpg"
     },
 
     {
-      id: 104,
+      sl_no: 3,
       name: "Ms. Nisy John Panicker",
       designation: "Assistant Professor (Sr.S)",
       designation_key: "asst",
       qualification: "M.Tech",
       research: "Image Processing",
       email: "nisyjohn@aisat.ac.in",
-      photo: null
+      photo: "https://aisat.ac.in/wp-content/uploads/2024/01/nisy-e1706206510394.jpg"
     },
     {
-      id: 105,
+      sl_no: 4,
       name: "Ms. Lima Sebastian",
       designation: "Assistant Professor",
       designation_key: "asst",
       qualification: "M.Tech",
       research: "Compiler Design",
       email: "limaseb@aisat.ac.in",
-      photo: null
+      photo: "https://aisat.ac.in/wp-content/uploads/2024/01/lima-e1706206284280.jpg"
     },
     {
-      id: 106,
+      sl_no: 5,
       name: "Ms. Teenu Jose",
       designation: "Assistant Professor",
       designation_key: "asst",
       qualification: "M.Tech",
       research: "Software Engineering",
       email: "teenu.jose@aisat.ac.in",
-      photo: null
+      photo: "https://aisat.ac.in/wp-content/uploads/2024/01/teenu1-242x300-1-e1706205964261.png"
     }
   ];
 
@@ -144,7 +144,7 @@
     try {
       const res = await fetch('/api/faculty');
       const data = await res.json();
-      allFaculty = (data && data.length > 0) ? data : FALLBACK_DATA;
+      allFaculty = (data && data.success) ? data.data : ( (data && data.length > 0) ? data : FALLBACK_DATA );
     } catch (err) {
       console.warn("Using fallback faculty data:", err);
       allFaculty = FALLBACK_DATA;

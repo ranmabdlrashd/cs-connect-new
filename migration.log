@@ -1,0 +1,161 @@
+2026-03-27 01:24:03,949 - INFO - Setting up dummy tables...
+2026-03-27 01:24:04,484 - INFO - Setup complete.
+2026-03-27 01:24:04,484 - INFO - Running migration on test_parent...
+2026-03-27 01:24:04,484 - INFO - >>> Processing table: test_parent
+2026-03-27 01:24:04,653 - INFO - Backup created: test_parent_backup
+2026-03-27 01:24:04,840 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:24:04,897 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:24:04,993 - INFO - Updating FK test_child_parent_id_fkey on test_child.parent_id to reference test_parent.sl_no
+2026-03-27 01:24:05,103 - ERROR - TEST FAILED: there is no unique constraint matching given keys for referenced table "test_parent"
+
+2026-03-27 01:24:23,526 - INFO - Setting up dummy tables...
+2026-03-27 01:24:24,012 - INFO - Setup complete.
+2026-03-27 01:24:24,012 - INFO - Running migration on test_parent...
+2026-03-27 01:24:24,012 - INFO - >>> Processing table: test_parent
+2026-03-27 01:24:24,190 - INFO - Backup created: test_parent_backup
+2026-03-27 01:24:24,375 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:24:24,439 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:24:24,557 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:24:24,617 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:24:24,863 - INFO - Successful migration for: test_parent
+2026-03-27 01:24:24,923 - INFO - Migration on test_parent complete.
+2026-03-27 01:24:25,165 - ERROR - TEST FAILED: 'NoneType' object is not subscriptable
+2026-03-27 01:24:51,191 - INFO - Setting up dummy tables...
+2026-03-27 01:24:51,693 - INFO - Setup complete.
+2026-03-27 01:24:51,694 - INFO - Running migration on test_parent...
+2026-03-27 01:24:51,694 - INFO - >>> Processing table: test_parent
+2026-03-27 01:24:51,868 - INFO - Backup created: test_parent_backup
+2026-03-27 01:24:52,044 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:24:52,100 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:24:52,212 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:24:52,270 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:24:52,523 - INFO - Successful migration for: test_parent
+2026-03-27 01:24:52,581 - INFO - Migration on test_parent complete.
+2026-03-27 01:24:52,752 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:24:52,811 - INFO - FKs for test_child: []
+2026-03-27 01:24:52,811 - ERROR - TEST FAILED: FK in test_child does not reference test_parent.sl_no
+2026-03-27 01:25:29,169 - INFO - Setting up dummy tables...
+2026-03-27 01:25:29,606 - INFO - Setup complete.
+2026-03-27 01:25:29,607 - INFO - Running migration on test_parent...
+2026-03-27 01:25:29,607 - INFO - >>> Processing table: test_parent
+2026-03-27 01:25:29,767 - INFO - Backup created: test_parent_backup
+2026-03-27 01:25:29,931 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:25:29,983 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:25:30,087 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:25:30,140 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:25:30,349 - INFO - Successful migration for: test_parent
+2026-03-27 01:25:30,401 - INFO - Migration on test_parent complete.
+2026-03-27 01:25:30,560 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:25:30,614 - INFO - FKs for test_child: []
+2026-03-27 01:25:30,615 - ERROR - TEST FAILED: FK in test_child does not reference test_parent.sl_no
+2026-03-27 01:25:44,821 - INFO - Setting up dummy tables...
+2026-03-27 01:25:45,269 - INFO - Setup complete.
+2026-03-27 01:25:45,269 - INFO - Running migration on test_parent...
+2026-03-27 01:25:45,269 - INFO - >>> Processing table: test_parent
+2026-03-27 01:25:45,431 - INFO - Backup created: test_parent_backup
+2026-03-27 01:25:45,600 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:25:45,652 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:25:45,757 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:25:45,812 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:25:46,050 - INFO - Successful migration for: test_parent
+2026-03-27 01:25:46,103 - INFO - Migration on test_parent complete.
+2026-03-27 01:25:46,269 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:25:46,376 - INFO - ALL CONSTRAINTS: [('pg_proc_oid_index', 'p', 'pg_proc', '-'), ('pg_proc_proname_args_nsp_index', 'u', 'pg_proc', '-'), ('pg_type_oid_index', 'p', 'pg_type', '-'), ('pg_type_typname_nsp_index', 'u', 'pg_type', '-'), ('pg_attribute_relid_attnam_index', 'u', 'pg_attribute', '-'), ('pg_attribute_relid_attnum_index', 'p', 'pg_attribute', '-'), ('pg_class_oid_index', 'p', 'pg_class', '-'), ('pg_class_relname_nsp_index', 'u', 'pg_class', '-'), ('pg_attrdef_adrelid_adnum_index', 'u', 'pg_attrdef', '-'), ('pg_attrdef_oid_index', 'p', 'pg_attrdef', '-'), ('pg_constraint_conrelid_contypid_conname_index', 'u', 'pg_constraint', '-'), ('pg_constraint_oid_index', 'p', 'pg_constraint', '-'), ('pg_inherits_relid_seqno_index', 'p', 'pg_inherits', '-'), ('pg_index_indexrelid_index', 'p', 'pg_index', '-'), ('pg_operator_oid_index', 'p', 'pg_operator', '-'), ('pg_operator_oprname_l_r_n_index', 'u', 'pg_operator', '-'), ('pg_opfamily_am_name_nsp_index', 'u', 'pg_opfamily', '-'), ('pg_opfamily_oid_index', 'p', 'pg_opfamily', '-'), ('pg_opclass_am_name_nsp_index', 'u', 'pg_opclass', '-'), ('pg_opclass_oid_index', 'p', 'pg_opclass', '-'), ('pg_am_name_index', 'u', 'pg_am', '-'), ('pg_am_oid_index', 'p', 'pg_am', '-'), ('pg_amop_fam_strat_index', 'u', 'pg_amop', '-'), ('pg_amop_opr_fam_index', 'u', 'pg_amop', '-'), ('pg_amop_oid_index', 'p', 'pg_amop', '-'), ('pg_amproc_fam_proc_index', 'u', 'pg_amproc', '-'), ('pg_amproc_oid_index', 'p', 'pg_amproc', '-'), ('pg_language_name_index', 'u', 'pg_language', '-'), ('pg_language_oid_index', 'p', 'pg_language', '-'), ('pg_largeobject_metadata_oid_index', 'p', 'pg_largeobject_metadata', '-'), ('pg_largeobject_loid_pn_index', 'p', 'pg_largeobject', '-'), ('pg_aggregate_fnoid_index', 'p', 'pg_aggregate', '-'), ('pg_statistic_relid_att_inh_index', 'p', 'pg_statistic', '-'), ('pg_statistic_ext_oid_index', 'p', 'pg_statistic_ext', '-'), ('pg_statistic_ext_name_index', 'u', 'pg_statistic_ext', '-'), ('pg_statistic_ext_data_stxoid_inh_index', 'p', 'pg_statistic_ext_data', '-'), ('pg_rewrite_oid_index', 'p', 'pg_rewrite', '-'), ('pg_rewrite_rel_rulename_index', 'u', 'pg_rewrite', '-'), ('pg_trigger_tgrelid_tgname_index', 'u', 'pg_trigger', '-'), ('pg_trigger_oid_index', 'p', 'pg_trigger', '-'), ('pg_event_trigger_evtname_index', 'u', 'pg_event_trigger', '-'), ('pg_event_trigger_oid_index', 'p', 'pg_event_trigger', '-'), ('pg_description_o_c_o_index', 'p', 'pg_description', '-'), ('pg_cast_oid_index', 'p', 'pg_cast', '-'), ('pg_cast_source_target_index', 'u', 'pg_cast', '-'), ('pg_enum_oid_index', 'p', 'pg_enum', '-'), ('pg_enum_typid_label_index', 'u', 'pg_enum', '-'), ('pg_enum_typid_sortorder_index', 'u', 'pg_enum', '-'), ('pg_namespace_nspname_index', 'u', 'pg_namespace', '-'), ('pg_namespace_oid_index', 'p', 'pg_namespace', '-'), ('pg_conversion_default_index', 'u', 'pg_conversion', '-'), ('pg_conversion_name_nsp_index', 'u', 'pg_conversion', '-'), ('pg_conversion_oid_index', 'p', 'pg_conversion', '-'), ('pg_database_datname_index', 'u', 'pg_database', '-'), ('pg_database_oid_index', 'p', 'pg_database', '-'), ('pg_db_role_setting_databaseid_rol_index', 'p', 'pg_db_role_setting', '-'), ('pg_tablespace_oid_index', 'p', 'pg_tablespace', '-'), ('pg_tablespace_spcname_index', 'u', 'pg_tablespace', '-'), ('pg_authid_rolname_index', 'u', 'pg_authid', '-'), ('pg_authid_oid_index', 'p', 'pg_authid', '-'), ('pg_auth_members_oid_index', 'p', 'pg_auth_members', '-'), ('pg_auth_members_role_member_index', 'u', 'pg_auth_members', '-'), ('pg_auth_members_member_role_index', 'u', 'pg_auth_members', '-'), ('pg_shdescription_o_c_index', 'p', 'pg_shdescription', '-'), ('pg_ts_config_cfgname_index', 'u', 'pg_ts_config', '-'), ('pg_ts_config_oid_index', 'p', 'pg_ts_config', '-'), ('pg_ts_config_map_index', 'p', 'pg_ts_config_map', '-'), ('pg_ts_dict_dictname_index', 'u', 'pg_ts_dict', '-'), ('pg_ts_dict_oid_index', 'p', 'pg_ts_dict', '-'), ('pg_ts_parser_prsname_index', 'u', 'pg_ts_parser', '-'), ('pg_ts_parser_oid_index', 'p', 'pg_ts_parser', '-'), ('pg_ts_template_tmplname_index', 'u', 'pg_ts_template', '-'), ('pg_ts_template_oid_index', 'p', 'pg_ts_template', '-'), ('pg_extension_oid_index', 'p', 'pg_extension', '-'), ('pg_extension_name_index', 'u', 'pg_extension', '-'), ('pg_foreign_data_wrapper_oid_index', 'p', 'pg_foreign_data_wrapper', '-'), ('pg_foreign_data_wrapper_name_index', 'u', 'pg_foreign_data_wrapper', '-'), ('pg_foreign_server_oid_index', 'p', 'pg_foreign_server', '-'), ('pg_foreign_server_name_index', 'u', 'pg_foreign_server', '-'), ('pg_user_mapping_oid_index', 'p', 'pg_user_mapping', '-'), ('pg_user_mapping_user_server_index', 'u', 'pg_user_mapping', '-'), ('pg_foreign_table_relid_index', 'p', 'pg_foreign_table', '-'), ('pg_policy_oid_index', 'p', 'pg_policy', '-'), ('pg_policy_polrelid_polname_index', 'u', 'pg_policy', '-'), ('pg_replication_origin_roiident_index', 'p', 'pg_replication_origin', '-'), ('pg_replication_origin_roname_index', 'u', 'pg_replication_origin', '-'), ('pg_default_acl_role_nsp_obj_index', 'u', 'pg_default_acl', '-'), ('pg_default_acl_oid_index', 'p', 'pg_default_acl', '-'), ('pg_init_privs_o_c_o_index', 'p', 'pg_init_privs', '-'), ('pg_seclabel_object_index', 'p', 'pg_seclabel', '-'), ('pg_shseclabel_object_index', 'p', 'pg_shseclabel', '-'), ('pg_collation_name_enc_nsp_index', 'u', 'pg_collation', '-'), ('pg_collation_oid_index', 'p', 'pg_collation', '-'), ('pg_parameter_acl_parname_index', 'u', 'pg_parameter_acl', '-'), ('pg_parameter_acl_oid_index', 'p', 'pg_parameter_acl', '-'), ('pg_partitioned_table_partrelid_index', 'p', 'pg_partitioned_table', '-'), ('pg_range_rngtypid_index', 'p', 'pg_range', '-'), ('pg_range_rngmultitypid_index', 'u', 'pg_range', '-'), ('pg_transform_oid_index', 'p', 'pg_transform', '-'), ('pg_transform_type_lang_index', 'u', 'pg_transform', '-'), ('pg_sequence_seqrelid_index', 'p', 'pg_sequence', '-'), ('pg_publication_oid_index', 'p', 'pg_publication', '-'), ('pg_publication_pubname_index', 'u', 'pg_publication', '-'), ('pg_publication_namespace_oid_index', 'p', 'pg_publication_namespace', '-'), ('pg_publication_namespace_pnnspid_pnpubid_index', 'u', 'pg_publication_namespace', '-'), ('pg_publication_rel_oid_index', 'p', 'pg_publication_rel', '-'), ('pg_publication_rel_prrelid_prpubid_index', 'u', 'pg_publication_rel', '-'), ('pg_subscription_oid_index', 'p', 'pg_subscription', '-'), ('pg_subscription_subname_index', 'u', 'pg_subscription', '-'), ('pg_subscription_rel_srrelid_srsubid_index', 'p', 'pg_subscription_rel', '-'), ('cardinal_number_domain_check', 'c', '-', '-'), ('yes_or_no_check', 'c', '-', '-'), ('users_pkey', 'p', 'users', '-'), ('results_pkey', 'p', 'results', '-'), ('results_student_id_fkey', 'f', 'results', 'users'), ('issues_pkey', 'p', 'issues', '-'), ('issues_user_id_fkey', 'f', 'issues', 'users'), ('requests_pkey', 'p', 'requests', '-'), ('requests_requested_by_fkey', 'f', 'requests', 'users'), ('notifications_pkey', 'p', 'notifications', '-'), ('notifications_user_id_fkey', 'f', 'notifications', 'users'), ('library_fines_pkey', 'p', 'library_fines', '-'), ('library_fines_student_id_fkey', 'f', 'library_fines', 'users'), ('book_reservations_pkey', 'p', 'book_reservations', '-'), ('book_reservations_student_id_fkey', 'f', 'book_reservations', 'users'), ('resource_downloads_pkey', 'p', 'resource_downloads', '-'), ('resource_downloads_user_id_fkey', 'f', 'resource_downloads', 'users'), ('alumni_pkey', 'p', 'alumni', '-'), ('books_pkey', 'p', 'books', '-'), ('faculty_pkey', 'p', 'faculty', '-'), ('home_stats_pkey', 'p', 'home_stats', '-'), ('internships_pkey', 'p', 'internships', '-'), ('news_ticker_pkey', 'p', 'news_ticker', '-'), ('placement_batches_pkey', 'p', 'placement_batches', '-'), ('placement_companies_pkey', 'p', 'placement_companies', '-'), ('placement_summary_pkey', 'p', 'placement_summary', '-'), ('programs_pkey', 'p', 'programs', '-'), ('semesters_pkey', 'p', 'semesters', '-'), ('site_data_pkey', 'p', 'site_data', '-'), ('timetable_meta_pkey', 'p', 'timetable_meta', '-'), ('timetable_pkey', 'p', 'timetable', '-'), ('timetable_subjects_pkey', 'p', 'timetable_subjects', '-'), ('users_email_key', 'u', 'users', '-'), ('users_user_id_key', 'u', 'users', '-'), ('website_content_pkey', 'p', 'website_content', '-'), ('website_content_url_key', 'u', 'website_content', '-'), ('document_chunks_pkey', 'p', 'document_chunks', '-'), ('document_chunks_document_name_chunk_index_key', 'u', 'document_chunks', '-'), ('mous_pkey', 'p', 'mous', '-'), ('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-'), ('library_loans_pkey', 'p', 'library_loans', '-'), ('library_loans_book_id_fkey', 'f', 'library_loans', 'books'), ('assignments_pkey', 'p', 'assignments', '-'), ('submissions_pkey', 'p', 'submissions', '-'), ('submissions_assignment_id_fkey', 'f', 'submissions', 'assignments'), ('resources_pkey', 'p', 'resources', '-'), ('notices_pkey', 'p', 'notices', '-'), ('placement_drives_pkey', 'p', 'placement_drives', '-'), ('placement_applications_pkey', 'p', 'placement_applications', '-'), ('placement_applications_drive_id_fkey', 'f', 'placement_applications', 'placement_drives'), ('portal_sessions_pkey', 'p', 'portal_sessions', '-'), ('pending_approvals_pkey', 'p', 'pending_approvals', '-'), ('events_pkey', 'p', 'events', '-'), ('settings_pkey', 'p', 'settings', '-'), ('book_requests_pkey', 'p', 'book_requests', '-'), ('book_requests_book_id_fkey', 'f', 'book_requests', 'books'), ('book_requests_blocking_loan_id_fkey', 'f', 'book_requests', 'library_loans'), ('library_notifications_pkey', 'p', 'library_notifications', '-'), ('student_performance_pkey', 'p', 'student_performance', '-'), ('student_semester_gpas_pkey', 'p', 'student_semester_gpas', '-'), ('student_subject_marks_pkey', 'p', 'student_subject_marks', '-'), ('internal_marks_pkey', 'p', 'internal_marks', '-')]
+2026-03-27 01:25:46,431 - INFO - FKs for test_child: []
+2026-03-27 01:25:46,432 - ERROR - TEST FAILED: FK in test_child does not reference test_parent.sl_no
+2026-03-27 01:26:04,809 - INFO - Setting up dummy tables...
+2026-03-27 01:26:05,247 - INFO - Setup complete.
+2026-03-27 01:26:05,247 - INFO - Running migration on test_parent...
+2026-03-27 01:26:05,247 - INFO - >>> Processing table: test_parent
+2026-03-27 01:26:05,407 - INFO - Backup created: test_parent_backup
+2026-03-27 01:26:05,571 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:26:05,623 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:26:05,728 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:26:05,780 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:26:05,999 - INFO - Successful migration for: test_parent
+2026-03-27 01:26:06,052 - INFO - Migration on test_parent complete.
+2026-03-27 01:26:06,208 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:26:06,261 - INFO - TEST CONSTRAINTS: [('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-')]
+2026-03-27 01:26:06,324 - INFO - FKs for test_child: []
+2026-03-27 01:26:06,324 - ERROR - TEST FAILED: FK in test_child does not reference test_parent.sl_no
+2026-03-27 01:26:46,526 - INFO - Setting up dummy tables...
+2026-03-27 01:26:46,987 - INFO - Setup complete.
+2026-03-27 01:26:46,987 - INFO - Running migration on test_parent...
+2026-03-27 01:26:46,987 - INFO - >>> Processing table: test_parent
+2026-03-27 01:26:47,139 - INFO - Backup created: test_parent_backup
+2026-03-27 01:26:47,295 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:26:47,344 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:26:47,443 - INFO - Dropped old PK constraint: test_parent_pkey
+2026-03-27 01:26:47,498 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:26:47,697 - INFO - Successful migration for: test_parent
+2026-03-27 01:26:47,752 - INFO - Migration on test_parent complete.
+2026-03-27 01:26:47,907 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:26:47,955 - INFO - TEST CONSTRAINTS: [('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-')]
+2026-03-27 01:26:48,010 - INFO - FKs for test_child: []
+2026-03-27 01:26:48,010 - ERROR - TEST FAILED: FK in test_child does not reference test_parent.sl_no
+2026-03-27 01:27:05,914 - INFO - Setting up dummy tables...
+2026-03-27 01:27:06,374 - INFO - Setup complete.
+2026-03-27 01:27:06,374 - INFO - Running migration on test_parent...
+2026-03-27 01:27:06,374 - INFO - >>> Processing table: test_parent
+2026-03-27 01:27:06,535 - INFO - Backup created: test_parent_backup
+2026-03-27 01:27:06,690 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:27:06,741 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:27:06,792 - INFO - Found 1 foreign keys to preserve for test_parent
+2026-03-27 01:27:06,891 - INFO - Dropped old PK constraint (CASCADE): test_parent_pkey
+2026-03-27 01:27:06,941 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:27:06,942 - INFO - Recreating FK test_fk_child_parent on test_child.parent_id to reference test_parent.sl_no
+2026-03-27 01:27:07,197 - INFO - Successful migration for: test_parent
+2026-03-27 01:27:07,247 - INFO - Migration on test_parent complete.
+2026-03-27 01:27:07,405 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:27:07,455 - INFO - TEST CONSTRAINTS: [('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-'), ('test_fk_child_parent', 'f', 'test_child', 'test_parent')]
+2026-03-27 01:27:07,517 - INFO - FKs for test_child: [('test_fk_child_parent', 'parent_id', 'test_parent', 'sl_no')]
+2026-03-27 01:27:07,665 - INFO - TEST PASSED: Migration logic is safe and correct.
+2026-03-27 01:27:25,234 - INFO - Setting up dummy tables...
+2026-03-27 01:27:25,721 - INFO - Setup complete.
+2026-03-27 01:27:25,721 - INFO - Running migration on test_parent...
+2026-03-27 01:27:25,721 - INFO - >>> Processing table: test_parent
+2026-03-27 01:27:25,877 - INFO - Backup created: test_parent_backup
+2026-03-27 01:27:26,047 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:27:26,102 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:27:26,153 - INFO - Found 1 foreign keys to preserve for test_parent
+2026-03-27 01:27:26,255 - INFO - Dropped old PK constraint (CASCADE): test_parent_pkey
+2026-03-27 01:27:26,307 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:27:26,307 - INFO - Recreating FK test_fk_child_parent on test_child.parent_id to reference test_parent.sl_no
+2026-03-27 01:27:26,562 - INFO - Successful migration for: test_parent
+2026-03-27 01:27:26,614 - INFO - Migration on test_parent complete.
+2026-03-27 01:27:26,811 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:27:26,863 - INFO - TEST CONSTRAINTS: [('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-'), ('test_fk_child_parent', 'f', 'test_child', 'test_parent')]
+2026-03-27 01:27:26,921 - INFO - FKs for test_child: [('test_fk_child_parent', 'parent_id', 'test_parent', 'sl_no')]
+2026-03-27 01:27:27,074 - INFO - TEST PASSED: Migration logic is safe and correct.
+2026-03-27 01:27:27,074 - INFO - Running rollback on test_parent...
+2026-03-27 01:27:27,074 - WARNING - !!! Rolling back table: test_parent
+2026-03-27 01:27:27,181 - ERROR - Critical error during rollback of test_parent: cannot drop constraint test_parent_pkey on table test_parent because other objects depend on it
+DETAIL:  constraint test_fk_child_parent on table test_child depends on index test_parent_pkey
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+2026-03-27 01:27:46,586 - INFO - Setting up dummy tables...
+2026-03-27 01:27:47,078 - INFO - Setup complete.
+2026-03-27 01:27:47,079 - INFO - Running migration on test_parent...
+2026-03-27 01:27:47,079 - INFO - >>> Processing table: test_parent
+2026-03-27 01:27:47,234 - INFO - Backup created: test_parent_backup
+2026-03-27 01:27:47,401 - INFO - Added column 'sl_no' (SERIAL) to test_parent
+2026-03-27 01:27:47,452 - INFO - Synchronized sl_no with id values in test_parent
+2026-03-27 01:27:47,503 - INFO - Found 1 foreign keys to preserve for test_parent
+2026-03-27 01:27:47,608 - INFO - Dropped old PK constraint (CASCADE): test_parent_pkey
+2026-03-27 01:27:47,661 - INFO - New Primary Key set on test_parent(sl_no)
+2026-03-27 01:27:47,661 - INFO - Recreating FK test_fk_child_parent on test_child.parent_id to reference test_parent.sl_no
+2026-03-27 01:27:47,917 - INFO - Successful migration for: test_parent
+2026-03-27 01:27:47,969 - INFO - Migration on test_parent complete.
+2026-03-27 01:27:48,128 - INFO - PK Query result: ('sl_no',)
+2026-03-27 01:27:48,180 - INFO - TEST CONSTRAINTS: [('test_child_pkey', 'p', 'test_child', '-'), ('test_parent_pkey', 'p', 'test_parent', '-'), ('test_fk_child_parent', 'f', 'test_child', 'test_parent')]
+2026-03-27 01:27:48,235 - INFO - FKs for test_child: [('test_fk_child_parent', 'parent_id', 'test_parent', 'sl_no')]
+2026-03-27 01:27:48,387 - INFO - TEST PASSED: Migration logic is safe and correct.
+2026-03-27 01:27:48,387 - INFO - Running rollback on test_parent...
+2026-03-27 01:27:48,388 - WARNING - !!! Rolling back table: test_parent
+2026-03-27 01:27:48,489 - INFO - Found 1 foreign keys to restore to 'id' for test_parent
+2026-03-27 01:27:48,590 - INFO - Dropped sl_no PK constraint: test_parent_pkey
+2026-03-27 01:27:48,643 - INFO - Restored Primary Key to test_parent(id)
+2026-03-27 01:27:48,643 - INFO - Restoring FK test_fk_child_parent on test_child.parent_id to reference test_parent.id
+2026-03-27 01:27:48,798 - INFO - Rollback complete for test_parent
+2026-03-27 01:27:48,850 - INFO - Rollback complete.
+2026-03-27 01:27:49,060 - INFO - ROLLBACK TEST PASSED.

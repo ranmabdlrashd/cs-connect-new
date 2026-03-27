@@ -78,13 +78,20 @@ async function sendChat() {
         const data = await response.json();
         hideTyping();
         
-        const replyText = data.response || "Sorry, I didn't get any response.";
-        conversationHistory.push({ role: 'assistant', content: replyText });
+        // Structured response handling
+        const reply = data.response;
+        if (!reply || typeof reply !== 'object') {
+            addMessageToDOM("Sorry, I didn't get a valid response from the server.", 'bot', true);
+            return;
+        }
+
+        // Push only the text message to history for context
+        conversationHistory.push({ role: 'assistant', content: reply.message });
         if(conversationHistory.length > 20) {
             conversationHistory.shift();
         }
         
-        addMessageToDOM(replyText, 'bot');
+        addMessageToDOM(reply, 'bot');
         
     } catch (error) {
         console.error("Chat Error:", error);
@@ -123,7 +130,7 @@ function sendChatbotQuick(text) {
 }
 
 // ── DOM Helpers ───────────────────────────────────────────────────────
-function addMessageToDOM(text, sender, isError=false) {
+function addMessageToDOM(data, sender, isError=false) {
     const container = document.getElementById("chatMessages");
     const typingIndicator = document.getElementById("chatTypingIndicator");
     
@@ -132,16 +139,28 @@ function addMessageToDOM(text, sender, isError=false) {
     
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
+    // Extract text from object if necessary
+    const text = (typeof data === 'string') ? data : (data.message || "");
+    
     // Premium Markdown Rendering
     let formattedText;
     if (sender === 'bot') {
         // AI responses use full Markdown rendering
-        // Ensure all links open in new tab
         const renderer = new marked.Renderer();
         renderer.link = ({ href, title, text }) => {
             return `<a href="${href}" title="${title || ''}" target="_blank" rel="noopener noreferrer">${text}</a>`;
         };
         formattedText = marked.parse(text, { renderer });
+
+        // If it's a notes button, append the styled link
+        if (typeof data === 'object' && data.type === 'notes_button' && data.file_url) {
+            formattedText += `
+                <a href="${data.file_url}" target="_blank" rel="noopener noreferrer" style="margin-top: 10px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    View / Download PDF
+                </a>
+            `;
+        }
     } else {
         // User messages are escaped for security and use basic break replacement
         formattedText = escapeHtml(text).replace(/\n/g, '<br>');

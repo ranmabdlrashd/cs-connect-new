@@ -1,7 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-from database import get_db_connection
+from database import db_connection
 import re
+import logging
+
+# Setup module-level logger
+logger = logging.getLogger(__name__)
 
 # List of URLs to scrape for the CS Connect chatbot's knowledge base
 URLS_TO_SCRAPE = [
@@ -66,8 +70,8 @@ def scrape_url(url):
         full_content = "\n\n".join(content_pieces)
         return title, full_content
 
-    except Exception as e:
-        print(f"Failed to scrape {url}: {e}")
+    except Exception:
+        logger.exception("Failed to scrape URL: %s", url)
         return None, None
 
 def save_to_database(url, title, content):
@@ -77,57 +81,49 @@ def save_to_database(url, title, content):
     if not content:
         return 0
         
-    conn = get_db_connection()
-    if conn is None:
-        print("Database connection failed. Cannot save data.")
-        return 0
-        
     try:
-        with conn.cursor() as cur:
-            upsert_query = """
-            INSERT INTO website_content (url, title, content)
-            VALUES (%s, %s, %s)
-            ON CONFLICT (url) DO UPDATE 
-            SET title = EXCLUDED.title,
-                content = EXCLUDED.content,
-                scraped_at = CURRENT_TIMESTAMP;
-            """
-            cur.execute(upsert_query, (url, title, content))
-            conn.commit()
-            return len(content)
-    except Exception as e:
-        print(f"Error saving data for {url} to database: {e}")
-        conn.rollback()
+        with db_connection() as conn:
+            with conn.cursor() as cur:
+                upsert_query = """
+                INSERT INTO website_content (url, title, content)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (url) DO UPDATE 
+                SET title = EXCLUDED.title,
+                    content = EXCLUDED.content,
+                    scraped_at = CURRENT_TIMESTAMP;
+                """
+                cur.execute(upsert_query, (url, title, content))
+                conn.commit()
+                return len(content)
+    except Exception:
+        logger.exception("Error saving data for %s to database", url)
         return 0
-    finally:
-        conn.close()
 
 def main():
-    print("Starting CS Connect Data Ingestion Phase 2...\n")
+    logger.info("Starting CS Connect Data Ingestion Phase 2...")
     
     total_saved = 0
     successful_urls = 0
     
     for url in URLS_TO_SCRAPE:
-        print(f"Scraping: {url}...")
+        logger.info("Scraping: %s...", url)
         title, content = scrape_url(url)
         
         if title and content:
             chars_saved = save_to_database(url, title, content)
             if chars_saved > 0:
-                print(f"  -> SUCCESS: Saved '{title}' ({chars_saved} characters).")
+                logger.info("  -> SUCCESS: Saved '%s' (%d characters).", title, chars_saved)
                 total_saved += chars_saved
                 successful_urls += 1
             else:
-                print(f"  -> FAILED: Could not save data to database.")
+                logger.error("  -> FAILED: Could not save data to database.")
         else:
-            print(f"  -> SKIPPED: No usable content extracted.")
+            logger.warning("  -> SKIPPED: No usable content extracted.")
             
-    print("\n" + "="*50)
-    print("INGESTION SUMMARY")
-    print(f"Total URLs successfully scraped: {successful_urls} / {len(URLS_TO_SCRAPE)}")
-    print(f"Total characters stored in database: {total_saved}")
-    print("="*50)
+    logger.info("INGESTION SUMMARY")
+    logger.info("Total URLs successfully scraped: %d / %d", successful_urls, len(URLS_TO_SCRAPE))
+    logger.info("Total characters stored in database: %d", total_saved)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     main()
